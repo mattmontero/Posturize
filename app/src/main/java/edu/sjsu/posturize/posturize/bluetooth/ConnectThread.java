@@ -26,4 +26,5 @@ public class ConnectThread extends Thread {
         }
         mmSocket = tmp;
     }
+
 }
