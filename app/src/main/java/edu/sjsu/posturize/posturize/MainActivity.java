@@ -1,5 +1,9 @@
 package edu.sjsu.posturize.posturize;
 
+import edu.sjsu.posturize.posturize.bluetooth.*;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,8 +23,14 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import java.util.Set;
+
+import static edu.sjsu.posturize.posturize.R.styleable.Toolbar;
+
 public class MainActivity extends AppCompatActivity {
 
+    private static BluetoothAdapter mBluetoothAdapter;
+    private static BluetoothConnection mBluetoothConnection;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -37,8 +48,52 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("onCreate", "Starting");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final String BLUETOOTH = "Bluetooth_Setup";
+        //1. Check if bluetooth is supported
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if(mBluetoothAdapter == null){
+            //Device does not support Bluetooth.
+            Log.d(BLUETOOTH, "Bluetooth is not supported");
+        } else {
+            Log.d(BLUETOOTH, "Bluetooth is supported");
+        }
+        //2. Check if bluetooth is enabled
+        if(!mBluetoothAdapter.isEnabled()){
+            Log.d(BLUETOOTH, "Bluetooth is not enabled");
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, 6969);
+        } else {
+            Log.d(BLUETOOTH, "Bluetooth is enabled");
+        }
+
+        //3. Get the Bluetooth module device
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        BluetoothDevice mDevice = null;
+        if(pairedDevices.size() > 0){
+            for(BluetoothDevice device : pairedDevices) {
+                if(device.getName().equals("HC-06")){
+                    //This is our bluetooth device.
+                    mDevice = device;
+                    Log.d(BLUETOOTH, device.getName());
+                    Log.d(BLUETOOTH, device.toString());
+                    break;
+                }
+            }
+        }
+        if(mDevice == null){
+            Log.d(BLUETOOTH, "No device found");
+        }
+        /*
+        //4. Create the connection thread
+        mBluetoothConnection.connectThread(mDevice);
+        Log.d("ConnectThread", "created");
+        mBluetoothConnection.startConnectThread();
+        Log.d("ConnectThread", "Running...");
+        */
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -59,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
+        Log.d("onCreate","Done");
     }
 
 
@@ -111,11 +166,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            Log.d("onCreateView", "Start");
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+
+            Log.d("onCreateView", "Done");
             return rootView;
         }
     }
