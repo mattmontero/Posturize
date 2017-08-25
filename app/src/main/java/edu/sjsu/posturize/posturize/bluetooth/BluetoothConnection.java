@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.icu.util.Output;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -130,5 +131,23 @@ public class BluetoothConnection {
             }
         }
     }
+
+    private Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            byte[] writeBuf = (byte[]) msg.obj;
+            int begin = (int) msg.arg1;
+            int end = (int) msg.arg2;
+            Log.d("Handler", "Message");
+            switch(msg.what){
+                case 1:
+                    String writeMessage = new String(writeBuf);
+                    writeMessage = writeMessage.substring(begin, end);
+                    Log.d("Receiving message", writeMessage.toString());
+                    break;
+            }
+
+        }
+    };
 
 }
