@@ -3,8 +3,12 @@
 #include "DW1000Ranging.h"
 #include "DW1000Device.h"
 
-#define BUZZER 8
-#define CALIBRATE 7
+#include <SoftwareSerial.h>
+
+#define RXPIN 0 //bluetooth pins
+#define RXPIN 1 //bluetooth pins
+#define BUZZER 8 // 
+#define CALIBRATE 7 //calibrationTrigger pin(hardware)
 #define POLLING_SIZE 10
 #define CALIBRATION_SIZE 25
 
@@ -70,6 +74,7 @@ void loop() {
       calibrationTriggerCounter++;
       if(calibrationTriggerCounter > 1500){
         isCalibrating = true;
+        calibratedValue = 0;
         //should we also send signal to phone to show its calibrating via hardware trigger?
       }
     }else if(bluetoothCalibration){//false will be changed to bluetooth signal for calibration
@@ -128,7 +133,7 @@ void newRange() {
     for(int outlierCounter = 0; outlierCounter < 3; outlierCounter++){
       int maxIndex = 0;
       int minIndex = 0;
-      double tempVal;
+      double tempVal = 0;
         for(int a = 0 + outlierCounter; a < CALIBRATION_SIZE - outlierCounter; a++){
           //iterate the non elimited readings to find new max and min
           if(calibrationAry[a] > calibrationAry[maxIndex]){
