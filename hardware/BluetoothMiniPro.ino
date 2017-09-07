@@ -3,6 +3,9 @@
 #define rxPin 0 //define rx data pin
 #define txPin 1 //define tx data pin
 
+//define button pin
+const short buttonPin = 12;
+
 //create instance of SoftwareSerial
 SoftwareSerial bluetooth(rxPin, txPin);
 
