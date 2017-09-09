@@ -14,6 +14,10 @@ public class PostureObject {
     private DailyPosture mDailyPosture;
     private MonthlyPosture mMonthlyPosture;
 
+    /**
+     * Writes a new value to daily object
+     * @param distance distance received from wearables
+     */
     public void writeDistance(float distance) {
         //if currentDate != mDailyPosture.getDate()){ //reset dailyPosture for new day
         //  mMonthlyPosture.add(mDailyPosture);
@@ -22,11 +26,20 @@ public class PostureObject {
         mDailyPosture.addMeasurement(distance);
     }
 
+    /**
+     * Get todays posture data
+     * @return ArrayList<PostureMeasurement> of measurements
+     */
     public ArrayList<PostureMeasurement> getTodaysPosture(){
         //return mDailyPosture.getMeasurements(); //return arraylist of postureMeasurements
         return null;
     }
 
+    /**
+     *
+     * @param date get specific date posture data
+     * @return DailyPosture
+     */
     public DailyPosture getDayPostureData(Date date){
         /*
          *  if date.month == mMonthlyPosture.month
@@ -34,6 +47,11 @@ public class PostureObject {
         return null;
     }
 
+    /**
+     * Grabs monthlyposture for given date
+     * @param date month date for
+     * @return MonthlyPosture
+     */
     public MonthlyPosture getMonthData(Date date){
         /*
          *  if date == this month && date != future month
