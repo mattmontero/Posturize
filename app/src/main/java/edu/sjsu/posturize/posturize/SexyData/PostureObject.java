@@ -4,6 +4,7 @@ package edu.sjsu.posturize.posturize.SexyData;
  * Created by Matthew on 8/28/2017.
  */
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -13,8 +14,17 @@ public class PostureObject {
     private DailyPosture mDailyPosture;
     private MonthlyPosture mMonthlyPosture;
 
-    public void writeDistance(float distance){
+    public void writeDistance(float distance) {
+        //if currentDate != mDailyPosture.getDate()){ //reset dailyPosture for new day
+        //  mMonthlyPosture.add(mDailyPosture);
+        //  mDailyPosture.clear()                     //Starts a fresh daily model
+        //}
         mDailyPosture.addMeasurement(distance);
+    }
+
+    public ArrayList<PostureMeasurement> getTodaysPosture(){
+        //return mDailyPosture.getMeasurements(); //return arraylist of postureMeasurements
+        return null;
     }
 
     public DailyPosture getDayPostureData(Date date){
