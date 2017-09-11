@@ -22,6 +22,24 @@ public class BluetoothConnection {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
 
+    private final String BLUETOOTH = "Connection Setup";
+
+    public BluetoothConnection(BluetoothAdapter btAdapter){
+        mBluetoothAdapter = btAdapter;
+    }
+
+    public void connectThread(BluetoothDevice device){
+        Log.d(BLUETOOTH, device.getName());
+        mConnectThread = new ConnectThread(device);
+    }
+
+    public void startConnectThread(){
+        if(mConnectThread != null){
+            Log.d(BLUETOOTH, "mConnectThread " + mConnectThread.toString());
+            mConnectThread.start();
+        }
+    }
+
     private class ConnectThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
