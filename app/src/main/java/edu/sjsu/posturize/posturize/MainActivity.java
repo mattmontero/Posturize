@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
         if(mBluetoothAdapter == null){
             //Device does not support Bluetooth.
             Log.d(BLUETOOTH, "Bluetooth is not supported");
@@ -87,13 +88,16 @@ public class MainActivity extends AppCompatActivity {
         if(mDevice == null){
             Log.d(BLUETOOTH, "No device found");
         }
-        /*
+
+        Log.d(BLUETOOTH, mDevice.getName());
+        Log.d(BLUETOOTH, mDevice.toString());
+
         //4. Create the connection thread
         mBluetoothConnection.connectThread(mDevice);
         Log.d("ConnectThread", "created");
         mBluetoothConnection.startConnectThread();
         Log.d("ConnectThread", "Running...");
-        */
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

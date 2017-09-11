@@ -22,13 +22,21 @@ public class BluetoothConnection {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
 
+    private final String BLUETOOTH = "Connection Setup";
+
+    public BluetoothConnection(BluetoothAdapter btAdapter){
+        mBluetoothAdapter = btAdapter;
+    }
+
     public void connectThread(BluetoothDevice device){
+        Log.d(BLUETOOTH, device.getName());
         mConnectThread = new ConnectThread(device);
     }
 
     public void startConnectThread(){
         if(mConnectThread != null){
-            mConnectedThread.start();
+            Log.d(BLUETOOTH, "mConnectThread " + mConnectThread.toString());
+            mConnectThread.start();
         }
     }
 
