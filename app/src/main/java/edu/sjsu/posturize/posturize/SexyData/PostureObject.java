@@ -2,17 +2,36 @@ package edu.sjsu.posturize.posturize.SexyData;
 
 /**
  * Created by Matthew on 8/28/2017.
+ *
+ *  TODO:
+ *  DONE - Create PostureObject to manage daily/monthly reports
+ *  Create write method to track measurements to daily object
+ *      ->Requires getDate from DailyPosture
+ *  Create getter for current days measurements
+ *      ->Requires getter for PostureMeasurements from DailyPosture
+ *  Create getter for specified days measurements
+ *      ->Requires getDate from DailyPosture
+ *  Create getter for specified month measurements
+ *
  */
+
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * PotureObject stores 1 month of data, after that, push to DB?
+ * PotureObject manages all activity coming in, and updates data visualizations.
  */
 public class PostureObject {
     private DailyPosture mDailyPosture;
     private MonthlyPosture mMonthlyPosture;
+    private TextView mTextView;
+
+    public PostureObject(){
+        mDailyPosture = new DailyPosture();
+        mMonthlyPosture = new MonthlyPosture();
+    }
 
     /**
      * Writes a new value to daily object
@@ -21,7 +40,7 @@ public class PostureObject {
     public void writeDistance(float distance) {
         //if currentDate != mDailyPosture.getDate()){ //reset dailyPosture for new day
         //  mMonthlyPosture.add(mDailyPosture);
-        //  mDailyPosture.clear()                     //Starts a fresh daily model
+        //  mDailyPosture = new DailyPosture();                     //Starts a fresh daily model
         //}
         mDailyPosture.addMeasurement(distance);
     }
@@ -54,7 +73,7 @@ public class PostureObject {
      */
     public MonthlyPosture getMonthData(Date date){
         /*
-         *  if date == this month && date != future month
+         *  if date == this month
          *      return mMonthlyPosture;
          *  else
          *      return new MonthlyPosture(Monthly data from DB);
