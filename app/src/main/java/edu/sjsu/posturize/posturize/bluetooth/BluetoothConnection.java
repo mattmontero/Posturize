@@ -7,6 +7,7 @@ import android.icu.util.Output;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,7 @@ public class BluetoothConnection {
     private BluetoothAdapter mBluetoothAdapter;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
+    private TextView mTextView;
 
     private final String BLUETOOTH = "Connection Setup";
 
@@ -31,6 +33,12 @@ public class BluetoothConnection {
     public void connectThread(BluetoothDevice device){
         Log.d(BLUETOOTH, device.getName());
         mConnectThread = new ConnectThread(device);
+    }
+
+    public void setTextView(TextView tv){
+        mTextView = tv;
+        Log.d("tv", tv.toString());
+        Log.d("Set TextView", mTextView.toString());
     }
 
     public void startConnectThread(){
@@ -117,8 +125,9 @@ public class BluetoothConnection {
                     bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
                     for(int i = begin; i < bytes; i++){
                         if(buffer[i] == "#".getBytes()[0]) {
-                            //Log.d("Found #", mHandler.toString());
-                            //mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+                            Log.d("Found #", mHandler.toString());
+                            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+                            Log.d("Message obtained", mHandler.toString());
                             begin++;
                             if(i == bytes - 1){
                                 bytes = 0;
@@ -147,11 +156,15 @@ public class BluetoothConnection {
             int begin = (int) msg.arg1;
             int end = (int) msg.arg2;
             Log.d("Handler", "Message");
+            Log.d("BING handler", msg.toString());
             switch(msg.what){
                 case 1:
+
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
-                    Log.d("Receiving message", writeMessage.toString());
+                    mTextView.setText(writeMessage);
+                    Log.d("receiving", writeMessage);
+
                     break;
             }
 
