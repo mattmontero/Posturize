@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private TextView mTextView;
     private Button refreshDatShit;
     private Button calibrateDatShit;
+    private Button connectBLEButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +59,33 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         setViewShit();
 
+        connectBLE();
 
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        mTextView = (TextView) findViewById(R.id.numberViewer);
+
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });*/
+        Log.d("onCreate","Done");
+    }
+
+    private boolean connectBLE(){
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -96,6 +123,8 @@ public class MainActivity extends AppCompatActivity
         }
         if(mDevice == null){
             Log.d(BLUETOOTH, "No device found");
+            connectBLEButton.setText("Connect");
+            return false;
         }
 
         Log.d(BLUETOOTH, mDevice.getName());
@@ -106,37 +135,20 @@ public class MainActivity extends AppCompatActivity
         Log.d("ConnectThread", "created");
         mBluetoothConnection.startConnectThread();
         Log.d("ConnectThread", "Running...");
+        mBluetoothConnection.isConnected();
+        connectBLEButton.setText("Disconnect");
+        return true;
 
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        mTextView = (TextView) findViewById(R.id.numberViewer);
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-        Log.d("onCreate","Done");
     }
 
     private void setViewShit(){
         mTextView = (TextView)findViewById(R.id.numberViewer);
         refreshDatShit = (Button) findViewById(R.id.refreshButton);
         calibrateDatShit = (Button) findViewById(R.id.calibrateButton);
+        connectBLEButton = (Button) findViewById(R.id.connectButton);
         refreshDatShit.setOnClickListener(this);
         calibrateDatShit.setOnClickListener(this);
+        connectBLEButton.setOnClickListener(this);
     }
 
 
@@ -166,6 +178,21 @@ public class MainActivity extends AppCompatActivity
         mTextView.setText("Calibrating...");
     }
 
+    private void connectButtonPressed() {
+        if(mBluetoothConnection.isConnected()){
+            mBluetoothConnection.cancelConnectThread();
+            mTextView.setText("Disconnected");
+            ((Button)findViewById(R.id.connectButton)).setText("Connect");
+        } else {
+            mTextView.setText("Connecting...");
+            if(connectBLE()){
+                mTextView.setText("Connected!");
+                ((Button)findViewById(R.id.connectButton)).setText("Disconnect");
+            }
+            mTextView.setText("Poop");
+        }
+    }
+
     private void refresh(){
         mTextView.setText("Super Fresh");
     }
@@ -179,6 +206,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.refreshButton:
                 refresh();
+                break;
+            case R.id.connectButton:
+                connectButtonPressed();
                 break;
             default:
                 break;
