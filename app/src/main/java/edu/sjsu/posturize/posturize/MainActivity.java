@@ -21,13 +21,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Set;
 
 import static edu.sjsu.posturize.posturize.R.styleable.Toolbar;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements View.OnClickListener{
 
     private static BluetoothAdapter mBluetoothAdapter;
     private static BluetoothConnection mBluetoothConnection;
@@ -45,17 +47,24 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private TextView mTextView;
+    private Button refreshDatShit;
+    private Button calibrateDatShit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("onCreate", "Starting");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setViewShit();
+
 
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
+        mBluetoothConnection.setTextView(mTextView);
+        Log.d("Text View Setup", "mTextView");
         if(mBluetoothAdapter == null){
             //Device does not support Bluetooth.
             Log.d(BLUETOOTH, "Bluetooth is not supported");
@@ -109,16 +118,25 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        mTextView = (TextView) findViewById(R.id.numberViewer);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
         Log.d("onCreate","Done");
+    }
+
+    private void setViewShit(){
+        mTextView = (TextView)findViewById(R.id.numberViewer);
+        refreshDatShit = (Button) findViewById(R.id.refreshButton);
+        calibrateDatShit = (Button) findViewById(R.id.calibrateButton);
+        refreshDatShit.setOnClickListener(this);
+        calibrateDatShit.setOnClickListener(this);
     }
 
 
@@ -142,6 +160,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void calibrate(){
+        mTextView.setText("Calibrating...");
+    }
+
+    private void refresh(){
+        mTextView.setText("Super Fresh");
+    }
+
+    @Override
+    public void onClick(View view) {
+        Log.d("onClick", view.toString());
+        switch (view.getId()){
+            case R.id.calibrateButton:
+                calibrate();
+                break;
+            case R.id.refreshButton:
+                refresh();
+                break;
+            default:
+                break;
+        }
     }
 
     /**
