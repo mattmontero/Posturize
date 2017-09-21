@@ -41,6 +41,20 @@ public class BluetoothConnection {
         Log.d("Set TextView", mTextView.toString());
     }
 
+    public boolean isConnected(){
+        if(mConnectThread.isAlive()) {
+            Log.d("isConnected", "Connected");
+        } else {
+            Log.d("isConnected", "Not Connnected");
+        }
+
+        return mConnectThread.isAlive();
+    }
+
+    public void cancelConnectThread(){
+        mConnectThread.cancel();
+    }
+
     public void startConnectThread(){
         if(mConnectThread != null){
             Log.d(BLUETOOTH, "mConnectThread " + mConnectThread.toString());
