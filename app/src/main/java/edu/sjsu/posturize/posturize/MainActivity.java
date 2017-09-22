@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         Log.d("onCreate", "Starting");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setViews();
+        setViewsAndListeners();
 
         connectBLE();
 
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity
         mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
         mBluetoothConnection.setTextView(mTextView);
         Log.d("Text View Setup", "mTextView");
+        //1. Check if device has bluetooth.
         if(mBluetoothAdapter == null){
             //Device does not support Bluetooth.
             Log.d(BLUETOOTH, "Bluetooth is not supported");
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity
 
         //3. Get the Bluetooth module device
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        //mDevice should end up being HC-06
         BluetoothDevice mDevice = null;
         if(pairedDevices.size() > 0){
             for(BluetoothDevice device : pairedDevices) {
@@ -137,7 +139,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void setViews(){
+    private void setViewsAndListeners(){
         mTextView = (TextView)findViewById(R.id.numberViewer);
         mRefreshButton = (Button) findViewById(R.id.refreshButton);
         mCalibrateButton = (Button) findViewById(R.id.calibrateButton);
