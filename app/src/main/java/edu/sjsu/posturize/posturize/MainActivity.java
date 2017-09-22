@@ -4,8 +4,6 @@ import edu.sjsu.posturize.posturize.bluetooth.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -25,8 +23,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.Set;
-
-import static edu.sjsu.posturize.posturize.R.styleable.Toolbar;
 
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener{
@@ -48,16 +44,16 @@ public class MainActivity extends AppCompatActivity
      */
     private ViewPager mViewPager;
     private TextView mTextView;
-    private Button refreshDatShit;
-    private Button calibrateDatShit;
-    private Button connectBLEButton;
+    private Button mRefreshButton;
+    private Button mCalibrateButton;
+    private Button mConnectButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("onCreate", "Starting");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setViewShit();
+        setViews();
 
         connectBLE();
 
@@ -123,7 +119,7 @@ public class MainActivity extends AppCompatActivity
         }
         if(mDevice == null){
             Log.d(BLUETOOTH, "No device found");
-            connectBLEButton.setText("Connect");
+            mConnectButton.setText("Connect");
             return false;
         }
 
@@ -136,19 +132,19 @@ public class MainActivity extends AppCompatActivity
         mBluetoothConnection.startConnectThread();
         Log.d("ConnectThread", "Running...");
         mBluetoothConnection.isConnected();
-        connectBLEButton.setText("Disconnect");
+        mConnectButton.setText("Disconnect");
         return true;
 
     }
 
-    private void setViewShit(){
+    private void setViews(){
         mTextView = (TextView)findViewById(R.id.numberViewer);
-        refreshDatShit = (Button) findViewById(R.id.refreshButton);
-        calibrateDatShit = (Button) findViewById(R.id.calibrateButton);
-        connectBLEButton = (Button) findViewById(R.id.connectButton);
-        refreshDatShit.setOnClickListener(this);
-        calibrateDatShit.setOnClickListener(this);
-        connectBLEButton.setOnClickListener(this);
+        mRefreshButton = (Button) findViewById(R.id.refreshButton);
+        mCalibrateButton = (Button) findViewById(R.id.calibrateButton);
+        mConnectButton = (Button) findViewById(R.id.connectButton);
+        mRefreshButton.setOnClickListener(this);
+        mCalibrateButton.setOnClickListener(this);
+        mConnectButton.setOnClickListener(this);
     }
 
 
@@ -189,7 +185,7 @@ public class MainActivity extends AppCompatActivity
                 mTextView.setText("Connected!");
                 ((Button)findViewById(R.id.connectButton)).setText("Disconnect");
             }
-            mTextView.setText("Poop");
+            mTextView.setText("Something bad happened.");
         }
     }
 
