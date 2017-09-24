@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity
         mRefreshButton = (Button) findViewById(R.id.refreshButton);
         mCalibrateButton = (Button) findViewById(R.id.calibrateButton);
         mConnectButton = (Button) findViewById(R.id.connectButton);
+        ((Button) findViewById(R.id.frontporch_signInButton)).setOnClickListener(this);
         mRefreshButton.setOnClickListener(this);
         mCalibrateButton.setOnClickListener(this);
         mConnectButton.setOnClickListener(this);
@@ -176,6 +177,10 @@ public class MainActivity extends AppCompatActivity
         mTextView.setText("Calibrating...");
     }
 
+    private void fpSignIn(Intent intent){
+        startActivity(intent);
+    };
+
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
             mBluetoothConnection.cancelConnectThread();
@@ -207,6 +212,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.connectButton:
                 connectButtonPressed();
+                break;
+            case R.id.frontporch_signInButton:
+                fpSignIn(new Intent(this, SignInActivity.class));
                 break;
             default:
                 break;
