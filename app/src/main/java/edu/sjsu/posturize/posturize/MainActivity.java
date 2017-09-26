@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity
 
     private void calibrate(){
         mTextView.setText("Calibrating...");
+        mBluetoothConnection.write("*");
     }
 
     private void fpSignIn(Intent intent){
