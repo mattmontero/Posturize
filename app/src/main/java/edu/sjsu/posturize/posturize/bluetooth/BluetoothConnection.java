@@ -35,6 +35,22 @@ public class BluetoothConnection {
         mConnectThread = new ConnectThread(device);
     }
 
+    public void write(String valueToWrite){
+        //Send * to arduino
+        Log.d("sending message", valueToWrite);
+
+        //Log.d("byte[]", msg.getBytes().toString());
+        try {
+            for(int i = 0; i < valueToWrite.length(); i++){
+                Log.d("Sending", valueToWrite.substring(i,i+1));
+                mConnectedThread.write(valueToWrite.substring(i,i+1).getBytes());
+            }
+            Log.d("ConnectedThread.Write", valueToWrite.getBytes().toString());
+        } catch (NullPointerException e) {
+            Log.d("Null ConnectedThread", e.toString());
+        }
+    }
+
     public void setTextView(TextView tv){
         mTextView = tv;
         Log.d("tv", tv.toString());
