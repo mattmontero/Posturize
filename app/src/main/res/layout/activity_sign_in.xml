@@ -10,6 +10,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="edu.sjsu.posturize.posturize.SignInActivity">
 
+    <TextView
+        android:id="@+id/account_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/signed_out"/>
     <!-- Login progress -->
     <ProgressBar
         android:id="@+id/login_progress"
@@ -68,7 +73,7 @@
                 android:weightSum="2">
 
                 <Button
-                    android:id="@+id/email_sign_in_button"
+                    android:id="@+id/generic_sign_in_button"
                     style="?android:textAppearanceSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -89,10 +94,24 @@
 
             </LinearLayout>
 
-            <Button
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/action_google_sign_in"/>
+                android:orientation="vertical"
+                android:id="@+id/apiSignIn">
+
+                <com.google.android.gms.common.SignInButton
+                    android:id="@+id/google_sign_in_button"
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"/>
+
+                <Button
+                    android:id="@+id/google_sign_out_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

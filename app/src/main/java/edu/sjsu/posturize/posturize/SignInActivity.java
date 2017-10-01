@@ -3,6 +3,7 @@ package edu.sjsu.posturize.posturize;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -19,15 +20,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.SignInButton;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,12 +46,17 @@ import static android.Manifest.permission.READ_CONTACTS;
 /**
  * A login screen that offers login via email/password.
  */
-public class SignInActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+public class SignInActivity extends AppCompatActivity implements
+        LoaderCallbacks<Cursor>,
+        GoogleApiClient.OnConnectionFailedListener,
+        View.OnClickListener {
 
     /**
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+    private static final int RC_SIGN_IN = 9001;
+    private static final String TAG = "SignInActivity";
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -61,6 +75,8 @@ public class SignInActivity extends AppCompatActivity implements LoaderCallbacks
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,16 +98,36 @@ public class SignInActivity extends AppCompatActivity implements LoaderCallbacks
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+        Button mGenericSignInButton = (Button) findViewById(R.id.generic_sign_in_button);
+        mGenericSignInButton.setOnClickListener(this);
+        ((SignInButton) findViewById(R.id.google_sign_in_button)).setOnClickListener(this);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        /*
+         * Configure Google Sign-In and the GoogleApiClient Object
+         * 1. create GoogleSignInOptions object
+         * Configure sign-in to request the user's ID, email address, and basic
+         * profile. ID and basic profile are included in DEFAULT_SIGN_IN.
+         */
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                //.requestIdToken("749349461099-5cpqn73ikggepcckpglu6osdsrp5cnpr.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+        Log.d(TAG, "googleSignInOptions:" + gso.toString());
+        //If we need to request additional scopes to access Google APIs, specify them with requestScopes.
+        /*
+         * 2. Create a GoogleApiClient object with access to the Google Sign-In API
+         * and the options we specified.
+         * Build a GoogleApiClient with access to the Google Sign-In API and the
+         * options specified by gso
+         */
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        Log.d(TAG, "GoogleApiClient:" + mGoogleApiClient.toString());
     }
 
     private void populateAutoComplete() {
@@ -190,6 +226,12 @@ public class SignInActivity extends AppCompatActivity implements LoaderCallbacks
         }
     }
 
+    private void googleSignIn(){
+        Intent googleSignInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        Log.d(TAG, "googleSignInIntent" + googleSignInIntent.toString());
+        startActivityForResult(googleSignInIntent, RC_SIGN_IN);
+    }
+
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.contains("@");
@@ -279,6 +321,60 @@ public class SignInActivity extends AppCompatActivity implements LoaderCallbacks
         mEmailView.setAdapter(adapter);
     }
 
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        //An unresolvable error has occured and Google APIs (including Sign-in) will not be available.
+        Log.d(TAG, "OnConnectionFailed:" + connectionResult.toString());
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.generic_sign_in_button:
+                attemptLogin();
+                break;
+            case R.id.google_sign_in_button:
+                googleSignIn();
+                break;
+
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult:requestCode->" + requestCode + " resultCode->" + resultCode);
+        //Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if(requestCode == RC_SIGN_IN){
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+    }
+
+    private void handleSignInResult(GoogleSignInResult result){
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        if(result.isSuccess()) {
+            //Sign in successfully, show authenticated UI.
+            GoogleSignInAccount account = result.getSignInAccount();
+            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()));
+            updateUI(true);
+        } else {
+            //Signed out, show authenticated UI.
+            updateUI(false);
+        }
+    }
+
+    private void updateUI(boolean signedIn){
+        if(signedIn) {
+            findViewById(R.id.google_sign_in_button).setVisibility(View.GONE);
+            findViewById(R.id.google_sign_out_button).setVisibility(View.VISIBLE);
+        } else {
+            ((TextView) findViewById(R.id.account_status)).setText(R.string.signed_out);
+
+            findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.google_sign_out_button).setVisibility(View.GONE);
+        }
+    }
 
     private interface ProfileQuery {
         String[] PROJECTION = {

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "749349461099",
+    "firebase_url": "https://posturize-b21d3.firebaseio.com",
+    "project_id": "posturize-b21d3",
+    "storage_bucket": "posturize-b21d3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:749349461099:android:550aad35eb6e4283",
+        "android_client_info": {
+          "package_name": "edu.sjsu.posturize.posturize"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "749349461099-kkc263i3amk8v6m8hj1115ii5j4pnagd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.sjsu.posturize.posturize",
+            "certificate_hash": "e150c3404da449534e2b3f7bb209c473c2da1afe"
+          }
+        },
+        {
+          "client_id": "749349461099-5cpqn73ikggepcckpglu6osdsrp5cnpr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9VOBkDXDzn3i0y8ZMbpYiYN-tTuWo96M"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "749349461099-5cpqn73ikggepcckpglu6osdsrp5cnpr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
