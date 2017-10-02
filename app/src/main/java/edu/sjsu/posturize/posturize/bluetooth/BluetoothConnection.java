@@ -189,7 +189,6 @@ public class BluetoothConnection {
             Log.d("BING handler", msg.toString());
             switch(msg.what){
                 case 1:
-
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
                     mTextView.setText(writeMessage);
