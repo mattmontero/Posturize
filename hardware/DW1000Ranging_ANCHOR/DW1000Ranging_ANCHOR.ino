@@ -6,11 +6,22 @@
 #include <SoftwareSerial.h>
 
 #define RXPIN 0 //bluetooth pins
-#define RXPIN 1 //bluetooth pins
-#define BUZZER 8 // 
+#define TXPIN 1 //bluetooth pins
+#define RELAY_PIN 6 //relay signal pin; high = buzz 
 #define CALIBRATE 7 //calibrationTrigger pin(hardware)
-#define POLLING_SIZE 10
+#define POLLING_SIZE 25
 #define CALIBRATION_SIZE 25
+
+#define BLUETOOTH_CALIBRATION 'C'
+#define BLUETOOTH_IDLE 'I'
+
+//create instance of SoftwareSerial
+SoftwareSerial bluetooth(RXPIN, TXPIN);
+
+
+//define button pin
+const short buttonPin = 12;
+
 
 void showDeviceInfo() {
   // DEBUG chip info and registers pretty printed
@@ -25,14 +36,38 @@ void showDeviceInfo() {
   Serial.print("Device mode: "); Serial.println(msg);
 }
 
+  static boolean isCalibrated = false;
+  static int calibrationTriggerCounter = 0;
+  static int isCalibrating = false;
+  static float threshold = 0.05;
+  static float calibratedValue = 0;
+  static float calibrationAry[25];
+  static int calibrationCounter = 0;
+  static int bluetoothCalibration = false;
+  static double currentSum = 0;
+  static int pollCounter = 0;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   delay(1000);
   //init the configuration
 
-  pinMode(BUZZER, OUTPUT);
+  pinMode(RELAY_PIN, OUTPUT);
+  digitalWrite(RELAY_PIN, HIGH);
   pinMode(CALIBRATE, INPUT);  
+
+  
+  // Define pin #12 as input and activate the internal pull-up resistor
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(8, OUTPUT);
+  digitalWrite(8, HIGH);
+  
+  pinMode(RXPIN, INPUT);
+  pinMode(TXPIN, OUTPUT);
+
+  //Setupt Bluetooth serial connection to android
+  bluetooth.begin(9600); //Start software Serial
+  
 
   DW1000Ranging.initCommunication(9, 10); //Reset and CS pin
   showDeviceInfo();
@@ -44,25 +79,15 @@ void setup() {
   DW1000Ranging.startAsAnchor("03:00:5B:D5:A9:9A:E2:9C", DW1000.MODE_LONGDATA_RANGE_ACCURACY);
 }
 
-static boolean isCalibrated = false;
-static int calibrationTriggerCounter = 0;
-static int isCalibrating = false;
-static float threshold = 0.05;
-static float calibratedValue = 0;
-static float calibrationAry[25];
-static int calibrationCounter = 0;
-static int bluetoothCalibration = false;
-
-void checkForBTData(){
+void checkForBTData(char inData){
   Serial.println("...checking for BT com channel for data....");
-  //checks the bt serial com channel for data....
-  //switch(incData){
-  //case btCalibration:
-      //bluetoothCalibration = true;
-  //case anotherCase: 
-      //doSomething else
-  //default:
-      //doNothing
+  switch(inData){
+  case '*':
+    bluetoothCalibration = true;
+    break;
+  default:
+    break;
+  }
 }
 
 void loop() {
@@ -78,6 +103,11 @@ void loop() {
         //should we also send signal to phone to show its calibrating via hardware trigger?
       }
     }else if(bluetoothCalibration){//false will be changed to bluetooth signal for calibration
+      //sending signal to phone
+      if(bluetooth.available()){
+        Serial.print("*");
+        Serial.print("#");
+      }
       isCalibrating = true;
       calibratedValue = 0;
     }
@@ -85,12 +115,15 @@ void loop() {
     calibrationTriggerCounter = 0;
   }
 
-  //checkForBTData();
+  if(bluetooth.available()> 0){
+    checkForBTData(bluetooth.read());
+  }
+  
+  char* temp = (char*) malloc(sizeof(char) * 3000);
+
+  Serial.print(temp);
+  
 }
-
-
-static double currentSum = 0;
-static int pollCounter = 0;
 
 void newRange() {
 //  Serial.print("from: "); Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
@@ -120,8 +153,9 @@ void newRange() {
 //    Serial.println(calibratedValue, 4);
 //    //DO STATS TO GET THRESHOLD AND CRALIBRATED VALUE
 //    //each index contains 
+  
   if(isCalibrating && calibrationCounter%25 != 24 && calibrationCounter < 250){
-    Serial.print(DW1000Ranging.getDistantDevice()->getRange(), 4);Serial.print(" counter is @ "); Serial.println(calibrationCounter);
+    if(calibrationCounter == 0) {Serial.print("#");Serial.println("CALIBRATION STARTED.......");Serial.println(calibratedValue);}
     calibrationAry[calibrationCounter%25] = DW1000Ranging.getDistantDevice()->getRange();
     calibrationCounter++;
   }else if(isCalibrating && (calibrationCounter%25==24 || calibrationCounter >= 250)){
@@ -148,12 +182,8 @@ void newRange() {
             currentSum += calibrationAry[a];
           }
         }
-         
-          Serial.println(currentSum);
           currentSum -= calibrationAry[maxIndex];
-          Serial.println(currentSum);
           currentSum -= calibrationAry[minIndex];
-          Serial.println("CURRENT SUM IN LOOP...");Serial.println(currentSum);
 
         //swapping the max and min to the edge of array so it wont be used next iteration.
         tempVal = calibrationAry[maxIndex];
@@ -164,11 +194,6 @@ void newRange() {
         calibrationAry[minIndex] = calibrationAry[0 + outlierCounter];
         calibrationAry[0 + outlierCounter] = tempVal;
     }
-
-
-        for(int a = 0; a < 25; a++){
-          Serial.println(calibrationAry[a]); 
-        }
     
     currentSum /= 19;
     calibratedValue += currentSum;
@@ -177,8 +202,9 @@ void newRange() {
       isCalibrated = true;
       isCalibrating = false;
       calibrationCounter = 0;
-    }    
-    Serial.print("THE Calibration AVERAGE IS...");Serial.println(calibratedValue);
+      bluetoothCalibration = false;
+      Serial.print("#");Serial.println("CALIBRATION COMPLETED.......");Serial.println(calibratedValue);Serial.println("C");Serial.print("#");
+    }
     
   }else if(isCalibrated){//not calibrating....means need to check reading...
     
@@ -186,9 +212,9 @@ void newRange() {
         calibrationAry[pollCounter] = DW1000Ranging.getDistantDevice()->getRange();
         pollCounter++;
     }else{
-        
+        currentSum = 0;
         //iterate the array to find total, and find current iteration outlier
-        for(int outlierCounter = 0; outlierCounter < 2; outlierCounter++){
+        for(int outlierCounter = 0; outlierCounter < 3; outlierCounter++){
           int maxIndex = 0;
           int minIndex = 0;
           
@@ -205,15 +231,9 @@ void newRange() {
               currentSum += calibrationAry[a];
             }
           }
-
-          Serial.println(currentSum);
-          
           currentSum -= calibrationAry[maxIndex];
-          
-          Serial.println(currentSum);
           currentSum -= calibrationAry[minIndex];
-          Serial.println("CURRENT SUM IN LOOP...");Serial.println(currentSum);
-
+          
           //swapping the max and min to the edge of array so it wont be used next iteration.
           double tempVal = calibrationAry[maxIndex];
           calibrationAry[maxIndex] = calibrationAry[POLLING_SIZE - outlierCounter - 1];
@@ -223,35 +243,17 @@ void newRange() {
           calibrationAry[minIndex] = calibrationAry[0 + outlierCounter];
           calibrationAry[0 + outlierCounter] = tempVal;
         }
-
-        for(int a = 0; a < 10; a++){
-          Serial.println(calibrationAry[a]); 
-        }
-    
-        currentSum /= 6;
-        
-        Serial.print("...CURRENT SUM....");
-        Serial.println(currentSum);
-
-
+        currentSum /= 19;
         if(calibratedValue + threshold < currentSum ||
             calibratedValue - threshold > currentSum ){
-              Serial.print("upper bound limit");
-              Serial.print(calibratedValue + threshold);
-              Serial.print("   distance from dwm:");
-              Serial.println(currentSum);
-              
-              Serial.print("lower bound limit");
-              Serial.print(calibratedValue - threshold);
-              Serial.print("   distance from dwm:");
-              Serial.println(currentSum);
-              
-              Serial.println("...SLOUCH DETECTED.... ");
-  
-              //NEED TO SEND DATA TO PHONE
-              
+            digitalWrite(RELAY_PIN, HIGH);
+            delay(700);
+            digitalWrite(RELAY_PIN, LOW);
+            
+            Serial.print("...SLOUCH DETECTED.... ");Serial.print(currentSum);Serial.println("#");
         }else{
-            Serial.println("...WITH IN RANGE...NOTHING TO WORRY...");
+            Serial.print("...WITH IN RANGE...NOTHING TO WORRY... ");Serial.print(currentSum);Serial.println("#");
+            digitalWrite(RELAY_PIN, LOW);
         }
         
         pollCounter = 0;
