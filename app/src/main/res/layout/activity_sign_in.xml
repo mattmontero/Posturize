@@ -11,9 +11,15 @@
               android:paddingTop="@dimen/activity_vertical_margin"
               android:weightSum="1"
               tools:context="edu.sjsu.posturize.posturize.SignInActivity">
+    <TextView
+        android:id="@+id/account_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/signed_out"/>
+
 
     <ImageView
-        android:id="@+id/account_status"
+        android:id="@+id/posturize_picture"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.94"
