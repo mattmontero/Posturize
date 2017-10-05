@@ -112,8 +112,8 @@ public class SignInActivity extends AppCompatActivity implements
          * profile. ID and basic profile are included in DEFAULT_SIGN_IN.
          */
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                //.requestIdToken("749349461099-5cpqn73ikggepcckpglu6osdsrp5cnpr.apps.googleusercontent.com")
                 .requestEmail()
+                .requestIdToken(getString(R.string.server_client_id))
                 .build();
         Log.d(TAG, "googleSignInOptions:" + gso.toString());
         //If we need to request additional scopes to access Google APIs, specify them with requestScopes.
@@ -124,7 +124,7 @@ public class SignInActivity extends AppCompatActivity implements
          * options specified by gso
          */
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         Log.d(TAG, "GoogleApiClient:" + mGoogleApiClient.toString());
@@ -344,9 +344,11 @@ public class SignInActivity extends AppCompatActivity implements
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult:requestCode->" + requestCode + " resultCode->" + resultCode);
-        //Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if(requestCode == RC_SIGN_IN){
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            Log.d(TAG, "GoogleSignInResult:" + result.getSignInAccount());
             handleSignInResult(result);
         }
     }
