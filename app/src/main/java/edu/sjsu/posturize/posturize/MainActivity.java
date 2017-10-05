@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity
         if(mBluetoothAdapter == null){
             //Device does not support Bluetooth.
             Log.d(BLUETOOTH, "Bluetooth is not supported");
+            return false;
         } else {
             Log.d(BLUETOOTH, "Bluetooth is supported");
         }
