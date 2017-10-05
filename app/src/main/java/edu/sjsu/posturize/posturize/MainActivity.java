@@ -55,6 +55,10 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         setViewsAndListeners();
 
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
+        mBluetoothConnection.setTextView(mTextView);
+
         /*
         if(userSettings.autoSync){
             connectBLE();
@@ -87,9 +91,6 @@ public class MainActivity extends AppCompatActivity
     private boolean connectBLE(){
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
-        mBluetoothConnection.setTextView(mTextView);
         Log.d("Text View Setup", "mTextView");
         //1. Check if device has bluetooth.
         if(mBluetoothAdapter == null){
@@ -139,7 +140,6 @@ public class MainActivity extends AppCompatActivity
         //What happens if connectThread does not start?
         mBluetoothConnection.startConnectThread();
         Log.d("ConnectThread", "Running...");
-        mBluetoothConnection.isConnected();
         mConnectButton.setText("Disconnect");
         return true;
 

@@ -58,16 +58,23 @@ public class BluetoothConnection {
     }
 
     public boolean isConnected(){
-        if(mConnectThread.isAlive()) {
+        if(mConnectThread != null) {
             Log.d("isConnected", "Connected");
+            Log.d("isConnected", "Thread State: " + mConnectThread.getState().toString());
         } else {
             Log.d("isConnected", "Not Connnected");
         }
 
-        return mConnectThread.isAlive();
+        return mConnectThread != null;
     }
 
-    public void kill(){
+    public void kill() {
+        Log.d(BLUETOOTH, "Thread State: " + mConnectThread.getState().toString());
+        try {
+            mConnectThread.cancel();
+        } catch (Exception e){
+            Log.d(BLUETOOTH, e.toString());
+        }
         mConnectThread.cancel();
         mConnectThread = new ConnectThread(null);
     }
@@ -76,6 +83,7 @@ public class BluetoothConnection {
         if(mConnectThread != null){
             Log.d(BLUETOOTH, "mConnectThread " + mConnectThread.toString());
             mConnectThread.start();
+            Log.d(BLUETOOTH, "Thread Status: " + mConnectThread.getState().toString());
         }
     }
 
@@ -117,6 +125,7 @@ public class BluetoothConnection {
 
         public void cancel() {
             try{
+                mConnectedThread.cancel();
                 mmSocket.close();
             } catch(IOException closeException){
                 //
@@ -176,6 +185,15 @@ public class BluetoothConnection {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 //
+            }
+        }
+
+        /* Call this from the main Activity to shutdown the connection */
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
