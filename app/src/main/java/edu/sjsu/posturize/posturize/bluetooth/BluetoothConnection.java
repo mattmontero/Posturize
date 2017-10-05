@@ -67,8 +67,9 @@ public class BluetoothConnection {
         return mConnectThread.isAlive();
     }
 
-    public void cancelConnectThread(){
+    public void kill(){
         mConnectThread.cancel();
+        mConnectThread = new ConnectThread(null);
     }
 
     public void startConnectThread(){

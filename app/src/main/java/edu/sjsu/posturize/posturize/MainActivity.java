@@ -55,8 +55,11 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         setViewsAndListeners();
 
-        connectBLE();
-
+        /*
+        if(userSettings.autoSync){
+            connectBLE();
+        }
+        */
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -129,8 +132,11 @@ public class MainActivity extends AppCompatActivity
         Log.d(BLUETOOTH, mDevice.toString());
 
         //4. Create the connection thread
+
+        //What happens if connectThread fails?
         mBluetoothConnection.connectThread(mDevice);
         Log.d("ConnectThread", "created");
+        //What happens if connectThread does not start?
         mBluetoothConnection.startConnectThread();
         Log.d("ConnectThread", "Running...");
         mBluetoothConnection.isConnected();
@@ -179,7 +185,7 @@ public class MainActivity extends AppCompatActivity
 
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
-            mBluetoothConnection.cancelConnectThread();
+            mBluetoothConnection.kill();
             mTextView.setText("Disconnected");
             ((Button)findViewById(R.id.connectButton)).setText("Connect");
         } else {
@@ -187,8 +193,9 @@ public class MainActivity extends AppCompatActivity
             if(connectBLE()){
                 mTextView.setText("Connected!");
                 ((Button)findViewById(R.id.connectButton)).setText("Disconnect");
+            } else {
+                mTextView.setText("Something bad happened.");
             }
-            mTextView.setText("Something bad happened.");
         }
     }
 
