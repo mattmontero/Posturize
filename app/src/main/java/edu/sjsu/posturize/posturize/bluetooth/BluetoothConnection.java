@@ -72,8 +72,11 @@ public class BluetoothConnection {
         Log.d(BLUETOOTH, "Thread State: " + mConnectThread.getState().toString());
 
         mConnectThread.interrupt();
-        //mConnectThread.cancel();
-        mConnectThread = new ConnectThread(null);
+        Log.d(BLUETOOTH, "ConnectedThread: " + mConnectThread.getState().toString());
+
+        mConnectThread.cancel();
+        mConnectThread = null;
+        mBluetoothAdapter.startDiscovery();
     }
 
     public void startConnectThread(){
@@ -85,7 +88,7 @@ public class BluetoothConnection {
     }
 
     private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
+        private BluetoothSocket mmSocket;
         private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
         public ConnectThread(BluetoothDevice device) {
@@ -121,11 +124,14 @@ public class BluetoothConnection {
         }
 
         public void cancel() {
-            if (mmSocket != null) {
+            if (this.mmSocket != null) {
                 try {
+                    Log.d(BLUETOOTH, "ConnectedThread: " + mConnectedThread.getState().toString());
                     mConnectedThread.interrupt();
+                    Log.d(BLUETOOTH, "ConnectedThread: " + mConnectedThread.getState().toString());
                     mConnectedThread.cancel();
-                    mmSocket.close();
+                    this.mmSocket.close();
+                    this.mmSocket = null;
                 } catch (IOException closeException) {
                     Log.d(BLUETOOTH, "Cancel : " + closeException.toString());
                 }
@@ -142,13 +148,13 @@ public class BluetoothConnection {
         private OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket){
-            mmSocket = socket;
+            this.mmSocket = socket;
             InputStream inTmp = null;
             OutputStream outTemp = null;
 
             try {
-                inTmp = mmSocket.getInputStream();
-                outTemp = mmSocket.getOutputStream();
+                inTmp = this.mmSocket.getInputStream();
+                outTemp = this.mmSocket.getOutputStream();
             } catch(IOException streamException) {
                 //
             }
@@ -170,12 +176,15 @@ public class BluetoothConnection {
                 try {
                     Log.d(BLUETOOTH, "InStream : " + mmInStream.toString() );
                     mmInStream.close();
-                    Log.d(BLUETOOTH, "InStream : " + mmOutStream.toString() );
+                    Log.d(BLUETOOTH, "OutStream : " + mmOutStream.toString() );
+                    mmOutStream.flush();
                     mmOutStream.close();
-                    Log.d(BLUETOOTH, "InStream : " + mmSocket.toString() );
-                    mmSocket.close();
+                    Log.d(BLUETOOTH, "InStream : " + this.mmSocket.toString() );
+                    this.mmSocket.close();
                 } catch (Exception e) {}
                 mmInStream = null;
+                mmOutStream = null;
+                this.mmSocket = null;
             }
         }
 
@@ -185,23 +194,25 @@ public class BluetoothConnection {
             int bytes = 0;
 
             while(true) {
-                try {
-                    //Log.d("bytes", Integer.toString(bytes));
-                    bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
-                    for(int i = begin; i < bytes; i++){
-                        if(buffer[i] == "#".getBytes()[0]) {
-                            Log.d("Found #", mHandler.toString());
-                            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
-                            Log.d("Message obtained", mHandler.toString());
-                            begin++;
-                            if(i == bytes - 1){
-                                bytes = 0;
-                                begin = 0;
+                if(mmInStream != null) {
+                    try {
+                        //Log.d("bytes", Integer.toString(bytes));
+                        bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
+                        for (int i = begin; i < bytes; i++) {
+                            if (buffer[i] == "#".getBytes()[0]) {
+                                Log.d("Found #", mHandler.toString());
+                                mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+                                Log.d("Message obtained", mHandler.toString());
+                                begin++;
+                                if (i == bytes - 1) {
+                                    bytes = 0;
+                                    begin = 0;
+                                }
                             }
                         }
+                    } catch (IOException e) {
+                        Log.d("ConnectedThread run()", e.toString());
                     }
-                } catch (IOException e) {
-                    Log.d("ConnectedThread run()", e.toString());
                 }
             }
         }
