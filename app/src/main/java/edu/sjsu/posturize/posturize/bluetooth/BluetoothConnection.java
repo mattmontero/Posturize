@@ -70,12 +70,9 @@ public class BluetoothConnection {
 
     public void kill() {
         Log.d(BLUETOOTH, "Thread State: " + mConnectThread.getState().toString());
-        try {
-            mConnectThread.cancel();
-        } catch (Exception e){
-            Log.d(BLUETOOTH, e.toString());
-        }
-        mConnectThread.cancel();
+
+        mConnectThread.interrupt();
+        //mConnectThread.cancel();
         mConnectThread = new ConnectThread(null);
     }
 
@@ -124,19 +121,25 @@ public class BluetoothConnection {
         }
 
         public void cancel() {
-            try{
-                mConnectedThread.cancel();
-                mmSocket.close();
-            } catch(IOException closeException){
-                //
+            if (mmSocket != null) {
+                try {
+                    mConnectedThread.interrupt();
+                    mConnectedThread.cancel();
+                    mmSocket.close();
+                } catch (IOException closeException) {
+                    Log.d(BLUETOOTH, "Cancel : " + closeException.toString());
+                }
             }
         }
     }
 
+
+
+
     private class ConnectedThread extends Thread{
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
+        private BluetoothSocket mmSocket;
+        private InputStream mmInStream;
+        private OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket){
             mmSocket = socket;
@@ -154,6 +157,28 @@ public class BluetoothConnection {
             mmOutStream = outTemp;
         }
 
+        /**
+         * Reset input and output streams and make sure socket is closed.
+         * This method will be used during shutdown() to ensure that the connection is properly closed during a shutdown.
+         * @return
+         */
+        private void cancel() {
+
+            Log.d(BLUETOOTH, "ConnectedThread breakdown");
+
+            if (mmInStream != null && mmOutStream != null && mmSocket != null) {
+                try {
+                    Log.d(BLUETOOTH, "InStream : " + mmInStream.toString() );
+                    mmInStream.close();
+                    Log.d(BLUETOOTH, "InStream : " + mmOutStream.toString() );
+                    mmOutStream.close();
+                    Log.d(BLUETOOTH, "InStream : " + mmSocket.toString() );
+                    mmSocket.close();
+                } catch (Exception e) {}
+                mmInStream = null;
+            }
+        }
+
         public void run() {
             byte[] buffer = new byte[1024];
             int begin = 0;
@@ -161,7 +186,7 @@ public class BluetoothConnection {
 
             while(true) {
                 try {
-                    Log.d("bytes", Integer.toString(bytes));
+                    //Log.d("bytes", Integer.toString(bytes));
                     bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
                     for(int i = begin; i < bytes; i++){
                         if(buffer[i] == "#".getBytes()[0]) {
@@ -185,15 +210,6 @@ public class BluetoothConnection {
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 //
-            }
-        }
-
-        /* Call this from the main Activity to shutdown the connection */
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
     }
