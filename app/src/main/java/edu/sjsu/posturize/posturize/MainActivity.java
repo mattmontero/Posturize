@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity
             connectBLE();
         }
         */
+        updateUI();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -86,6 +87,14 @@ public class MainActivity extends AppCompatActivity
             }
         });*/
         Log.d("onCreate","Done");
+    }
+
+    private void updateUI(){
+        if(mBluetoothConnection.isConnected()){
+            ((Button) findViewById(R.id.calibrateButton)).setEnabled(true);
+        } else {
+            ((Button) findViewById(R.id.calibrateButton)).setEnabled(false);
+        }
     }
 
     private boolean connectBLE(){
@@ -126,6 +135,7 @@ public class MainActivity extends AppCompatActivity
         if(mDevice == null){
             Log.d(BLUETOOTH, "No device found");
             mConnectButton.setText("Connect");
+            updateUI();
             return false;
         }
 
@@ -139,8 +149,18 @@ public class MainActivity extends AppCompatActivity
         Log.d("ConnectThread", "created");
         //What happens if connectThread does not start?
         mBluetoothConnection.startConnectThread();
+        /*
+         if(mBluetoothConnection.startConnectThread()){
+            mConnectButton.setText("Disconnect");
+            updateUI();
+            return true;
+         } else {
+            Log.d("ConnectThread", "Something went wrong..");
+            return false
+         */
         Log.d("ConnectThread", "Running...");
         mConnectButton.setText("Disconnect");
+        updateUI();
         return true;
 
     }
@@ -186,6 +206,7 @@ public class MainActivity extends AppCompatActivity
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
             mBluetoothConnection.kill();
+            updateUI();
             mTextView.setText("Disconnected");
             ((Button)findViewById(R.id.connectButton)).setText("Connect");
         } else {

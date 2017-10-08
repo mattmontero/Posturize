@@ -53,7 +53,8 @@
             android:id="@+id/calibrateButton"
             android:text="Calibrate"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:enabled="false"/>
 
         <TextView
             android:id="@+id/numberViewer"
