@@ -101,6 +101,7 @@ public class BluetoothConnection {
                 Log.d("tmp Socket", e.toString());
             }
             mmSocket = tmp;
+            Log.d(BLUETOOTH, "Socket established: " + mmSocket.toString());
         }
 
         public void run() {
