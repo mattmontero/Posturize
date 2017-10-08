@@ -1,0 +1,91 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:2:1-22:12
+	package
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:3:5-44
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+	xmlns:android
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:2:11-69
+	android:versionCode
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+uses-permission#android.permission.BLUETOOTH
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:4:5-68
+	android:name
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:4:22-65
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:5:5-74
+	android:name
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:5:22-71
+application
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:7:5-20:19
+MERGED from [com.android.support:appcompat-v7:25.3.0] C:\Users\Matthew\.android\build-cache\a734e57f7634da539ecd8811f921fdb59c73f863\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-v4:25.3.0] C:\Users\Matthew\.android\build-cache\f019cbd4d834cc3cd2993e27ecaba8f466d0432f\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-fragment:25.3.0] C:\Users\Matthew\.android\build-cache\229214938da24ba8da104967fc41468258435901\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-media-compat:25.3.0] C:\Users\Matthew\.android\build-cache\edd3d10685d4843f859010dfa6d10a999b32b792\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-ui:25.3.0] C:\Users\Matthew\.android\build-cache\654618da188df95584a4bd1b1dbeced9828e95c1\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:support-core-utils:25.3.0] C:\Users\Matthew\.android\build-cache\92a95849979a315f26e083715122fa6b66375291\output\AndroidManifest.xml:29:5-20
+MERGED from [com.android.support:animated-vector-drawable:25.3.0] C:\Users\Matthew\.android\build-cache\3991ae373099885fb32a8379872f4e84160e5b91\output\AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-vector-drawable:25.3.0] C:\Users\Matthew\.android\build-cache\b6a2f38fba222ce87b067b4bb5b9ff301d07d585\output\AndroidManifest.xml:26:5-20
+MERGED from [com.android.support:support-compat:25.3.0] C:\Users\Matthew\.android\build-cache\0a4bcfec02a6b7a0af4fc9f10a81bdff832632f2\output\AndroidManifest.xml:29:5-20
+	android:label
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:10:9-41
+	android:supportsRtl
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:11:9-35
+	android:allowBackup
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:8:9-35
+	android:icon
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:9:9-43
+	android:theme
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:12:9-40
+activity#sjsu.posturize.firstbluetooth.MainActivity
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:13:9-19:20
+	android:name
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:13:19-47
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:14:13-18:29
+action#android.intent.action.MAIN
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:15:17-69
+	android:name
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:15:25-66
+category#android.intent.category.LAUNCHER
+ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:17:17-77
+	android:name
+		ADDED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml:17:27-74
+uses-sdk
+INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [com.android.support:appcompat-v7:25.3.0] C:\Users\Matthew\.android\build-cache\a734e57f7634da539ecd8811f921fdb59c73f863\output\AndroidManifest.xml:21:5-23:78
+MERGED from [com.android.support:support-v4:25.3.0] C:\Users\Matthew\.android\build-cache\f019cbd4d834cc3cd2993e27ecaba8f466d0432f\output\AndroidManifest.xml:21:5-23:54
+MERGED from [com.android.support:support-fragment:25.3.0] C:\Users\Matthew\.android\build-cache\229214938da24ba8da104967fc41468258435901\output\AndroidManifest.xml:21:5-23:60
+MERGED from [com.android.support:support-media-compat:25.3.0] C:\Users\Matthew\.android\build-cache\edd3d10685d4843f859010dfa6d10a999b32b792\output\AndroidManifest.xml:21:5-23:63
+MERGED from [com.android.support:support-core-ui:25.3.0] C:\Users\Matthew\.android\build-cache\654618da188df95584a4bd1b1dbeced9828e95c1\output\AndroidManifest.xml:21:5-23:58
+MERGED from [com.android.support:support-core-utils:25.3.0] C:\Users\Matthew\.android\build-cache\92a95849979a315f26e083715122fa6b66375291\output\AndroidManifest.xml:21:5-23:61
+MERGED from [com.android.support:animated-vector-drawable:25.3.0] C:\Users\Matthew\.android\build-cache\3991ae373099885fb32a8379872f4e84160e5b91\output\AndroidManifest.xml:20:5-44
+MERGED from [com.android.support:support-vector-drawable:25.3.0] C:\Users\Matthew\.android\build-cache\b6a2f38fba222ce87b067b4bb5b9ff301d07d585\output\AndroidManifest.xml:20:5-43
+MERGED from [com.android.support:support-compat:25.3.0] C:\Users\Matthew\.android\build-cache\0a4bcfec02a6b7a0af4fc9f10a81bdff832632f2\output\AndroidManifest.xml:21:5-23:58
+	tools:overrideLibrary
+		ADDED from [com.android.support:appcompat-v7:25.3.0] C:\Users\Matthew\.android\build-cache\a734e57f7634da539ecd8811f921fdb59c73f863\output\AndroidManifest.xml:23:9-75
+	android:targetSdkVersion
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+		INJECTED from C:\Users\Matthew\AndroidStudioProjects\FirstBluetooth\app\src\main\AndroidManifest.xml
+meta-data#android.support.VERSION
+ADDED from [com.android.support:appcompat-v7:25.3.0] C:\Users\Matthew\.android\build-cache\a734e57f7634da539ecd8811f921fdb59c73f863\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-v4:25.3.0] C:\Users\Matthew\.android\build-cache\f019cbd4d834cc3cd2993e27ecaba8f466d0432f\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-fragment:25.3.0] C:\Users\Matthew\.android\build-cache\229214938da24ba8da104967fc41468258435901\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-media-compat:25.3.0] C:\Users\Matthew\.android\build-cache\edd3d10685d4843f859010dfa6d10a999b32b792\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-core-ui:25.3.0] C:\Users\Matthew\.android\build-cache\654618da188df95584a4bd1b1dbeced9828e95c1\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:support-core-utils:25.3.0] C:\Users\Matthew\.android\build-cache\92a95849979a315f26e083715122fa6b66375291\output\AndroidManifest.xml:25:5-27:34
+MERGED from [com.android.support:animated-vector-drawable:25.3.0] C:\Users\Matthew\.android\build-cache\3991ae373099885fb32a8379872f4e84160e5b91\output\AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:support-vector-drawable:25.3.0] C:\Users\Matthew\.android\build-cache\b6a2f38fba222ce87b067b4bb5b9ff301d07d585\output\AndroidManifest.xml:22:5-24:34
+MERGED from [com.android.support:support-compat:25.3.0] C:\Users\Matthew\.android\build-cache\0a4bcfec02a6b7a0af4fc9f10a81bdff832632f2\output\AndroidManifest.xml:25:5-27:34
+	android:value
+		ADDED from [com.android.support:appcompat-v7:25.3.0] C:\Users\Matthew\.android\build-cache\a734e57f7634da539ecd8811f921fdb59c73f863\output\AndroidManifest.xml:27:9-31
+	android:name
+		ADDED from [com.android.support:appcompat-v7:25.3.0] C:\Users\Matthew\.android\build-cache\a734e57f7634da539ecd8811f921fdb59c73f863\output\AndroidManifest.xml:26:9-47
