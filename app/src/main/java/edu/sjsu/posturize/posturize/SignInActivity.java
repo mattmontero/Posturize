@@ -37,6 +37,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,6 +84,7 @@ public class SignInActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_sign_in);
 
         ((SignInButton) findViewById(R.id.google_sign_in_button)).setOnClickListener(this);
+        ((Button) findViewById(R.id.google_sign_out_button)).setOnClickListener(this);
 
         mProgressView = findViewById(R.id.login_progress);
 
@@ -126,6 +129,19 @@ public class SignInActivity extends AppCompatActivity implements
         Intent googleSignInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         Log.d(TAG, "googleSignInIntent" + googleSignInIntent.toString());
         startActivityForResult(googleSignInIntent, RC_SIGN_IN);
+    }
+
+    private void googleSignOut(){
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Log.d(TAG, "Sign out status: " + status.toString());
+                        // [START_EXCLUDE]
+                        updateUI(false);
+                        // [END_EXCLUDE]
+                    }
+                });
     }
 
     /**
@@ -208,6 +224,9 @@ public class SignInActivity extends AppCompatActivity implements
             case R.id.google_sign_in_button:
                 googleSignIn();
                 break;
+            case R.id.google_sign_out_button:
+                googleSignOut();
+                break;
             default:
                 break;
         }
@@ -242,11 +261,13 @@ public class SignInActivity extends AppCompatActivity implements
     private void updateUI(boolean signedIn){
         if(signedIn) {
             findViewById(R.id.google_sign_in_button).setVisibility(View.GONE);
+            findViewById(R.id.remember_me).setVisibility(View.GONE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.VISIBLE);
         } else {
             ((TextView) findViewById(R.id.account_status)).setText(R.string.signed_out);
 
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.remember_me).setVisibility(View.VISIBLE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.GONE);
         }
     }
