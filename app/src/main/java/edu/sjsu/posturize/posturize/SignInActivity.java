@@ -3,7 +3,9 @@ package edu.sjsu.posturize.posturize;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -27,6 +29,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -37,6 +40,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
@@ -59,6 +63,8 @@ public class SignInActivity extends AppCompatActivity implements
     private static final int REQUEST_READ_CONTACTS = 0;
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "SignInActivity";
+
+    private SharedPreferences sharedPreferences;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -83,11 +89,38 @@ public class SignInActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
+        sharedPreferences = getSharedPreferences("SAVED_LOGIN", Context.MODE_PRIVATE);
         ((SignInButton) findViewById(R.id.google_sign_in_button)).setOnClickListener(this);
         ((Button) findViewById(R.id.google_sign_out_button)).setOnClickListener(this);
 
         mProgressView = findViewById(R.id.login_progress);
+        setGoogleApiClient();
+    }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        if(sharedPreferences.getBoolean("REMEMBER_ME", false)) {
+            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+            if (opr.isDone()) {
+                Log.d(TAG, "Got cached sign-in");
+                GoogleSignInResult result = opr.get();
+                handleSignInResult(result);
+            } else {
+                //showProgressDialog();
+                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                    @Override
+                    public void onResult(GoogleSignInResult googleSignInResult) {
+                        //hideProgressDialog();
+                        handleSignInResult(googleSignInResult);
+                    }
+                });
+            }
+        }
+    }
+
+    private void setGoogleApiClient(){
         /*
          * Configure Google Sign-In and the GoogleApiClient Object
          * 1. create GoogleSignInOptions object
@@ -125,7 +158,14 @@ public class SignInActivity extends AppCompatActivity implements
         }
     }
 
+    private void saveUserLogin(boolean rememberMe){
+        SharedPreferences.Editor spEditor = sharedPreferences.edit();
+        spEditor.putBoolean("REMEMBER_ME", rememberMe);
+        spEditor.commit();
+    }
+
     private void googleSignIn(){
+        saveUserLogin(((CheckBox) findViewById(R.id.remember_me)).isChecked());
         Intent googleSignInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         Log.d(TAG, "googleSignInIntent" + googleSignInIntent.toString());
         startActivityForResult(googleSignInIntent, RC_SIGN_IN);
@@ -247,10 +287,15 @@ public class SignInActivity extends AppCompatActivity implements
 
     private void handleSignInResult(GoogleSignInResult result){
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        Log.d(TAG, "Result toString: " + result.toString());
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
-            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()));
+            if(((CheckBox) findViewById(R.id.remember_me)).isChecked()){
+                //saveUserLogin(account.getIdToken());
+                //Log.d(TAG, "ID TOKEN SAVED: " + account.getIdToken());
+            }
+            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + " " + account.getEmail());
             updateUI(true);
         } else {
             //Signed out, show authenticated UI.
