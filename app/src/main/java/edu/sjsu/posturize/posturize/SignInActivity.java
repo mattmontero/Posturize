@@ -92,6 +92,8 @@ public class SignInActivity extends AppCompatActivity implements
         sharedPreferences = getSharedPreferences("SAVED_LOGIN", Context.MODE_PRIVATE);
         ((SignInButton) findViewById(R.id.google_sign_in_button)).setOnClickListener(this);
         ((Button) findViewById(R.id.google_sign_out_button)).setOnClickListener(this);
+        ((Button) findViewById(R.id.continue_button)).setOnClickListener(this);
+
 
         mProgressView = findViewById(R.id.login_progress);
         setGoogleApiClient();
@@ -267,6 +269,9 @@ public class SignInActivity extends AppCompatActivity implements
             case R.id.google_sign_out_button:
                 googleSignOut();
                 break;
+            case R.id.continue_button:
+                startActivity((new Intent(this, MainActivity.class)));
+                break;
             default:
                 break;
         }
@@ -291,11 +296,7 @@ public class SignInActivity extends AppCompatActivity implements
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
-            if(((CheckBox) findViewById(R.id.remember_me)).isChecked()){
-                //saveUserLogin(account.getIdToken());
-                //Log.d(TAG, "ID TOKEN SAVED: " + account.getIdToken());
-            }
-            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + " " + account.getEmail());
+            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
             updateUI(true);
         } else {
             //Signed out, show authenticated UI.
@@ -308,12 +309,14 @@ public class SignInActivity extends AppCompatActivity implements
             findViewById(R.id.google_sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.remember_me).setVisibility(View.GONE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.continue_button).setVisibility(View.VISIBLE);
         } else {
             ((TextView) findViewById(R.id.account_status)).setText(R.string.signed_out);
 
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.remember_me).setVisibility(View.VISIBLE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.GONE);
+            findViewById(R.id.continue_button).setVisibility(View.GONE);
         }
     }
 
