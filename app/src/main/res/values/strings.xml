@@ -12,4 +12,5 @@
     <string name="action_google_sign_in">Sign In with Google</string>
     <string name="server_client_id">749349461099-5cpqn73ikggepcckpglu6osdsrp5cnpr.apps.googleusercontent.com</string>
     <string name="signed_out">Signed Out</string>
+    <string name="signed_in_greeting">Welcome, %s!</string>
 </resources>
