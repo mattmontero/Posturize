@@ -270,7 +270,7 @@ public class SignInActivity extends AppCompatActivity implements
                 googleSignOut();
                 break;
             case R.id.continue_button:
-                startActivity((new Intent(this, MainActivity.class)));
+                startActivity((new Intent(this, HomeActivity.class)));
                 break;
             default:
                 break;

@@ -2,6 +2,7 @@ package edu.sjsu.posturize.posturize;
 
 import android.annotation.TargetApi;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,7 +26,9 @@ import java.util.GregorianCalendar;
 
 import static edu.sjsu.posturize.posturize.R.menu.navigation;
 
-public class HomeActivity extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
+public class HomeActivity extends AppCompatActivity
+        implements DatePickerDialog.OnDateSetListener,
+                    View.OnClickListener{
 
     //DATE PICKER THINGS
     DatePicker datePicker;
@@ -70,6 +73,7 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        ((Button) findViewById(R.id.settings_button)).setOnClickListener(this);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_daily);
@@ -108,6 +112,15 @@ public class HomeActivity extends AppCompatActivity implements DatePickerDialog.
     public void onDateSet(DatePicker view, int year, int month, int day) {
         Calendar cal = new GregorianCalendar(year, month, day);
         setDate(cal);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.settings_button:
+                startActivity((new Intent(this, MainActivity.class)));
+                break;
+        }
     }
 
     /**
