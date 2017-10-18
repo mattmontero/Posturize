@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_daily"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:title="@string/nav_daily"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/navigation_weekly"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:title="@string/nav_weekly"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/navigation_monthly"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:title="@string/nav_monthly"
+        android:visible="true" />
+</menu>
