@@ -101,6 +101,7 @@ public class BluetoothConnection {
                 Log.d("tmp Socket", e.toString());
             }
             mmSocket = tmp;
+            Log.d(BLUETOOTH, "Socket established: " + mmSocket.toString());
         }
 
         public void run() {
@@ -235,7 +236,6 @@ public class BluetoothConnection {
             Log.d("BING handler", msg.toString());
             switch(msg.what){
                 case 1:
-
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
                     mTextView.setText(writeMessage);

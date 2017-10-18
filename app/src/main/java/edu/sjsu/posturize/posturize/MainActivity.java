@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity
      */
     private ViewPager mViewPager;
     private TextView mTextView;
-    private Button mRefreshButton;
-    private Button mCalibrateButton;
     private Button mConnectButton;
 
     @Override
@@ -53,7 +51,10 @@ public class MainActivity extends AppCompatActivity
         Log.d("onCreate", "Starting");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.setTitle(getString(R.string.signed_in_greeting, "User"));
         setViewsAndListeners();
+        connectBLE();
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity
         if(mBluetoothAdapter == null){
             //Device does not support Bluetooth.
             Log.d(BLUETOOTH, "Bluetooth is not supported");
+            return false;
         } else {
             Log.d(BLUETOOTH, "Bluetooth is supported");
         }
@@ -147,12 +149,12 @@ public class MainActivity extends AppCompatActivity
 
     private void setViewsAndListeners(){
         mTextView = (TextView)findViewById(R.id.numberViewer);
-        mRefreshButton = (Button) findViewById(R.id.refreshButton);
-        mCalibrateButton = (Button) findViewById(R.id.calibrateButton);
         mConnectButton = (Button) findViewById(R.id.connectButton);
-        mRefreshButton.setOnClickListener(this);
-        mCalibrateButton.setOnClickListener(this);
-        mConnectButton.setOnClickListener(this);
+        //((Button) findViewById(R.id.frontporch_signInButton)).setOnClickListener(this);
+        ((Button) findViewById(R.id.signoutButton)).setOnClickListener(this);
+        ((Button) findViewById(R.id.calibrateButton)).setOnClickListener(this);
+        ((Button) findViewById(R.id.refreshButton)).setOnClickListener(this);
+
     }
 
 
@@ -182,6 +184,10 @@ public class MainActivity extends AppCompatActivity
         mTextView.setText("Calibrating...");
         mBluetoothConnection.write("*");
     }
+
+    private void fpSignIn(Intent intent){
+        startActivity(intent);
+    };
 
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
@@ -216,6 +222,16 @@ public class MainActivity extends AppCompatActivity
             case R.id.connectButton:
                 connectButtonPressed();
                 break;
+            case R.id.signoutButton:
+                //mBluetoothConnection.kill();
+                //userData.save()
+                this.finish();
+                break;
+            /*
+            case R.id.frontporch_signInButton:
+                fpSignIn(new Intent(this, SignInActivity.class));
+                break;
+            */
             default:
                 break;
         }

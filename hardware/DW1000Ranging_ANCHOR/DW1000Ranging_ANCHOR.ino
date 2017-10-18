@@ -7,10 +7,11 @@
 
 #define RXPIN 0 //bluetooth pins
 #define TXPIN 1 //bluetooth pins
-#define RELAY_PIN 6 //relay signal pin; high = buzz 
+#define RELAY_PIN 8 //relay signal pin; high = buzz 
 #define CALIBRATE 7 //calibrationTrigger pin(hardware)
 #define POLLING_SIZE 25
 #define CALIBRATION_SIZE 25
+#define CON_SEC_SLOUCH_NUM 4
 
 #define BLUETOOTH_CALIBRATION 'C'
 #define BLUETOOTH_IDLE 'I'
@@ -21,7 +22,6 @@ SoftwareSerial bluetooth(RXPIN, TXPIN);
 
 //define button pin
 const short buttonPin = 12;
-
 
 void showDeviceInfo() {
   // DEBUG chip info and registers pretty printed
@@ -36,6 +36,7 @@ void showDeviceInfo() {
   Serial.print("Device mode: "); Serial.println(msg);
 }
 
+
   static boolean isCalibrated = false;
   static int calibrationTriggerCounter = 0;
   static int isCalibrating = false;
@@ -46,21 +47,19 @@ void showDeviceInfo() {
   static int bluetoothCalibration = false;
   static double currentSum = 0;
   static int pollCounter = 0;
-
+  static boolean lastPollSlouch = false;
+  static int conSecSlouch = 0;
 void setup() {
   Serial.begin(9600);
   delay(1000);
   //init the configuration
 
   pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, HIGH);
   pinMode(CALIBRATE, INPUT);  
 
   
   // Define pin #12 as input and activate the internal pull-up resistor
   pinMode(buttonPin, INPUT_PULLUP);
-  pinMode(8, OUTPUT);
-  digitalWrite(8, HIGH);
   
   pinMode(RXPIN, INPUT);
   pinMode(TXPIN, OUTPUT);
@@ -97,10 +96,12 @@ void loop() {
   if(!isCalibrating){
     if(digitalRead(CALIBRATE) == HIGH){
       calibrationTriggerCounter++;
-      if(calibrationTriggerCounter > 1500){
+
+      if(calibrationTriggerCounter > 3000){
         isCalibrating = true;
         calibratedValue = 0;
         //should we also send signal to phone to show its calibrating via hardware trigger?
+        Serial.println("CALIBRATION BUTTON PRESSED");
       }
     }else if(bluetoothCalibration){//false will be changed to bluetooth signal for calibration
       //sending signal to phone
@@ -108,6 +109,7 @@ void loop() {
         Serial.print("*");
         Serial.print("#");
       }
+
       isCalibrating = true;
       calibratedValue = 0;
     }
@@ -118,44 +120,20 @@ void loop() {
   if(bluetooth.available()> 0){
     checkForBTData(bluetooth.read());
   }
-  
-  char* temp = (char*) malloc(sizeof(char) * 3000);
-
-  Serial.print(temp);
-  
 }
 
 void newRange() {
 //  Serial.print("from: "); Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
 //  Serial.print("\t Range: "); Serial.print(DW1000Ranging.getDistantDevice()->getRange()); Serial.print(" m");
-//  Serial.print("\t RX power: "); Serial.print(DW1000Ranging.getDistantDevice()->getRXPower()); Serial.println(" dBm");
-
-//  if(isCalibrating && calibrationCounter < 250){ //sampling 300 readings to get good variations of data
-//    Serial.print(DW1000Ranging.getDistantDevice()->getRange(), 4);Serial.print(" counter is @ "); Serial.println(calibrationCounter);
-//    if(calibrationCounter < 25)
-//      calibrationAry[calibrationCounter%25] = DW1000Ranging.getDistantDevice()->getRange();
-//    else
-//      calibrationAry[calibrationCounter%25] += DW1000Ranging.getDistantDevice()->getRange();
-//    calibrationCounter++;
-//  }else if(isCalibrating && calibrationCounter >= 250){
-//    //send signal to phone to trigger end of calibration
-//    isCalibrating = false;
-//
-//    float totalSum = 0;
-//    for(int a = 0; a < 25; a++){
-//      totalSum += calibrationAry[a]/10;
-//    }
-//    calibratedValue = totalSum/25;
-//    isCalibrated = true;
-//    isCalibrating = false;
-//    calibrationCounter = 0;
-//    Serial.print("calibratedValue is : ");
-//    Serial.println(calibratedValue, 4);
-//    //DO STATS TO GET THRESHOLD AND CRALIBRATED VALUE
-//    //each index contains 
-  
+//  Serial.print("\t RX power: "); Serial.print(DW1000Ranging.getDistantDevice()->getRXPower()); Serial.println(" dBm"); 
   if(isCalibrating && calibrationCounter%25 != 24 && calibrationCounter < 250){
-    if(calibrationCounter == 0) {Serial.print("#");Serial.println("CALIBRATION STARTED.......");Serial.println(calibratedValue);}
+    if(calibrationCounter == 0) {
+      Serial.print("#");Serial.println("CALIBRATION STARTED.......");Serial.println(calibratedValue);
+      digitalWrite(RELAY_PIN, HIGH);
+      delay(800);
+      digitalWrite(RELAY_PIN, LOW);
+    }
+
     calibrationAry[calibrationCounter%25] = DW1000Ranging.getDistantDevice()->getRange();
     calibrationCounter++;
   }else if(isCalibrating && (calibrationCounter%25==24 || calibrationCounter >= 250)){
@@ -182,6 +160,7 @@ void newRange() {
             currentSum += calibrationAry[a];
           }
         }
+
           currentSum -= calibrationAry[maxIndex];
           currentSum -= calibrationAry[minIndex];
 
@@ -194,7 +173,7 @@ void newRange() {
         calibrationAry[minIndex] = calibrationAry[0 + outlierCounter];
         calibrationAry[0 + outlierCounter] = tempVal;
     }
-    
+
     currentSum /= 19;
     calibratedValue += currentSum;
     if(calibrationCounter >= 249){
@@ -202,9 +181,14 @@ void newRange() {
       isCalibrated = true;
       isCalibrating = false;
       calibrationCounter = 0;
+
       bluetoothCalibration = false;
       Serial.print("#");Serial.println("CALIBRATION COMPLETED.......");Serial.println(calibratedValue);Serial.println("C");Serial.print("#");
+      digitalWrite(RELAY_PIN, HIGH);
+      delay(800);
+      digitalWrite(RELAY_PIN, LOW);
     }
+
     
   }else if(isCalibrated){//not calibrating....means need to check reading...
     
@@ -212,9 +196,11 @@ void newRange() {
         calibrationAry[pollCounter] = DW1000Ranging.getDistantDevice()->getRange();
         pollCounter++;
     }else{
+
         currentSum = 0;
         //iterate the array to find total, and find current iteration outlier
         for(int outlierCounter = 0; outlierCounter < 3; outlierCounter++){
+
           int maxIndex = 0;
           int minIndex = 0;
           
@@ -231,6 +217,7 @@ void newRange() {
               currentSum += calibrationAry[a];
             }
           }
+
           currentSum -= calibrationAry[maxIndex];
           currentSum -= calibrationAry[minIndex];
           
@@ -246,14 +233,29 @@ void newRange() {
         currentSum /= 19;
         if(calibratedValue + threshold < currentSum ||
             calibratedValue - threshold > currentSum ){
-            digitalWrite(RELAY_PIN, HIGH);
-            delay(700);
-            digitalWrite(RELAY_PIN, LOW);
+            if(lastPollSlouch){
+              conSecSlouch++;
+            }else{
+              conSecSlouch=0;
+            }
+            lastPollSlouch = true;
             
+            if(conSecSlouch == CON_SEC_SLOUCH_NUM){
+              digitalWrite(RELAY_PIN, HIGH);
+              delay(400);
+              digitalWrite(RELAY_PIN, LOW);
+              delay(400);
+              digitalWrite(RELAY_PIN, HIGH);
+              delay(400);
+              digitalWrite(RELAY_PIN, LOW);
+              conSecSlouch=0;
+            }
             Serial.print("...SLOUCH DETECTED.... ");Serial.print(currentSum);Serial.println("#");
         }else{
+            lastPollSlouch = false;
             Serial.print("...WITH IN RANGE...NOTHING TO WORRY... ");Serial.print(currentSum);Serial.println("#");
             digitalWrite(RELAY_PIN, LOW);
+
         }
         
         pollCounter = 0;
@@ -266,8 +268,3 @@ void newRange() {
   
   }
 }
-/* todos....
- * test and debug STAGE 2 calibration and polling/reading distance. Code theory crafted
- * wired the switch for buzzer?
- * integrate bluetooth calibration to the hardwares. debug and test.
- */
