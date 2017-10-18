@@ -56,6 +56,16 @@ public class MainActivity extends AppCompatActivity
         setViewsAndListeners();
         connectBLE();
 
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
+        mBluetoothConnection.setTextView(mTextView);
+
+        /*
+        if(userSettings.autoSync){
+            connectBLE();
+        }
+        */
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -82,9 +92,6 @@ public class MainActivity extends AppCompatActivity
     private boolean connectBLE(){
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
-        mBluetoothConnection.setTextView(mTextView);
         Log.d("Text View Setup", "mTextView");
         //1. Check if device has bluetooth.
         if(mBluetoothAdapter == null){
@@ -128,11 +135,13 @@ public class MainActivity extends AppCompatActivity
         Log.d(BLUETOOTH, mDevice.toString());
 
         //4. Create the connection thread
+
+        //What happens if connectThread fails?
         mBluetoothConnection.connectThread(mDevice);
         Log.d("ConnectThread", "created");
+        //What happens if connectThread does not start?
         mBluetoothConnection.startConnectThread();
         Log.d("ConnectThread", "Running...");
-        mBluetoothConnection.isConnected();
         mConnectButton.setText("Disconnect");
         return true;
 
@@ -182,7 +191,7 @@ public class MainActivity extends AppCompatActivity
 
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
-            mBluetoothConnection.cancelConnectThread();
+            mBluetoothConnection.kill();
             mTextView.setText("Disconnected");
             ((Button)findViewById(R.id.connectButton)).setText("Connect");
         } else {
@@ -190,8 +199,9 @@ public class MainActivity extends AppCompatActivity
             if(connectBLE()){
                 mTextView.setText("Connected!");
                 ((Button)findViewById(R.id.connectButton)).setText("Disconnect");
+            } else {
+                mTextView.setText("Something bad happened.");
             }
-            mTextView.setText("Something bad happened.");
         }
     }
 
