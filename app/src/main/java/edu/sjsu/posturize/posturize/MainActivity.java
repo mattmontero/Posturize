@@ -55,8 +55,15 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         setViewsAndListeners();
 
-        connectBLE();
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
+        mBluetoothConnection.setTextView(mTextView);
 
+        /*
+        if(userSettings.autoSync){
+            connectBLE();
+        }
+        */
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -84,9 +91,6 @@ public class MainActivity extends AppCompatActivity
     private boolean connectBLE(){
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
-        mBluetoothConnection.setTextView(mTextView);
         Log.d("Text View Setup", "mTextView");
         //1. Check if device has bluetooth.
         if(mBluetoothAdapter == null){
@@ -129,11 +133,13 @@ public class MainActivity extends AppCompatActivity
         Log.d(BLUETOOTH, mDevice.toString());
 
         //4. Create the connection thread
+
+        //What happens if connectThread fails?
         mBluetoothConnection.connectThread(mDevice);
         Log.d("ConnectThread", "created");
+        //What happens if connectThread does not start?
         mBluetoothConnection.startConnectThread();
         Log.d("ConnectThread", "Running...");
-        mBluetoothConnection.isConnected();
         mConnectButton.setText("Disconnect");
         return true;
 
@@ -144,6 +150,7 @@ public class MainActivity extends AppCompatActivity
         mRefreshButton = (Button) findViewById(R.id.refreshButton);
         mCalibrateButton = (Button) findViewById(R.id.calibrateButton);
         mConnectButton = (Button) findViewById(R.id.connectButton);
+        ((Button) findViewById(R.id.frontporch_signInButton)).setOnClickListener(this);
         mRefreshButton.setOnClickListener(this);
         mCalibrateButton.setOnClickListener(this);
         mConnectButton.setOnClickListener(this);
@@ -177,9 +184,13 @@ public class MainActivity extends AppCompatActivity
         mBluetoothConnection.write("*");
     }
 
+    private void fpSignIn(Intent intent){
+        startActivity(intent);
+    };
+
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
-            mBluetoothConnection.cancelConnectThread();
+            mBluetoothConnection.kill();
             mTextView.setText("Disconnected");
             ((Button)findViewById(R.id.connectButton)).setText("Connect");
         } else {
@@ -187,8 +198,9 @@ public class MainActivity extends AppCompatActivity
             if(connectBLE()){
                 mTextView.setText("Connected!");
                 ((Button)findViewById(R.id.connectButton)).setText("Disconnect");
+            } else {
+                mTextView.setText("Something bad happened.");
             }
-            mTextView.setText("Something bad happened.");
         }
     }
 
@@ -208,6 +220,9 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.connectButton:
                 connectButtonPressed();
+                break;
+            case R.id.frontporch_signInButton:
+                fpSignIn(new Intent(this, SignInActivity.class));
                 break;
             default:
                 break;
