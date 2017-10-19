@@ -1,9 +1,12 @@
 package edu.sjsu.posturize.posturize;
 
 import edu.sjsu.posturize.posturize.bluetooth.*;
+import edu.sjsu.posturize.posturize.reminder.DailyUpdateFragment;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -47,6 +50,9 @@ public class MainActivity extends AppCompatActivity
     private Button mRefreshButton;
     private Button mCalibrateButton;
     private Button mConnectButton;
+    private DailyUpdateFragment sDailyUpdateFragment;
+    public static final String FRAGTAG = "RepeatingAlarmFragment";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setViewsAndListeners();
+        setDailyUpdate();
+
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
@@ -154,6 +162,15 @@ public class MainActivity extends AppCompatActivity
         mRefreshButton.setOnClickListener(this);
         mCalibrateButton.setOnClickListener(this);
         mConnectButton.setOnClickListener(this);
+    }
+
+    private void setDailyUpdate() {
+        if (getSupportFragmentManager().findFragmentByTag(FRAGTAG) == null ) {
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            DailyUpdateFragment fragment = new DailyUpdateFragment();
+            transaction.add(0, fragment, FRAGTAG);
+            transaction.commit();
+        }
     }
 
 
