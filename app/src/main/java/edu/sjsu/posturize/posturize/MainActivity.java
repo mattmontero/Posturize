@@ -1,5 +1,6 @@
 package edu.sjsu.posturize.posturize;
 
+import edu.sjsu.posturize.posturize.SexyData.FirebaseHelper;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -23,6 +24,8 @@ import android.view.ViewGroup;
 
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Set;
 
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity
     private Button refreshDatShit;
     private Button calibrateDatShit;
     private Button connectBLEButton;
+    private FirebaseHelper mFirebaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +77,7 @@ public class MainActivity extends AppCompatActivity
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         mTextView = (TextView) findViewById(R.id.numberViewer);
+        mFirebaseHelper = FirebaseHelper.getInstance(this);
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +100,7 @@ public class MainActivity extends AppCompatActivity
         if(mBluetoothAdapter == null){
             //Device does not support Bluetooth.
             Log.d(BLUETOOTH, "Bluetooth is not supported");
+            return false;
         } else {
             Log.d(BLUETOOTH, "Bluetooth is supported");
         }
