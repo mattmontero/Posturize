@@ -12,7 +12,10 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.UUID;
+
+import edu.sjsu.posturize.posturize.SexyData.PostureMeasurement;
 
 /**
  * Created by matthewmontero on 8/6/17.
@@ -238,7 +241,9 @@ public class BluetoothConnection {
                 case 1:
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
-                    mTextView.setText(writeMessage);
+                    //mTextView.setText(writeMessage);
+                    PostureMeasurement current = new PostureMeasurement(new Date(), Float.parseFloat(writeMessage));
+                    mTextView.setText(current.toString());
                     Log.d("receiving", writeMessage);
 
                     break;
