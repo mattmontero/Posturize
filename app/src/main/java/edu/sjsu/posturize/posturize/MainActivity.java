@@ -151,6 +151,7 @@ public class MainActivity extends AppCompatActivity
         mTextView = (TextView)findViewById(R.id.numberViewer);
         mConnectButton = (Button) findViewById(R.id.connectButton);
         //((Button) findViewById(R.id.frontporch_signInButton)).setOnClickListener(this);
+        mConnectButton.setOnClickListener(this);
         ((Button) findViewById(R.id.signoutButton)).setOnClickListener(this);
         ((Button) findViewById(R.id.calibrateButton)).setOnClickListener(this);
         ((Button) findViewById(R.id.refreshButton)).setOnClickListener(this);
