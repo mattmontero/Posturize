@@ -1,9 +1,12 @@
 package edu.sjsu.posturize.posturize;
 
+import edu.sjsu.posturize.posturize.SexyData.DailyPosture;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v4.content.SharedPreferencesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -22,6 +25,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
@@ -29,6 +37,7 @@ public class MainActivity extends AppCompatActivity
 
     private static BluetoothAdapter mBluetoothAdapter;
     private static BluetoothConnection mBluetoothConnection;
+    private SharedPreferences sharedPreferences;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -53,6 +62,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         this.setTitle(getString(R.string.signed_in_greeting, "User"));
+        setupSharedPreferences();
         setViewsAndListeners();
         connectBLE();
 
@@ -87,6 +97,23 @@ public class MainActivity extends AppCompatActivity
             }
         });*/
         Log.d("onCreate","Done");
+    }
+
+    private void setupSharedPreferences(){
+        DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+        String simpleDate = sdf.format(new Date());
+        Gson gson = new Gson();
+        Log.d("SHARED PREFERENCES", "Simple Date: " + simpleDate);
+        if(sharedPreferences.contains(simpleDate)){ //if contains, grab object
+            String json = sharedPreferences.getString(simpleDate, "");
+            DailyPosture currentDailyPosture = gson.fromJson(json, DailyPosture.class);
+
+        } else { //create new object
+            String json = gson.toJson(new DailyPosture()); // myObject - instance of MyObject
+            SharedPreferences.Editor spEditor = sharedPreferences.edit();
+            spEditor.putString(simpleDate, json);
+            spEditor.commit();
+        }
     }
 
     private boolean connectBLE(){

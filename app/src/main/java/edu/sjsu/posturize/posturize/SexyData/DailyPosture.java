@@ -20,7 +20,7 @@ public class DailyPosture {
     private Date date;
     private ArrayList<PostureMeasurement> measurements;
 
-    DailyPosture(){
+    public DailyPosture(){
         measurements = new ArrayList<PostureMeasurement>();
     }
 
@@ -30,6 +30,11 @@ public class DailyPosture {
             measurements.clear();
         }
         measurements.add(new PostureMeasurement(new Date(), distance));
+    }
+
+    @Override
+    public String toString(){
+        return measurements.toString();
     }
 
     public Date getDate(){
