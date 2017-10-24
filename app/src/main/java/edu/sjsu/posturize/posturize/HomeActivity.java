@@ -24,6 +24,11 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+
+
 import static edu.sjsu.posturize.posturize.R.menu.navigation;
 
 public class HomeActivity extends AppCompatActivity
@@ -54,19 +59,49 @@ public class HomeActivity extends AppCompatActivity
                 case R.id.navigation_daily:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectDaily));
                     mTextMessage.setText(getString(R.string.selectDaily));
+                    setDataView(100);
                     return true;
                 case R.id.navigation_weekly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectWeekly));
                     mTextMessage.setText((R.string.selectWeekly));
+                    setDataView(500);
                     return true;
                 case R.id.navigation_monthly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectMonthly));
                     mTextMessage.setText((R.string.selectMonthly));
+                    setDataView(1000);
                     return true;
             }
             return false;
         }
     };
+
+    private void setDataView(int numPoints){
+
+        /*DATA GRAPH THINGS*/
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        DataPoint[] points = new DataPoint[numPoints];
+        for (int i = 0; i < points.length; i++) {
+            points[i] = new DataPoint(i, Math.sin(i*0.5) * 20*(Math.random()*10+1));
+        }
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
+        graph.removeAllSeries();
+        // set manual X bounds
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(-150);
+        graph.getViewport().setMaxY(150);
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(4);
+        graph.getViewport().setMaxX(80);
+
+        // enable scaling and scrolling
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScalableY(true);
+
+        graph.addSeries(series);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

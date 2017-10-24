@@ -47,6 +47,10 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/showDate"
                     android:textSize="18dp"/>
+                <com.jjoe64.graphview.GraphView
+                    android:layout_width="match_parent"
+                    android:layout_height="400dip"
+                    android:id="@+id/graph" />
             </LinearLayout>
         </ScrollView>
     </FrameLayout>
