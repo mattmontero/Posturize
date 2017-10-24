@@ -19,10 +19,21 @@ import android.widget.TextView;
 
 import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
+
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
+
 
 import static edu.sjsu.posturize.posturize.R.menu.navigation;
 
@@ -54,19 +65,56 @@ public class HomeActivity extends AppCompatActivity
                 case R.id.navigation_daily:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectDaily));
                     mTextMessage.setText(getString(R.string.selectDaily));
+                    setDataView(100);
                     return true;
                 case R.id.navigation_weekly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectWeekly));
                     mTextMessage.setText((R.string.selectWeekly));
+                    setDataView(500);
                     return true;
                 case R.id.navigation_monthly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectMonthly));
                     mTextMessage.setText((R.string.selectMonthly));
+                    setDataView(1000);
                     return true;
             }
             return false;
         }
     };
+
+    private void setDataView(int numPoints){
+
+        //DATA GRAPH THINGS
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        DataPoint[] points = new DataPoint[numPoints];
+        for (int i = 0; i < points.length; i++) {
+            points[i] = new DataPoint(i, -1 * Math.abs(5 *(Math.random())));
+        }
+        LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
+        graph.removeAllSeries();
+        // set manual X bounds
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(-5);
+        graph.getViewport().setMaxY(0);
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(4);
+        graph.getViewport().setMaxX(80);
+
+        // enable scaling and scrolling
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScalableY(false);
+
+        graph.addSeries(series);
+
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Toast.makeText(getApplicationContext(), "Series1: On Data Point clicked: "+dataPoint, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
