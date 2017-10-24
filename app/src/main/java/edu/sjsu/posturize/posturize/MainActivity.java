@@ -1,13 +1,12 @@
 package edu.sjsu.posturize.posturize;
 
-import edu.sjsu.posturize.posturize.SexyData.DailyPosture;
+import edu.sjsu.posturize.posturize.PostureData.DailyPosture;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.content.SharedPreferencesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 

@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.SexyData;
+package edu.sjsu.posturize.posturize.PostureData;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,10 +25,10 @@ public class DailyPosture {
     }
 
     public void addMeasurement(float distance){
-        if((new Date()).compareTo(date) != 0){ //different day, reset daily object
+        /*if((new Date()).compareTo(date) != 0){ //different day, reset daily object
             date = new Date();
             measurements.clear();
-        }
+        }*/
         measurements.add(new PostureMeasurement(new Date(), distance));
     }
 

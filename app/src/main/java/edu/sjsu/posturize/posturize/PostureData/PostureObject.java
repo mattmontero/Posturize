@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.SexyData;
+package edu.sjsu.posturize.posturize.PostureData;
 
 /**
  * Created by Matthew on 8/28/2017.
@@ -25,12 +25,9 @@ import java.util.Date;
  */
 public class PostureObject {
     private DailyPosture mDailyPosture;
-    private MonthlyPosture mMonthlyPosture;
-    private TextView mTextView;
 
     public PostureObject(){
         mDailyPosture = new DailyPosture();
-        mMonthlyPosture = new MonthlyPosture();
     }
 
     /**
@@ -38,10 +35,6 @@ public class PostureObject {
      * @param distance distance received from wearables
      */
     public void writeDistance(float distance) {
-        //if currentDate != mDailyPosture.getDate()){ //reset dailyPosture for new day
-        //  mMonthlyPosture.add(mDailyPosture);
-        //  mDailyPosture = new DailyPosture();                     //Starts a fresh daily model
-        //}
         mDailyPosture.addMeasurement(distance);
     }
 
@@ -56,28 +49,10 @@ public class PostureObject {
 
     /**
      *
-     * @param date get specific date posture data
+     * @param date get specific date posture data Format "MM-dd-yyy"
      * @return DailyPosture
      */
-    public DailyPosture getDayPostureData(Date date){
-        /*
-         *  if date.month == mMonthlyPosture.month
-         */
-        return null;
-    }
-
-    /**
-     * Grabs monthlyposture for given date
-     * @param date month date for
-     * @return MonthlyPosture
-     */
-    public MonthlyPosture getMonthData(Date date){
-        /*
-         *  if date == this month
-         *      return mMonthlyPosture;
-         *  else
-         *      return new MonthlyPosture(Monthly data from DB);
-         */
+    public DailyPosture getDayPostureData(String date){
         return null;
     }
 }

@@ -3,7 +3,6 @@ package edu.sjsu.posturize.posturize.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.icu.util.Output;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -15,7 +14,7 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.UUID;
 
-import edu.sjsu.posturize.posturize.SexyData.PostureMeasurement;
+import edu.sjsu.posturize.posturize.PostureData.PostureMeasurement;
 
 /**
  * Created by matthewmontero on 8/6/17.

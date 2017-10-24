@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.SexyData;
+package edu.sjsu.posturize.posturize.PostureData;
 
 import java.util.Date;
 
