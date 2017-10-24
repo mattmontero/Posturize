@@ -1,7 +1,12 @@
 package edu.sjsu.posturize.posturize.PostureData;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import java.util.ArrayList;
 import java.util.Date;
+
+import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
  * Created by Matthew on 8/28/2017.
@@ -17,7 +22,6 @@ import java.util.Date;
  * DailyPosture tracks the posture measurements for a given day.
  */
 public class DailyPosture {
-    private Date date;
     private ArrayList<PostureMeasurement> measurements;
 
     public DailyPosture(){
@@ -37,7 +41,4 @@ public class DailyPosture {
         return measurements.toString();
     }
 
-    public Date getDate(){
-        return date;
-    }
 }

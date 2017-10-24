@@ -3,18 +3,25 @@ package edu.sjsu.posturize.posturize.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import edu.sjsu.posturize.posturize.PostureData.PostureManager;
 import edu.sjsu.posturize.posturize.PostureData.PostureMeasurement;
+import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
  * Created by matthewmontero on 8/6/17.
@@ -25,11 +32,23 @@ public class BluetoothConnection {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private TextView mTextView;
+    private PostureManager mPostureManager;
 
     private final String BLUETOOTH = "Connection Setup";
 
     public BluetoothConnection(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
+        //setPostureManager();
+    }
+
+    private void setPostureManager(){
+        Gson gson = new Gson();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SignInActivity.getAppContext());
+        String simpleDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+
+        String json = sharedPreferences.getString(simpleDate, "");
+        mPostureManager = gson.fromJson(json, PostureManager.class);
+        Log.d("SHARED PREFERENCES", "PostureManager: " + mPostureManager.toString(simpleDate));
     }
 
     public void connectThread(BluetoothDevice device){

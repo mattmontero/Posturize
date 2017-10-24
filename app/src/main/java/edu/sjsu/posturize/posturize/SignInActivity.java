@@ -81,14 +81,14 @@ public class SignInActivity extends AppCompatActivity implements
     // UI references.
     private View mProgressView;
     private View mLoginFormView;
-
+    private static Context appContext;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-
+        appContext = this.getApplicationContext();
         sharedPreferences = getSharedPreferences("SAVED_LOGIN", Context.MODE_PRIVATE);
         ((SignInButton) findViewById(R.id.google_sign_in_button)).setOnClickListener(this);
         ((Button) findViewById(R.id.google_sign_out_button)).setOnClickListener(this);
@@ -120,6 +120,13 @@ public class SignInActivity extends AppCompatActivity implements
                 });
             }
         }
+    }
+
+    /*
+     * workaround to get getDefaultSharedPreferences(context) in any non-activity class
+     */
+    public static Context getAppContext(){
+        return appContext;
     }
 
     private void setGoogleApiClient(){

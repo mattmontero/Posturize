@@ -1,6 +1,7 @@
 package edu.sjsu.posturize.posturize;
 
 import edu.sjsu.posturize.posturize.PostureData.DailyPosture;
+import edu.sjsu.posturize.posturize.PostureData.PostureManager;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -64,11 +65,6 @@ public class MainActivity extends AppCompatActivity
         this.setTitle(getString(R.string.signed_in_greeting, "User"));
         setupSharedPreferences();
         setViewsAndListeners();
-        connectBLE();
-
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
-        mBluetoothConnection.setTextView(mTextView);
 
         /*
         if(userSettings.autoSync){
@@ -105,21 +101,72 @@ public class MainActivity extends AppCompatActivity
         String simpleDate = sdf.format(new Date());
         Gson gson = new Gson();
         Log.d("SHARED PREFERENCES", "Simple Date: " + simpleDate);
-        if(sharedPreferences.contains(simpleDate)){ //if contains, grab object
-            String json = sharedPreferences.getString(simpleDate, "");
-            DailyPosture currentDailyPosture = gson.fromJson(json, DailyPosture.class);
-            Log.d("SHARED PREFERENCES", "DailyObject: " + currentDailyPosture.toString());
 
-        } else { //create new object
-            String json = gson.toJson(new DailyPosture()); // myObject - instance of MyObject
+        if(!sharedPreferences.contains(simpleDate)){
+             //create new object
+            String json = gson.toJson(new PostureManager()); // myObject - instance of MyObject
+            //String json = gson.toJson(new DailyPosture()); // myObject - instance of MyObject
 
             SharedPreferences.Editor spEditor = sharedPreferences.edit();
             spEditor.putString(simpleDate, json);
             spEditor.commit();
         }
+
+        //grab object
+        String json = sharedPreferences.getString(simpleDate, "");
+        Log.d("SHARED PREFERENCES", "Pulled from shared preferences json: " + json);
+
+        //DailyPosture currentPosture = gson.fromJson(json, DailyPosture.class);
+        //Log.d("SHARED PREFERENCES", "Posture: " + currentPosture.toString());
+
+        PostureManager currentPosture = gson.fromJson(json, PostureManager.class);
+
+
+
+
+
+        Log.d("Gson.fromJson()", "Before changes:::" + currentPosture.toString(simpleDate));
+
+        tempMakeChanges(currentPosture);
+
+        json = sharedPreferences.getString(simpleDate, "");
+        Log.d("SHARED PREFERENCES", "Pulled from shared preferences json After Modification: " + json);
+    }
+
+    //public void tempMakeChanges(DailyPosture pm){
+    public void tempMakeChanges(PostureManager pm){
+        //pm.writeDistance(11.9f);
+        pm.writeDistance(14.9f);
+        pm.writeDistance(15.9f);
+        pm.writeDistance(15.3f);
+        //pm.addMeasurement(13.0f);
+        //pm.addMeasurement(11.9f);
+
+        String simpleDate =  new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+        Log.d("SHARED PREFERENCES", "pm object from json after chagnes::: " + pm.toString(simpleDate));
+        Gson gson = new Gson();
+
+        String json = gson.toJson(pm); // myObject - instance of MyObject
+        Log.d("SHARED PREFERENCES", "json after modification: " + json);
+
+
+
+        SharedPreferences.Editor spEditor = sharedPreferences.edit();
+        spEditor.putString(simpleDate, json);
+        spEditor.commit();
+
+
+
+        Log.d("SHARED PREFERENCES", "commited");
     }
 
     private boolean connectBLE(){
+        //This cannot be in onCreate..VV
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
+        mBluetoothConnection.setTextView(mTextView);
+        //Fix this..^^
+
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
         Log.d("Text View Setup", "mTextView");
