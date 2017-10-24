@@ -4,6 +4,7 @@ import edu.sjsu.posturize.posturize.SexyData.DailyPosture;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v4.content.SharedPreferencesCompat;
@@ -100,6 +101,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupSharedPreferences(){
+        sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
         DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         String simpleDate = sdf.format(new Date());
         Gson gson = new Gson();
@@ -107,9 +109,11 @@ public class MainActivity extends AppCompatActivity
         if(sharedPreferences.contains(simpleDate)){ //if contains, grab object
             String json = sharedPreferences.getString(simpleDate, "");
             DailyPosture currentDailyPosture = gson.fromJson(json, DailyPosture.class);
+            Log.d("SHARED PREFERENCES", "DailyObject: " + currentDailyPosture.toString());
 
         } else { //create new object
             String json = gson.toJson(new DailyPosture()); // myObject - instance of MyObject
+
             SharedPreferences.Editor spEditor = sharedPreferences.edit();
             spEditor.putString(simpleDate, json);
             spEditor.commit();
