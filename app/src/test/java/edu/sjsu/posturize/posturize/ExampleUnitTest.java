@@ -5,8 +5,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import edu.sjsu.posturize.posturize.PostureData.PostureManager;
 import edu.sjsu.posturize.posturize.PostureData.PostureMeasurement;
-import edu.sjsu.posturize.posturize.PostureData.PostureObject;
 
 import static org.junit.Assert.*;
 
@@ -25,7 +25,7 @@ public class ExampleUnitTest {
     public void posturizeObject_isGud() throws Exception {
         int userDefinedReadDelay = 1; //arduino sends reading every second
         float numbers[] = {1.02f, 1.05f, 1.07f, 1.1f, 1.09f, 1.12f};
-        PostureObject po = new PostureObject();
+        PostureManager po = new PostureManager();
         for(int i = 0; i < numbers.length; i++){
             po.writeDistance(numbers[i]);
             TimeUnit.SECONDS.sleep(userDefinedReadDelay);
