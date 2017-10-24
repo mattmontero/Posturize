@@ -3,11 +3,10 @@ package edu.sjsu.posturize.posturize;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import edu.sjsu.posturize.posturize.SexyData.PostureMeasurement;
-import edu.sjsu.posturize.posturize.SexyData.PostureObject;
+import edu.sjsu.posturize.posturize.PostureData.PostureMeasurement;
+import edu.sjsu.posturize.posturize.PostureData.PostureObject;
 
 import static org.junit.Assert.*;
 
