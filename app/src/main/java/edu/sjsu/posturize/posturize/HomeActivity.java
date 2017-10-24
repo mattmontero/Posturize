@@ -19,14 +19,20 @@ import android.widget.TextView;
 
 import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.OnDataPointTapListener;
+import com.jjoe64.graphview.series.Series;
 
 
 import static edu.sjsu.posturize.posturize.R.menu.navigation;
@@ -78,18 +84,18 @@ public class HomeActivity extends AppCompatActivity
 
     private void setDataView(int numPoints){
 
-        /*DATA GRAPH THINGS*/
+        //DATA GRAPH THINGS
         GraphView graph = (GraphView) findViewById(R.id.graph);
         DataPoint[] points = new DataPoint[numPoints];
         for (int i = 0; i < points.length; i++) {
-            points[i] = new DataPoint(i, Math.sin(i*0.5) * 20*(Math.random()*10+1));
+            points[i] = new DataPoint(i, -1 * Math.abs(5 *(Math.random())));
         }
         LineGraphSeries<DataPoint> series = new LineGraphSeries<>(points);
         graph.removeAllSeries();
         // set manual X bounds
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(-150);
-        graph.getViewport().setMaxY(150);
+        graph.getViewport().setMinY(-5);
+        graph.getViewport().setMaxY(0);
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(4);
@@ -97,11 +103,18 @@ public class HomeActivity extends AppCompatActivity
 
         // enable scaling and scrolling
         graph.getViewport().setScalable(true);
-        graph.getViewport().setScalableY(true);
+        graph.getViewport().setScalableY(false);
 
         graph.addSeries(series);
 
+        series.setOnDataPointTapListener(new OnDataPointTapListener() {
+            @Override
+            public void onTap(Series series, DataPointInterface dataPoint) {
+                Toast.makeText(getApplicationContext(), "Series1: On Data Point clicked: "+dataPoint, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
