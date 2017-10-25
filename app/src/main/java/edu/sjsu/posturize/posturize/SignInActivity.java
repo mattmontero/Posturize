@@ -291,6 +291,7 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     private void handleSignInResult(GoogleSignInResult result){
+        Log.d(TAG, "result status message: " + result.getStatus().getStatusCode());
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         Log.d(TAG, "Result toString: " + result.toString());
         if(result.isSuccess()) {
