@@ -300,13 +300,19 @@ public class SignInActivity extends AppCompatActivity implements
     private void handleSignInResult(GoogleSignInResult result){
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         Log.d(TAG, "Result toString: " + result.toString());
+
+        SharedPreferences.Editor editor = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE).edit();
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
             ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
+            editor.putString("current_user", account.getEmail());
+            editor.commit();
             updateUI(true);
         } else {
             //Signed out, show authenticated UI.
+            editor.putString("current_user", "");
+            editor.commit();
             updateUI(false);
         }
     }

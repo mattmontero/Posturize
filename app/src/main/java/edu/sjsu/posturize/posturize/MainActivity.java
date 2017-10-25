@@ -105,14 +105,17 @@ public class MainActivity extends AppCompatActivity
         sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
         String simpleDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
         Log.d("SHARED PREFERENCES", "Simple Date: " + simpleDate);
+        Log.d("SHARED PREFERENCES", "Current User: " + sharedPreferences.getString("current_user", ""));
+        String userEmail = sharedPreferences.getString("current_user", "");
 
-        if(!sharedPreferences.contains(simpleDate)){//create new object
-            String json = new Gson().toJson(new PostureManager()); // myObject - instance of MyObject
-
+        if(!sharedPreferences.contains(userEmail)){//create new object
+            String json = new Gson().toJson(new PostureManager());
             SharedPreferences.Editor spEditor = sharedPreferences.edit();
-            spEditor.putString(simpleDate, json); //Instead of simpleDate use user identifier
+            spEditor.putString(userEmail, json); //Instead of simpleDate use user identifier
             spEditor.commit();
         }
+        String json = sharedPreferences.getString(userEmail, "");
+        Log.d("SHARED PREFERENCES", "json: " + json);
     }
 
     private boolean connectBLE(){

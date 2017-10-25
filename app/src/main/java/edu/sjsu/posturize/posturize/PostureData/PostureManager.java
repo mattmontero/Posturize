@@ -46,7 +46,7 @@ public class PostureManager {
         SharedPreferences sharedPreferences = context.getSharedPreferences("USER_DATA", context.MODE_PRIVATE);
         String json = new Gson().toJson(this);
         SharedPreferences.Editor spEditor = sharedPreferences.edit();
-        spEditor.putString(new SimpleDateFormat("MM/dd/yyyy").format(new Date()), json);
+        spEditor.putString(sharedPreferences.getString("current_user", ""), json);
         spEditor.commit();
         Log.d("Wrote to PostureManager", this.toString(new SimpleDateFormat("MM/dd/yyy").format(new Date())));
     }
