@@ -48,8 +48,7 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
     private TextView mTextView;
     private Button mConnectButton;
-    private DailyUpdateFragment sDailyUpdateFragment;
-    public static final String FRAGTAG = "RepeatingAlarmFragment";
+    public static final String REPEATING_ALARM_FRAGMENT = "RepeatingAlarmFragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,10 +164,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setDailyUpdate() {
-        if (getSupportFragmentManager().findFragmentByTag(FRAGTAG) == null ) {
+        if (getSupportFragmentManager().findFragmentByTag(REPEATING_ALARM_FRAGMENT) == null ) {
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             DailyUpdateFragment fragment = new DailyUpdateFragment();
-            transaction.add(0, fragment, FRAGTAG);
+            transaction.add(0, fragment, REPEATING_ALARM_FRAGMENT);
             transaction.commit();
         }
     }
