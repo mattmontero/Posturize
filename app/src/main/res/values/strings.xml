@@ -2,21 +2,30 @@
     <string name="app_name">Posturize</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+
+    <string name="nav_daily">Daily</string>
+    <string name="selectDaily">Select Day</string>
+    <string name="nav_weekly">Weekly</string>
+    <string name="selectWeekly">Select Week</string>
+    <string name="nav_monthly">Monthly</string>
+    <string name="selectMonthly">Select Month</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+  
     <string name="title_activity_sign_in">Sign in</string>
 
     <!-- Strings related to login -->
     <string name="signed_in_fmt">Signed in as: %s</string>
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_register">Register</string>
-    <string name="action_sign_in">Sign in</string>
+    <string name="remember_me">Remember me</string>
+    <string name="label_sign_in">Sign In</string>
+    <string name="action_google_sign_out">Sign Out</string>
     <string name="action_google_sign_in">Sign In with Google</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
+    <string name="server_client_id">513031166011-sr6s6kgvp6off9hb7m7hq19l8r2o4cbm.apps.googleusercontent.com</string>
     <string name="signed_out">Signed Out</string>
+    <string name="signed_in_greeting">Welcome, %s!</string>
 </resources>

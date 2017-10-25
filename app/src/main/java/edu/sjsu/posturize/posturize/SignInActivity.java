@@ -3,7 +3,9 @@ package edu.sjsu.posturize.posturize;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -27,6 +29,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -37,6 +40,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +64,8 @@ public class SignInActivity extends AppCompatActivity implements
     private static final int RC_SIGN_IN = 9001;
     private static final String TAG = "SignInActivity";
 
+    private SharedPreferences sharedPreferences;
+
     /**
      * A dummy authentication store containing known user names and passwords.
      * TODO: remove after connecting to a real authentication system.
@@ -71,8 +79,6 @@ public class SignInActivity extends AppCompatActivity implements
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
-    private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -82,29 +88,41 @@ public class SignInActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-
-        Button mGenericSignInButton = (Button) findViewById(R.id.generic_sign_in_button);
-        mGenericSignInButton.setOnClickListener(this);
+        sharedPreferences = getSharedPreferences("SAVED_LOGIN", Context.MODE_PRIVATE);
         ((SignInButton) findViewById(R.id.google_sign_in_button)).setOnClickListener(this);
+        ((Button) findViewById(R.id.google_sign_out_button)).setOnClickListener(this);
+        ((Button) findViewById(R.id.continue_button)).setOnClickListener(this);
 
-        mLoginFormView = findViewById(R.id.login_form);
+
         mProgressView = findViewById(R.id.login_progress);
+        setGoogleApiClient();
+    }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+        if(sharedPreferences.getBoolean("REMEMBER_ME", false)) {
+            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+            if (opr.isDone()) {
+                Log.d(TAG, "Got cached sign-in");
+                GoogleSignInResult result = opr.get();
+                handleSignInResult(result);
+            } else {
+                //showProgressDialog();
+                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                    @Override
+                    public void onResult(GoogleSignInResult googleSignInResult) {
+                        //hideProgressDialog();
+                        handleSignInResult(googleSignInResult);
+                    }
+                });
+            }
+        }
+    }
+
+    private void setGoogleApiClient(){
         /*
          * Configure Google Sign-In and the GoogleApiClient Object
          * 1. create GoogleSignInOptions object
@@ -112,8 +130,8 @@ public class SignInActivity extends AppCompatActivity implements
          * profile. ID and basic profile are included in DEFAULT_SIGN_IN.
          */
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                //.requestIdToken("749349461099-5cpqn73ikggepcckpglu6osdsrp5cnpr.apps.googleusercontent.com")
                 .requestEmail()
+                .requestIdToken(getString(R.string.server_client_id))
                 .build();
         Log.d(TAG, "googleSignInOptions:" + gso.toString());
         //If we need to request additional scopes to access Google APIs, specify them with requestScopes.
@@ -124,40 +142,10 @@ public class SignInActivity extends AppCompatActivity implements
          * options specified by gso
          */
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         Log.d(TAG, "GoogleApiClient:" + mGoogleApiClient.toString());
-    }
-
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
     }
 
     /**
@@ -168,78 +156,34 @@ public class SignInActivity extends AppCompatActivity implements
                                            @NonNull int[] grantResults) {
         if (requestCode == REQUEST_READ_CONTACTS) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
             }
         }
     }
 
-
-    /**
-     * Attempts to sign in or register the account specified by the login form.
-     * If there are form errors (invalid email, missing fields, etc.), the
-     * errors are presented and no actual login attempt is made.
-     */
-    private void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
-        // Reset errors.
-        mEmailView.setError(null);
-        mPasswordView.setError(null);
-
-        // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
-
-        boolean cancel = false;
-        View focusView = null;
-
-        // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
-            mEmailView.setError(getString(R.string.error_field_required));
-            focusView = mEmailView;
-            cancel = true;
-        } else if (!isEmailValid(email)) {
-            mEmailView.setError(getString(R.string.error_invalid_email));
-            focusView = mEmailView;
-            cancel = true;
-        }
-
-        if (cancel) {
-            // There was an error; don't attempt login and focus the first
-            // form field with an error.
-            focusView.requestFocus();
-        } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
-            mAuthTask.execute((Void) null);
-        }
+    private void saveUserLogin(boolean rememberMe){
+        SharedPreferences.Editor spEditor = sharedPreferences.edit();
+        spEditor.putBoolean("REMEMBER_ME", rememberMe);
+        spEditor.commit();
     }
 
     private void googleSignIn(){
+        saveUserLogin(((CheckBox) findViewById(R.id.remember_me)).isChecked());
         Intent googleSignInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         Log.d(TAG, "googleSignInIntent" + googleSignInIntent.toString());
         startActivityForResult(googleSignInIntent, RC_SIGN_IN);
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+    private void googleSignOut(){
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Log.d(TAG, "Sign out status: " + status.toString());
+                        // [START_EXCLUDE]
+                        updateUI(false);
+                        // [END_EXCLUDE]
+                    }
+                });
     }
 
     /**
@@ -303,22 +247,11 @@ public class SignInActivity extends AppCompatActivity implements
             emails.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
-
-        addEmailsToAutoComplete(emails);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(SignInActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
     }
 
     @Override
@@ -330,13 +263,17 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()){
-            case R.id.generic_sign_in_button:
-                attemptLogin();
-                break;
             case R.id.google_sign_in_button:
                 googleSignIn();
                 break;
-
+            case R.id.google_sign_out_button:
+                googleSignOut();
+                break;
+            case R.id.continue_button:
+                startActivity((new Intent(this, HomeActivity.class)));
+                break;
+            default:
+                break;
         }
     }
 
@@ -344,19 +281,23 @@ public class SignInActivity extends AppCompatActivity implements
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult:requestCode->" + requestCode + " resultCode->" + resultCode);
-        //Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if(requestCode == RC_SIGN_IN){
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            Log.d(TAG, "GoogleSignInResult:" + result.getSignInAccount());
             handleSignInResult(result);
         }
     }
 
     private void handleSignInResult(GoogleSignInResult result){
+        Log.d(TAG, "result status message: " + result.getStatus().getStatusCode());
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        Log.d(TAG, "Result toString: " + result.toString());
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
-            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()));
+            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
             updateUI(true);
         } else {
             //Signed out, show authenticated UI.
@@ -367,12 +308,16 @@ public class SignInActivity extends AppCompatActivity implements
     private void updateUI(boolean signedIn){
         if(signedIn) {
             findViewById(R.id.google_sign_in_button).setVisibility(View.GONE);
+            findViewById(R.id.remember_me).setVisibility(View.GONE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.continue_button).setVisibility(View.VISIBLE);
         } else {
             ((TextView) findViewById(R.id.account_status)).setText(R.string.signed_out);
 
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.remember_me).setVisibility(View.VISIBLE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.GONE);
+            findViewById(R.id.continue_button).setVisibility(View.GONE);
         }
     }
 
@@ -431,8 +376,7 @@ public class SignInActivity extends AppCompatActivity implements
             if (success) {
                 finish();
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+
             }
         }
 
