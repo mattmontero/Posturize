@@ -58,13 +58,19 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("onCreate", "Starting");
+        Log.d("MainActivity", "onCreate: Starting");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         this.setTitle(getString(R.string.signed_in_greeting, "User"));
         setupSharedPreferences();
         setViewsAndListeners();
+
+        //This cannot be in onCreate..VV
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
+        mBluetoothConnection.setTextView(mTextView);
+        //Fix this..^^
 
         /*
         if(userSettings.autoSync){
@@ -97,76 +103,19 @@ public class MainActivity extends AppCompatActivity
 
     private void setupSharedPreferences(){
         sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
-        DateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
-        String simpleDate = sdf.format(new Date());
-        Gson gson = new Gson();
+        String simpleDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
         Log.d("SHARED PREFERENCES", "Simple Date: " + simpleDate);
 
-        if(!sharedPreferences.contains(simpleDate)){
-             //create new object
-            String json = gson.toJson(new PostureManager()); // myObject - instance of MyObject
-            //String json = gson.toJson(new DailyPosture()); // myObject - instance of MyObject
+        if(!sharedPreferences.contains(simpleDate)){//create new object
+            String json = new Gson().toJson(new PostureManager()); // myObject - instance of MyObject
 
             SharedPreferences.Editor spEditor = sharedPreferences.edit();
-            spEditor.putString(simpleDate, json);
+            spEditor.putString(simpleDate, json); //Instead of simpleDate use user identifier
             spEditor.commit();
         }
-
-        //grab object
-        String json = sharedPreferences.getString(simpleDate, "");
-        Log.d("SHARED PREFERENCES", "Pulled from shared preferences json: " + json);
-
-        //DailyPosture currentPosture = gson.fromJson(json, DailyPosture.class);
-        //Log.d("SHARED PREFERENCES", "Posture: " + currentPosture.toString());
-
-        PostureManager currentPosture = gson.fromJson(json, PostureManager.class);
-
-
-
-
-
-        Log.d("Gson.fromJson()", "Before changes:::" + currentPosture.toString(simpleDate));
-
-        tempMakeChanges(currentPosture);
-
-        json = sharedPreferences.getString(simpleDate, "");
-        Log.d("SHARED PREFERENCES", "Pulled from shared preferences json After Modification: " + json);
-    }
-
-    //public void tempMakeChanges(DailyPosture pm){
-    public void tempMakeChanges(PostureManager pm){
-        //pm.writeDistance(11.9f);
-        pm.writeDistance(14.9f);
-        pm.writeDistance(15.9f);
-        pm.writeDistance(15.3f);
-        //pm.addMeasurement(13.0f);
-        //pm.addMeasurement(11.9f);
-
-        String simpleDate =  new SimpleDateFormat("MM/dd/yyyy").format(new Date());
-        Log.d("SHARED PREFERENCES", "pm object from json after chagnes::: " + pm.toString(simpleDate));
-        Gson gson = new Gson();
-
-        String json = gson.toJson(pm); // myObject - instance of MyObject
-        Log.d("SHARED PREFERENCES", "json after modification: " + json);
-
-
-
-        SharedPreferences.Editor spEditor = sharedPreferences.edit();
-        spEditor.putString(simpleDate, json);
-        spEditor.commit();
-
-
-
-        Log.d("SHARED PREFERENCES", "commited");
     }
 
     private boolean connectBLE(){
-        //This cannot be in onCreate..VV
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
-        mBluetoothConnection.setTextView(mTextView);
-        //Fix this..^^
-
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if bluetooth is supported
         Log.d("Text View Setup", "mTextView");
@@ -343,12 +292,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            Log.d("onCreateView", "Start");
+            Log.d("MainActivity", "onCreateView: Start");
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
 
-
-            Log.d("onCreateView", "Done");
+            Log.d("MainActivity", "onCreateView: Done");
             return rootView;
         }
     }

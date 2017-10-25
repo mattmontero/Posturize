@@ -3,6 +3,7 @@ package edu.sjsu.posturize.posturize.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
@@ -38,15 +39,16 @@ public class BluetoothConnection {
 
     public BluetoothConnection(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
-        //setPostureManager();
+        setPostureManager();
     }
 
     private void setPostureManager(){
         Gson gson = new Gson();
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(SignInActivity.getAppContext());
+        Context context = SignInActivity.getAppContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("USER_DATA", context.MODE_PRIVATE);
         String simpleDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
 
-        String json = sharedPreferences.getString(simpleDate, "");
+        String json = sharedPreferences.getString(simpleDate, ""); //Grab using UserEmail
         mPostureManager = gson.fromJson(json, PostureManager.class);
         Log.d("SHARED PREFERENCES", "PostureManager: " + mPostureManager.toString(simpleDate));
     }
@@ -260,8 +262,11 @@ public class BluetoothConnection {
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
                     //mTextView.setText(writeMessage);
-                    PostureMeasurement current = new PostureMeasurement(new Date(), Float.parseFloat(writeMessage));
-                    mTextView.setText(current.toString());
+                    if(isNumeric(writeMessage)){
+                        mPostureManager.writeDistance(Float.parseFloat(writeMessage));
+                        mPostureManager.commit();
+                    }
+                    mTextView.setText(writeMessage);
                     Log.d("receiving", writeMessage);
 
                     break;
@@ -270,4 +275,12 @@ public class BluetoothConnection {
         }
     };
 
+    private boolean isNumeric(String str){
+        try{
+            float value = Float.parseFloat(str);
+        } catch(NumberFormatException e){
+            return false;
+        }
+        return true;
+    }
 }

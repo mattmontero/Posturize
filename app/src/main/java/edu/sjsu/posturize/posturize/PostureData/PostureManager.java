@@ -15,8 +15,12 @@ package edu.sjsu.posturize.posturize.PostureData;
  *
  */
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
  * PostureManager manages all activity coming in, and updates data visualizations.
@@ -33,6 +39,16 @@ public class PostureManager {
 
     public PostureManager(){
         dailyPostureMap = new HashMap<>();
+    }
+
+    public void commit(){
+        Context context = SignInActivity.getAppContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("USER_DATA", context.MODE_PRIVATE);
+        String json = new Gson().toJson(this);
+        SharedPreferences.Editor spEditor = sharedPreferences.edit();
+        spEditor.putString(new SimpleDateFormat("MM/dd/yyyy").format(new Date()), json);
+        spEditor.commit();
+        Log.d("Wrote to PostureManager", this.toString(new SimpleDateFormat("MM/dd/yyy").format(new Date())));
     }
 
     /**
