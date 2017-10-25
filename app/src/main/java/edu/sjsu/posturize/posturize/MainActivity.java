@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
     private TextView mTextView;
     private Button mConnectButton;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("onCreate", "Starting");
