@@ -41,6 +41,16 @@ public class PostureManager {
         dailyPostureMap = new HashMap<>();
     }
 
+    public static PostureManager getManager() {
+        Gson gson = new Gson();
+        Context context = SignInActivity.getAppContext();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("USER_DATA", context.MODE_PRIVATE);
+
+        String json = sharedPreferences.getString(sharedPreferences.getString("current_user", ""), ""); //sharedPreferences current_user : email
+
+        return gson.fromJson(json, PostureManager.class);
+    }
+
     public void commit(){
         Context context = SignInActivity.getAppContext();
         SharedPreferences sharedPreferences = context.getSharedPreferences("USER_DATA", context.MODE_PRIVATE);

@@ -39,17 +39,8 @@ public class BluetoothConnection {
 
     public BluetoothConnection(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
+        mPostureManager = PostureManager.getManager();
         setPostureManager();
-    }
-
-    private void setPostureManager(){
-        Gson gson = new Gson();
-        Context context = SignInActivity.getAppContext();
-        SharedPreferences sharedPreferences = context.getSharedPreferences("USER_DATA", context.MODE_PRIVATE);
-
-        String json = sharedPreferences.getString(sharedPreferences.getString("current_user", ""), ""); //sharedPreferences current_user : email
-        mPostureManager = gson.fromJson(json, PostureManager.class);
-        Log.d("SHARED PREFERENCES", "PostureManager: " + mPostureManager.toString(new SimpleDateFormat("MM/dd/yyyy").format(new Date())));
     }
 
     public void connectThread(BluetoothDevice device){
