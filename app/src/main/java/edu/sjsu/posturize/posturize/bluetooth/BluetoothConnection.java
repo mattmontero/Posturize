@@ -82,6 +82,7 @@ public class BluetoothConnection {
     public void startConnectThread(){
         if(mConnectThread != null){
             Log.d(BLUETOOTH, "mConnectThread " + mConnectThread.toString());
+            mConnectThread.start();
             Log.d(BLUETOOTH, "Thread Status: " + mConnectThread.getState().toString());
         }
     }
