@@ -25,7 +25,7 @@
     <string name="label_sign_in">Sign In</string>
     <string name="action_google_sign_out">Sign Out</string>
     <string name="action_google_sign_in">Sign In with Google</string>
-    <string name="server_client_id">749349461099-5cpqn73ikggepcckpglu6osdsrp5cnpr.apps.googleusercontent.com</string>
+    <string name="server_client_id">513031166011-sr6s6kgvp6off9hb7m7hq19l8r2o4cbm.apps.googleusercontent.com</string>
     <string name="signed_out">Signed Out</string>
     <string name="signed_in_greeting">Welcome, %s!</string>
 </resources>
