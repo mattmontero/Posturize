@@ -40,7 +40,6 @@ public class BluetoothConnection {
     public BluetoothConnection(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
         mPostureManager = PostureManager.getManager();
-        setPostureManager();
     }
 
     public void connectThread(BluetoothDevice device){
