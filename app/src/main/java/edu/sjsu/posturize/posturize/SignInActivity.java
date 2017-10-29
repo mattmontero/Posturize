@@ -47,6 +47,8 @@ import com.google.android.gms.common.api.Status;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.sjsu.posturize.posturize.Users.PosturizeUserInfo;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -307,6 +309,8 @@ public class SignInActivity extends AppCompatActivity implements
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
             ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
+            //((PosturizeUserInfo)getApplicationContext()).setUser(account);
+
             editor.putString("current_user", account.getEmail());
             editor.commit();
             updateUI(true);
