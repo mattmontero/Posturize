@@ -15,8 +15,14 @@ package edu.sjsu.posturize.posturize.PostureData;
  *
  */
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -29,6 +35,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.sjsu.posturize.posturize.HomeActivity;
+import edu.sjsu.posturize.posturize.R;
 import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
@@ -36,6 +44,9 @@ import edu.sjsu.posturize.posturize.SignInActivity;
  */
 public class PostureManager {
     private HashMap<String, DailyPosture> dailyPostureMap;
+    private int slouchCounter = 0; //Tracks consecutive slouches
+    private float threshold = 65.0f; //fixed value for PoC //Represents %error from target calibration/
+    private int consistentSlouchThreshold = 5; //Some value that designates how long the user can slouch
 
     public PostureManager(){
         dailyPostureMap = new HashMap<>();
@@ -58,7 +69,7 @@ public class PostureManager {
         SharedPreferences.Editor spEditor = sharedPreferences.edit();
         spEditor.putString(sharedPreferences.getString("current_user", ""), json);
         spEditor.commit();
-        Log.d("Wrote to PostureManager", this.toString(new SimpleDateFormat("MM/dd/yyy").format(new Date())));
+        //Log.d("Wrote to PostureManager", this.toString(new SimpleDateFormat("MM/dd/yyy").format(new Date())));
     }
 
     /**
@@ -74,6 +85,52 @@ public class PostureManager {
         }
         dailyPostureMap.get(simpleDate).addMeasurement(distance);
         //Log.d("PostureManager", "after writeDistance: " + dailyPostureMap.get(simpleDate).toString());
+
+        report(distance);
+    }
+
+    private void report(float value){
+        if(value < threshold){
+            slouchCounter++;
+            Log.d("SLOUCH DETECTED", "slouchCounter : " + Integer.toString(slouchCounter));
+            //Log.d("SLOUCH DETECTED", "YOU BITCH");
+            if(slouchCounter >= consistentSlouchThreshold){
+                Log.d("SLOUCH DETECTED", "YOU BITCH, NOW I NEED TO SEND A NOTIFICATION");
+                sendNotification();
+            }
+            return;
+        }
+        slouchCounter = 0;
+    }
+
+    private void sendNotification(){
+        Context context = SignInActivity.getAppContext();
+
+        String CHANNEL_ID = "slouch_channel_01";
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_home_black_24dp)
+                .setContentTitle("Sloucher")
+                .setContentText("Stop Slouching, Bitch");
+        //Creates an explicit intent for an activity in your app
+        Intent resultIntent = new Intent(context, HomeActivity.class);
+
+        //The stack builder object will contain an artificial back stack for the started Activity
+        //This ensures that navigating backward from the Activity leads out of your app to the Home screen.
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
+        //Adds the back stack for the Intent (but not the Intent itself)
+        stackBuilder.addParentStack(HomeActivity.class);
+        //Adds the Intent that starts the Activity to the top of the stack
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent =
+                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        mBuilder.setContentIntent(resultPendingIntent);
+        NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(context.NOTIFICATION_SERVICE);
+
+        //mNotificationId is a unique integer your app uses to identify the notification.
+        //For example, to cancel the notification, you can pass its ID number to NotifactionManager.cancel().
+        int mNotificationId = 1001;
+        mNotificationManager.notify(mNotificationId, mBuilder.build());
     }
 
     /**
