@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity
             connectBLE();
         }
         */
+        updateUI();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -101,14 +102,14 @@ public class MainActivity extends AppCompatActivity
         Log.d("onCreate","Done");
     }
 
-    private void setupSharedPreferences(){
+    private void setupSharedPreferences() {
         sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
         String simpleDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
         Log.d("SHARED PREFERENCES", "Simple Date: " + simpleDate);
         Log.d("SHARED PREFERENCES", "Current User: " + sharedPreferences.getString("current_user", ""));
         String userEmail = sharedPreferences.getString("current_user", "");
 
-        if(!sharedPreferences.contains(userEmail)){//create new object
+        if (!sharedPreferences.contains(userEmail)) {//create new object
             String json = new Gson().toJson(new PostureManager());
             SharedPreferences.Editor spEditor = sharedPreferences.edit();
             spEditor.putString(userEmail, json); //Instead of simpleDate use user identifier
@@ -116,6 +117,14 @@ public class MainActivity extends AppCompatActivity
         }
         String json = sharedPreferences.getString(userEmail, "");
         Log.d("SHARED PREFERENCES", "json: " + json);
+    }
+
+    private void updateUI(){
+        if(mBluetoothConnection.isConnected()){
+            ((Button) findViewById(R.id.calibrateButton)).setEnabled(true);
+        } else {
+            ((Button) findViewById(R.id.calibrateButton)).setEnabled(false);
+        }
     }
 
     private boolean connectBLE(){
@@ -157,6 +166,7 @@ public class MainActivity extends AppCompatActivity
         if(mDevice == null){
             Log.d(BLUETOOTH, "No device found");
             mConnectButton.setText("Connect");
+            updateUI();
             return false;
         }
 
@@ -170,8 +180,18 @@ public class MainActivity extends AppCompatActivity
         Log.d("ConnectThread", "created");
         //What happens if connectThread does not start?
         mBluetoothConnection.startConnectThread();
+        /*
+         if(mBluetoothConnection.startConnectThread()){
+            mConnectButton.setText("Disconnect");
+            updateUI();
+            return true;
+         } else {
+            Log.d("ConnectThread", "Something went wrong..");
+            return false
+         */
         Log.d("ConnectThread", "Running...");
         mConnectButton.setText("Disconnect");
+        updateUI();
         return true;
 
     }
@@ -181,7 +201,7 @@ public class MainActivity extends AppCompatActivity
         mConnectButton = (Button) findViewById(R.id.connectButton);
         //((Button) findViewById(R.id.frontporch_signInButton)).setOnClickListener(this);
         mConnectButton.setOnClickListener(this);
-        ((Button) findViewById(R.id.signoutButton)).setOnClickListener(this);
+        //((Button) findViewById(R.id.signoutButton)).setOnClickListener(this);
         ((Button) findViewById(R.id.calibrateButton)).setOnClickListener(this);
         ((Button) findViewById(R.id.refreshButton)).setOnClickListener(this);
 
@@ -222,6 +242,7 @@ public class MainActivity extends AppCompatActivity
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
             mBluetoothConnection.kill();
+            updateUI();
             mTextView.setText("Disconnected");
             ((Button)findViewById(R.id.connectButton)).setText("Connect");
         } else {
@@ -252,12 +273,12 @@ public class MainActivity extends AppCompatActivity
             case R.id.connectButton:
                 connectButtonPressed();
                 break;
+            /*
             case R.id.signoutButton:
                 //mBluetoothConnection.kill();
                 //userData.save()
                 this.finish();
                 break;
-            /*
             case R.id.frontporch_signInButton:
                 fpSignIn(new Intent(this, SignInActivity.class));
                 break;

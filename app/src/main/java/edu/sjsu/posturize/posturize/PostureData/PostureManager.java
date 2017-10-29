@@ -73,7 +73,7 @@ public class PostureManager {
             dailyPostureMap.put(simpleDate, new DailyPosture());
         }
         dailyPostureMap.get(simpleDate).addMeasurement(distance);
-        Log.d("PostureManager", "after writeDistance: " + dailyPostureMap.get(simpleDate).toString());
+        //Log.d("PostureManager", "after writeDistance: " + dailyPostureMap.get(simpleDate).toString());
     }
 
     /**

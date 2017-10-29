@@ -54,13 +54,16 @@
             android:id="@+id/calibrateButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calibrate" />
+            android:text="Calibrate"
+            android:enabled="false"/>
 
+        <!--
         <Button
             android:id="@+id/signoutButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/action_google_sign_out"/>
+        -->
         <!--
         <Button
             android:id="@+id/frontporch_signInButton"
