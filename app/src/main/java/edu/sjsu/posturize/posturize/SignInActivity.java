@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -21,16 +20,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -47,10 +40,6 @@ import com.google.android.gms.common.api.Status;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.sjsu.posturize.posturize.Users.PosturizeUserInfo;
-
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
  * A login screen that offers login via email/password.
  */
@@ -63,7 +52,7 @@ public class SignInActivity extends AppCompatActivity implements
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-    private static final int RC_SIGN_IN = 9001;
+    private static final int USER_SIGN_IN = 9001;
     private static final String TAG = "SignInActivity";
 
     private SharedPreferences sharedPreferences;
@@ -99,28 +88,27 @@ public class SignInActivity extends AppCompatActivity implements
 
         mProgressView = findViewById(R.id.login_progress);
         setGoogleApiClient();
-    }
-
-    @Override
-    protected void onStart(){
-        super.onStart();
 
         if(sharedPreferences.getBoolean("REMEMBER_ME", false)) {
-            OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-            if (opr.isDone()) {
-                Log.d(TAG, "Got cached sign-in");
-                GoogleSignInResult result = opr.get();
-                handleSignInResult(result);
-            } else {
-                //showProgressDialog();
-                opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                    @Override
-                    public void onResult(GoogleSignInResult googleSignInResult) {
-                        //hideProgressDialog();
-                        handleSignInResult(googleSignInResult);
-                    }
-                });
-            }
+            silentSignIn();
+        }
+    }
+
+    private void silentSignIn(){
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        if (opr.isDone()) {
+            Log.d(TAG, "Got cached sign-in");
+            GoogleSignInResult result = opr.get();
+            handleSignInResult(result);
+        } else {
+            //showProgressDialog();
+            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
+                @Override
+                public void onResult(GoogleSignInResult googleSignInResult) {
+                    //hideProgressDialog();
+                    handleSignInResult(googleSignInResult);
+                }
+            });
         }
     }
 
@@ -179,7 +167,7 @@ public class SignInActivity extends AppCompatActivity implements
         saveUserLogin(((CheckBox) findViewById(R.id.remember_me)).isChecked());
         Intent googleSignInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         Log.d(TAG, "googleSignInIntent" + googleSignInIntent.toString());
-        startActivityForResult(googleSignInIntent, RC_SIGN_IN);
+        startActivityForResult(googleSignInIntent, USER_SIGN_IN);
     }
 
     private void googleSignOut(){
@@ -292,11 +280,14 @@ public class SignInActivity extends AppCompatActivity implements
         Log.d(TAG, "onActivityResult:requestCode->" + requestCode + " resultCode->" + resultCode);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            Log.d(TAG, "GoogleSignInResult:" + result.getSignInAccount());
-            handleSignInResult(result);
+        switch(requestCode){
+            case USER_SIGN_IN:
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                Log.d(TAG, "GoogleSignInResult:" + result.getSignInAccount());
+                handleSignInResult(result);
+                break;
         }
+
     }
 
     private void handleSignInResult(GoogleSignInResult result){
@@ -328,6 +319,7 @@ public class SignInActivity extends AppCompatActivity implements
             findViewById(R.id.remember_me).setVisibility(View.GONE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.VISIBLE);
             findViewById(R.id.continue_button).setVisibility(View.VISIBLE);
+            startActivity((new Intent(this, HomeActivity.class)));
         } else {
             ((TextView) findViewById(R.id.account_status)).setText(R.string.signed_out);
 
