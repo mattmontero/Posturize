@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import edu.sjsu.posturize.posturize.HomeActivity;
+import edu.sjsu.posturize.posturize.Notifications.SlouchNotification;
 import edu.sjsu.posturize.posturize.R;
 import edu.sjsu.posturize.posturize.SignInActivity;
 
@@ -104,33 +105,8 @@ public class PostureManager {
     }
 
     private void sendNotification(){
-        Context context = SignInActivity.getAppContext();
-
-        String CHANNEL_ID = "slouch_channel_01";
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_home_black_24dp)
-                .setContentTitle("Sloucher")
-                .setContentText("Stop Slouching, Bitch");
-        //Creates an explicit intent for an activity in your app
-        Intent resultIntent = new Intent(context, HomeActivity.class);
-
-        //The stack builder object will contain an artificial back stack for the started Activity
-        //This ensures that navigating backward from the Activity leads out of your app to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        //Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(HomeActivity.class);
-        //Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setContentIntent(resultPendingIntent);
-        NotificationManager mNotificationManager = (NotificationManager)context.getSystemService(context.NOTIFICATION_SERVICE);
-
-        //mNotificationId is a unique integer your app uses to identify the notification.
-        //For example, to cancel the notification, you can pass its ID number to NotifactionManager.cancel().
-        int mNotificationId = 1001;
-        mNotificationManager.notify(mNotificationId, mBuilder.build());
+        SlouchNotification sn = new SlouchNotification(SignInActivity.getAppContext());
+        sn.notify(1001);
     }
 
     /**
