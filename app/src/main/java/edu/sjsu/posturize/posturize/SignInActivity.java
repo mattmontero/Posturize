@@ -3,6 +3,7 @@ package edu.sjsu.posturize.posturize;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.sjsu.posturize.posturize.Users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -332,6 +334,9 @@ public class SignInActivity extends AppCompatActivity implements
             findViewById(R.id.remember_me).setVisibility(View.GONE);
             findViewById(R.id.google_sign_out_button).setVisibility(View.VISIBLE);
             findViewById(R.id.continue_button).setVisibility(View.VISIBLE);
+
+            BluetoothConnection btConnection = BluetoothConnection.getInstance();
+            btConnection.setBluetoothAdapter(BluetoothAdapter.getDefaultAdapter());
         } else {
             ((TextView) findViewById(R.id.account_status)).setText(R.string.signed_out);
 
