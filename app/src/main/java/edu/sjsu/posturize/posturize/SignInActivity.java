@@ -47,6 +47,8 @@ import com.google.android.gms.common.api.Status;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.sjsu.posturize.posturize.Users.PosturizeUserInfo;
+
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -81,14 +83,14 @@ public class SignInActivity extends AppCompatActivity implements
     // UI references.
     private View mProgressView;
     private View mLoginFormView;
-
+    private static Context appContext;
     private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-
+        appContext = this.getApplicationContext();
         sharedPreferences = getSharedPreferences("SAVED_LOGIN", Context.MODE_PRIVATE);
         ((SignInButton) findViewById(R.id.google_sign_in_button)).setOnClickListener(this);
         ((Button) findViewById(R.id.google_sign_out_button)).setOnClickListener(this);
@@ -120,6 +122,13 @@ public class SignInActivity extends AppCompatActivity implements
                 });
             }
         }
+    }
+
+    /*
+     * workaround to get getDefaultSharedPreferences(context) in any non-activity class
+     */
+    public static Context getAppContext(){
+        return appContext;
     }
 
     private void setGoogleApiClient(){
@@ -294,13 +303,21 @@ public class SignInActivity extends AppCompatActivity implements
         Log.d(TAG, "result status message: " + result.getStatus().getStatusCode());
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         Log.d(TAG, "Result toString: " + result.toString());
+
+        SharedPreferences.Editor editor = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE).edit();
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
             ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
+            //((PosturizeUserInfo)getApplicationContext()).setUser(account);
+
+            editor.putString("current_user", account.getEmail());
+            editor.commit();
             updateUI(true);
         } else {
             //Signed out, show authenticated UI.
+            editor.putString("current_user", "");
+            editor.commit();
             updateUI(false);
         }
     }

@@ -1,9 +1,13 @@
 package edu.sjsu.posturize.posturize;
 
+import edu.sjsu.posturize.posturize.PostureData.DailyPosture;
+import edu.sjsu.posturize.posturize.PostureData.PostureManager;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -22,6 +26,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity
@@ -29,6 +38,7 @@ public class MainActivity extends AppCompatActivity
 
     private static BluetoothAdapter mBluetoothAdapter;
     private static BluetoothConnection mBluetoothConnection;
+    private SharedPreferences sharedPreferences;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -48,23 +58,26 @@ public class MainActivity extends AppCompatActivity
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d("onCreate", "Starting");
+        Log.d("MainActivity", "onCreate: Starting");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         this.setTitle(getString(R.string.signed_in_greeting, "User"));
+        setupSharedPreferences();
         setViewsAndListeners();
-        connectBLE();
 
+        //This cannot be in onCreate..VV
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
         mBluetoothConnection.setTextView(mTextView);
+        //Fix this..^^
 
         /*
         if(userSettings.autoSync){
             connectBLE();
         }
         */
+        updateUI();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -87,6 +100,31 @@ public class MainActivity extends AppCompatActivity
             }
         });*/
         Log.d("onCreate","Done");
+    }
+
+    private void setupSharedPreferences() {
+        sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
+        String simpleDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
+        Log.d("SHARED PREFERENCES", "Simple Date: " + simpleDate);
+        Log.d("SHARED PREFERENCES", "Current User: " + sharedPreferences.getString("current_user", ""));
+        String userEmail = sharedPreferences.getString("current_user", "");
+
+        if (!sharedPreferences.contains(userEmail)) {//create new object
+            String json = new Gson().toJson(new PostureManager());
+            SharedPreferences.Editor spEditor = sharedPreferences.edit();
+            spEditor.putString(userEmail, json); //Instead of simpleDate use user identifier
+            spEditor.commit();
+        }
+        String json = sharedPreferences.getString(userEmail, "");
+        Log.d("SHARED PREFERENCES", "json: " + json);
+    }
+
+    private void updateUI(){
+        if(mBluetoothConnection.isConnected()){
+            ((Button) findViewById(R.id.calibrateButton)).setEnabled(true);
+        } else {
+            ((Button) findViewById(R.id.calibrateButton)).setEnabled(false);
+        }
     }
 
     private boolean connectBLE(){
@@ -128,6 +166,7 @@ public class MainActivity extends AppCompatActivity
         if(mDevice == null){
             Log.d(BLUETOOTH, "No device found");
             mConnectButton.setText("Connect");
+            updateUI();
             return false;
         }
 
@@ -141,8 +180,18 @@ public class MainActivity extends AppCompatActivity
         Log.d("ConnectThread", "created");
         //What happens if connectThread does not start?
         mBluetoothConnection.startConnectThread();
+        /*
+         if(mBluetoothConnection.startConnectThread()){
+            mConnectButton.setText("Disconnect");
+            updateUI();
+            return true;
+         } else {
+            Log.d("ConnectThread", "Something went wrong..");
+            return false
+         */
         Log.d("ConnectThread", "Running...");
         mConnectButton.setText("Disconnect");
+        updateUI();
         return true;
 
     }
@@ -152,7 +201,7 @@ public class MainActivity extends AppCompatActivity
         mConnectButton = (Button) findViewById(R.id.connectButton);
         //((Button) findViewById(R.id.frontporch_signInButton)).setOnClickListener(this);
         mConnectButton.setOnClickListener(this);
-        ((Button) findViewById(R.id.signoutButton)).setOnClickListener(this);
+        //((Button) findViewById(R.id.signoutButton)).setOnClickListener(this);
         ((Button) findViewById(R.id.calibrateButton)).setOnClickListener(this);
         ((Button) findViewById(R.id.refreshButton)).setOnClickListener(this);
 
@@ -193,6 +242,7 @@ public class MainActivity extends AppCompatActivity
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
             mBluetoothConnection.kill();
+            updateUI();
             mTextView.setText("Disconnected");
             ((Button)findViewById(R.id.connectButton)).setText("Connect");
         } else {
@@ -223,12 +273,12 @@ public class MainActivity extends AppCompatActivity
             case R.id.connectButton:
                 connectButtonPressed();
                 break;
+            /*
             case R.id.signoutButton:
                 //mBluetoothConnection.kill();
                 //userData.save()
                 this.finish();
                 break;
-            /*
             case R.id.frontporch_signInButton:
                 fpSignIn(new Intent(this, SignInActivity.class));
                 break;
@@ -266,12 +316,11 @@ public class MainActivity extends AppCompatActivity
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            Log.d("onCreateView", "Start");
+            Log.d("MainActivity", "onCreateView: Start");
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            //textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
 
-
-            Log.d("onCreateView", "Done");
+            Log.d("MainActivity", "onCreateView: Done");
             return rootView;
         }
     }

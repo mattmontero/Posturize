@@ -3,16 +3,26 @@ package edu.sjsu.posturize.posturize.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.icu.util.Output;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.UUID;
+
+import edu.sjsu.posturize.posturize.PostureData.PostureManager;
+import edu.sjsu.posturize.posturize.PostureData.PostureMeasurement;
+import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
  * Created by matthewmontero on 8/6/17.
@@ -23,11 +33,13 @@ public class BluetoothConnection {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private TextView mTextView;
+    private PostureManager mPostureManager;
 
     private final String BLUETOOTH = "Connection Setup";
 
     public BluetoothConnection(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
+        mPostureManager = PostureManager.getManager();
     }
 
     public void connectThread(BluetoothDevice device){
@@ -238,6 +250,11 @@ public class BluetoothConnection {
                 case 1:
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
+                    //mTextView.setText(writeMessage);
+                    if(isNumeric(writeMessage)){
+                        mPostureManager.writeDistance(Float.parseFloat(writeMessage));
+                        mPostureManager.commit();
+                    }
                     mTextView.setText(writeMessage);
                     Log.d("receiving", writeMessage);
 
@@ -247,4 +264,12 @@ public class BluetoothConnection {
         }
     };
 
+    private boolean isNumeric(String str){
+        try{
+            float value = Float.parseFloat(str);
+        } catch(NumberFormatException e){
+            return false;
+        }
+        return true;
+    }
 }
