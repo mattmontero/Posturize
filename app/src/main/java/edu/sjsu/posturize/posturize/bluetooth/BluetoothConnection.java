@@ -36,7 +36,6 @@ public class BluetoothConnection {
     private PostureManager mPostureManager;
 
     private final String BLUETOOTH = "Connection Setup";
-
     public BluetoothConnection(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
         mPostureManager = PostureManager.getManager();
@@ -250,13 +249,19 @@ public class BluetoothConnection {
                 case 1:
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
-                    //mTextView.setText(writeMessage);
-                    if(isNumeric(writeMessage)){
-                        mPostureManager.writeDistance(Float.parseFloat(writeMessage));
-                        mPostureManager.commit();
+                    if(SignInActivity.getAppContext().getSharedPreferences("USER_DATA", SignInActivity.getAppContext().MODE_PRIVATE).getString("current_user", "") == ""){
+                        kill();
+                        Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
+                        mTextView.setText("ERROR: No user found.");
+                    } else {
+                        if(isNumeric(writeMessage)){
+                            mPostureManager.writeDistance(Float.parseFloat(writeMessage));
+                            mPostureManager.commit();
+                        }
+                        mTextView.setText(writeMessage);
+                        Log.d("receiving", writeMessage);
                     }
-                    mTextView.setText(writeMessage);
-                    Log.d("receiving", writeMessage);
+
 
                     break;
             }

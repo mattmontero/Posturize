@@ -188,9 +188,13 @@ public class SignInActivity extends AppCompatActivity implements
                     @Override
                     public void onResult(Status status) {
                         Log.d(TAG, "Sign out status: " + status.toString());
+                        SharedPreferences.Editor editor = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE).edit();
+                        editor.putString("current_user", "");
+                        editor.commit();
                         // [START_EXCLUDE]
                         updateUI(false);
                         // [END_EXCLUDE]
+
                     }
                 });
     }
