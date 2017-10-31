@@ -10,12 +10,6 @@ import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
  * Created by Matthew on 8/28/2017.
- *
- * TODO:
- * DONE - Create Object to manage daily posture activity
- * DONE - Create method to add measurement with timestamp.
- * Create method to get date
- *
  */
 
 /**
