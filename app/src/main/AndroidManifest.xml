@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".SettingsActivity"
             android:label="@string/signed_in_greeting"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
@@ -35,6 +35,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".NotificationActivity">
+        </activity>
+
+        <receiver android:name=".reminder.AlarmNotificationReceiver" />
     </application>
 
 </manifest>

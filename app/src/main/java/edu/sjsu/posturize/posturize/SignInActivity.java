@@ -1,5 +1,17 @@
 package edu.sjsu.posturize.posturize;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +19,10 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -24,7 +40,7 @@ import com.google.android.gms.common.api.Status;
 
 import edu.sjsu.posturize.posturize.Users.PosturizeUserInfo;
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
-
+import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
@@ -185,6 +201,7 @@ public class SignInActivity extends AppCompatActivity implements
             editor.putString("current_user", account.getEmail());
             editor.commit();
             updateUI(true);
+            setDailyUpdate();
         } else {
             //Signed out, show authenticated UI.
             editor.putString("current_user", "");
@@ -210,6 +227,15 @@ public class SignInActivity extends AppCompatActivity implements
             findViewById(R.id.google_sign_out_button).setVisibility(View.GONE);
             findViewById(R.id.continue_button).setVisibility(View.GONE);
         }
+    }
+
+    private void setDailyUpdate() {
+        AlarmManager manager = (AlarmManager) getSystemService(getApplicationContext().ALARM_SERVICE);
+        Intent intent;
+        PendingIntent pendingIntent;
+        intent = new Intent(this, AlarmNotificationReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(this,0,intent,0);
+        manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_DAY, AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 }
 
