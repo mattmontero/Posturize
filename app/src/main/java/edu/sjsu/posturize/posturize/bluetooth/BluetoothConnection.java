@@ -3,7 +3,6 @@ package edu.sjsu.posturize.posturize.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.icu.util.Output;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -14,20 +13,41 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import edu.sjsu.posturize.posturize.PostureData.PostureManager;
+import edu.sjsu.posturize.posturize.SignInActivity;
+
 /**
  * Created by matthewmontero on 8/6/17.
  */
 
 public class BluetoothConnection {
+    private static BluetoothConnection singleBluetoothConnection;
+
     private BluetoothAdapter mBluetoothAdapter;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private TextView mTextView;
+    private PostureManager mPostureManager;
 
-    private final String BLUETOOTH = "Connection Setup";
+    private static final String BLUETOOTH = "Connection Setup";
 
-    public BluetoothConnection(BluetoothAdapter btAdapter){
+    private BluetoothConnection(){
+        mPostureManager = PostureManager.getManager();
+    }
+
+    public static BluetoothConnection getInstance(){
+        if (singleBluetoothConnection == null){
+            singleBluetoothConnection = new BluetoothConnection();
+        }
+        return singleBluetoothConnection;
+    }
+
+    public void setBluetoothAdapter(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
+    }
+
+    public BluetoothAdapter getBluetoothAdapter(){
+        return mBluetoothAdapter;
     }
 
     public void connectThread(BluetoothDevice device){
@@ -53,8 +73,6 @@ public class BluetoothConnection {
 
     public void setTextView(TextView tv){
         mTextView = tv;
-        Log.d("tv", tv.toString());
-        Log.d("Set TextView", mTextView.toString());
     }
 
     public boolean isConnected(){
@@ -95,7 +113,6 @@ public class BluetoothConnection {
             BluetoothSocket tmp = null;
             try{
                 tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-                Log.d("UUID", MY_UUID.toString());
                 Log.d("socket", tmp.toString());
             } catch(IOException e){
                 Log.d("tmp Socket", e.toString());
@@ -175,12 +192,9 @@ public class BluetoothConnection {
 
             if (mmInStream != null && mmOutStream != null && mmSocket != null) {
                 try {
-                    Log.d(BLUETOOTH, "InStream : " + mmInStream.toString() );
                     mmInStream.close();
-                    Log.d(BLUETOOTH, "OutStream : " + mmOutStream.toString() );
                     mmOutStream.flush();
                     mmOutStream.close();
-                    Log.d(BLUETOOTH, "InStream : " + this.mmSocket.toString() );
                     this.mmSocket.close();
                 } catch (Exception e) {}
                 mmInStream = null;
@@ -238,13 +252,30 @@ public class BluetoothConnection {
                 case 1:
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
-                    mTextView.setText(writeMessage);
-                    Log.d("receiving", writeMessage);
-
+                    //Kill connection if sign out
+                    if(SignInActivity.getAppContext().getSharedPreferences("USER_DATA", SignInActivity.getAppContext().MODE_PRIVATE).getString("current_user", "") == ""){
+                        kill();
+                        Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
+                        mTextView.setText("ERROR: No user found.");
+                    } else {
+                        if(isNumeric(writeMessage)){
+                            mPostureManager.writeDistance(Float.parseFloat(writeMessage));
+                            mPostureManager.commit();
+                        }
+                        mTextView.setText(writeMessage);
+                        Log.d("receiving", writeMessage);
+                    }
                     break;
             }
-
         }
     };
 
+    private boolean isNumeric(String str){
+        try{
+            float value = Float.parseFloat(str);
+        } catch(NumberFormatException e){
+            return false;
+        }
+        return true;
+    }
 }
