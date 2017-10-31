@@ -1,7 +1,6 @@
 package edu.sjsu.posturize.posturize;
 
-import edu.sjsu.posturize.posturize.PostureData.DailyPosture;
-import edu.sjsu.posturize.posturize.PostureData.PostureManager;
+import edu.sjsu.posturize.posturize.data.PostureManager;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 
 import android.bluetooth.BluetoothAdapter;
@@ -29,7 +28,6 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;

@@ -22,8 +22,8 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Notification from alarm!!!!")
-                .setContentText("alarm notif text!!!")
+                .setContentTitle("Don't Forget to Posturize!")
+                .setContentText("Analysis Stuff")//make call to get analysis from Firebase
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                 .setContentInfo("Info");
         NotificationManager nm = (NotificationManager) context.getSystemService((Context.NOTIFICATION_SERVICE));

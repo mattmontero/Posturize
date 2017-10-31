@@ -5,8 +5,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import edu.sjsu.posturize.posturize.PostureData.PostureManager;
-import edu.sjsu.posturize.posturize.PostureData.PostureMeasurement;
+import edu.sjsu.posturize.posturize.data.PostureManager;
+import edu.sjsu.posturize.posturize.data.PostureMeasurement;
 
 import static org.junit.Assert.*;
 

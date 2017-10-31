@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.SexyData;
+package edu.sjsu.posturize.posturize.data;
 
 import android.content.Context;
 

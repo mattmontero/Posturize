@@ -1,28 +1,15 @@
 package edu.sjsu.posturize.posturize;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
 import android.bluetooth.BluetoothAdapter;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -38,7 +25,6 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-import edu.sjsu.posturize.posturize.Users.PosturizeUserInfo;
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
 
