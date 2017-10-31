@@ -1,6 +1,4 @@
-package edu.sjsu.posturize.posturize.Users;
-
-import android.content.SharedPreferences;
+package edu.sjsu.posturize.posturize.users;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.Users;
+package edu.sjsu.posturize.posturize.users;
 
 import android.app.Application;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;

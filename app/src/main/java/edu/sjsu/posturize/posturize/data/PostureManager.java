@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.PostureData;
+package edu.sjsu.posturize.posturize.data;
 
 /**
  * Created by Matthew on 8/28/2017.
@@ -15,29 +15,18 @@ package edu.sjsu.posturize.posturize.PostureData;
  *
  */
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
-import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
-import edu.sjsu.posturize.posturize.HomeActivity;
-import edu.sjsu.posturize.posturize.Notifications.SlouchNotification;
-import edu.sjsu.posturize.posturize.R;
+import edu.sjsu.posturize.posturize.notifications.SlouchNotification;
 import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
