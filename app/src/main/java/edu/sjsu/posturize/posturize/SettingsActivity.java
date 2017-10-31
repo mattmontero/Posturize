@@ -1,12 +1,10 @@
 package edu.sjsu.posturize.posturize;
 
 import edu.sjsu.posturize.posturize.bluetooth.*;
-import edu.sjsu.posturize.posturize.reminder.DailyUpdateFragment;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -27,7 +25,7 @@ import android.widget.TextView;
 
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity
+public class SettingsActivity extends AppCompatActivity
         implements View.OnClickListener{
 
     private static BluetoothAdapter mBluetoothAdapter;
@@ -48,17 +46,16 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
     private TextView mTextView;
     private Button mConnectButton;
-    public static final String REPEATING_ALARM_FRAGMENT = "RepeatingAlarmFragment";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("onCreate", "Starting");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_settings);
 
         this.setTitle(getString(R.string.signed_in_greeting, "User"));
         setViewsAndListeners();
-        setDailyUpdate();
         connectBLE();
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -161,15 +158,6 @@ public class MainActivity extends AppCompatActivity
         ((Button) findViewById(R.id.calibrateButton)).setOnClickListener(this);
         ((Button) findViewById(R.id.refreshButton)).setOnClickListener(this);
 
-    }
-
-    private void setDailyUpdate() {
-        if (getSupportFragmentManager().findFragmentByTag(REPEATING_ALARM_FRAGMENT) == null ) {
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            DailyUpdateFragment fragment = new DailyUpdateFragment();
-            transaction.add(0, fragment, REPEATING_ALARM_FRAGMENT);
-            transaction.commit();
-        }
     }
 
 

@@ -3,12 +3,15 @@ package edu.sjsu.posturize.posturize;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
@@ -21,16 +24,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -47,7 +44,7 @@ import com.google.android.gms.common.api.Status;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.Manifest.permission.READ_CONTACTS;
+import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
 
 /**
  * A login screen that offers login via email/password.
@@ -299,6 +296,7 @@ public class SignInActivity extends AppCompatActivity implements
             GoogleSignInAccount account = result.getSignInAccount();
             ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
             updateUI(true);
+            setDailyUpdate();
         } else {
             //Signed out, show authenticated UI.
             updateUI(false);
@@ -329,6 +327,15 @@ public class SignInActivity extends AppCompatActivity implements
 
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
+    }
+
+    private void setDailyUpdate() {
+        AlarmManager manager = (AlarmManager) getSystemService(getApplicationContext().ALARM_SERVICE);
+        Intent intent;
+        PendingIntent pendingIntent;
+        intent = new Intent(this, AlarmNotificationReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(this,0,intent,0);
+        manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_DAY, AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 
     /**

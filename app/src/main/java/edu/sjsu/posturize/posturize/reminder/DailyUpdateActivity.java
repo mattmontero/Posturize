@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import edu.sjsu.posturize.posturize.R;
+
 /**
  * Created by markbragg on 10/18/17.
  */
@@ -15,6 +17,7 @@ public class DailyUpdateActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("onCreate", "Starting");
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_daily_update);
     }
 
     /**
