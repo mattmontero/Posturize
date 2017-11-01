@@ -36,8 +36,7 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity
         implements View.OnClickListener{
 
-    private static BluetoothAdapter mBluetoothAdapter;
-    private static BluetoothConnection mBluetoothConnection;
+    private  BluetoothConnection mBluetoothConnection;
     private SharedPreferences sharedPreferences;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -66,17 +65,9 @@ public class MainActivity extends AppCompatActivity
         setupSharedPreferences();
         setViewsAndListeners();
 
-        //This cannot be in onCreate..VV
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        mBluetoothConnection = new BluetoothConnection(mBluetoothAdapter);
+        mBluetoothConnection = BluetoothConnection.getInstance();
         mBluetoothConnection.setTextView(mTextView);
-        //Fix this..^^
 
-        /*
-        if(userSettings.autoSync){
-            connectBLE();
-        }
-        */
         updateUI();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -122,17 +113,17 @@ public class MainActivity extends AppCompatActivity
     private void updateUI(){
         if(mBluetoothConnection.isConnected()){
             ((Button) findViewById(R.id.calibrateButton)).setEnabled(true);
+            mConnectButton.setText("Disconnect");
         } else {
             ((Button) findViewById(R.id.calibrateButton)).setEnabled(false);
+            mConnectButton.setText("Connect");
         }
     }
 
     private boolean connectBLE(){
         final String BLUETOOTH = "Bluetooth_Setup";
-        //1. Check if bluetooth is supported
-        Log.d("Text View Setup", "mTextView");
         //1. Check if device has bluetooth.
-        if(mBluetoothAdapter == null){
+        if(mBluetoothConnection.getBluetoothAdapter() == null){
             //Device does not support Bluetooth.
             Log.d(BLUETOOTH, "Bluetooth is not supported");
             return false;
@@ -140,7 +131,7 @@ public class MainActivity extends AppCompatActivity
             Log.d(BLUETOOTH, "Bluetooth is supported");
         }
         //2. Check if bluetooth is enabled
-        if(!mBluetoothAdapter.isEnabled()){
+        if(!mBluetoothConnection.getBluetoothAdapter().isEnabled()){
             Log.d(BLUETOOTH, "Bluetooth is not enabled");
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 6969);
@@ -149,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         //3. Get the Bluetooth module device
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        Set<BluetoothDevice> pairedDevices = mBluetoothConnection.getBluetoothAdapter().getBondedDevices();
         //mDevice should end up being HC-06
         BluetoothDevice mDevice = null;
         if(pairedDevices.size() > 0){
@@ -234,10 +225,6 @@ public class MainActivity extends AppCompatActivity
         mTextView.setText("Calibrating...");
         mBluetoothConnection.write("*");
     }
-
-    private void fpSignIn(Intent intent){
-        startActivity(intent);
-    };
 
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
