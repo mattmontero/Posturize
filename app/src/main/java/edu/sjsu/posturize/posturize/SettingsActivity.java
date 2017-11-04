@@ -1,8 +1,8 @@
 package edu.sjsu.posturize.posturize;
 
-import edu.sjsu.posturize.posturize.PostureData.DailyPosture;
-import edu.sjsu.posturize.posturize.PostureData.PostureManager;
+import edu.sjsu.posturize.posturize.data.PostureManager;
 import edu.sjsu.posturize.posturize.bluetooth.*;
+
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
@@ -28,12 +28,11 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity
+public class SettingsActivity extends AppCompatActivity
         implements View.OnClickListener{
 
     private  BluetoothConnection mBluetoothConnection;
@@ -54,12 +53,13 @@ public class MainActivity extends AppCompatActivity
     private ViewPager mViewPager;
     private TextView mTextView;
     private Button mConnectButton;
-    
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("MainActivity", "onCreate: Starting");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_settings);
 
         this.setTitle(getString(R.string.signed_in_greeting, "User"));
         setupSharedPreferences();

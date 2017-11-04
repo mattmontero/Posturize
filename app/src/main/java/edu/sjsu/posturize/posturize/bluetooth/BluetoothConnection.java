@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import edu.sjsu.posturize.posturize.PostureData.PostureManager;
+import edu.sjsu.posturize.posturize.data.PostureManager;
 import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**

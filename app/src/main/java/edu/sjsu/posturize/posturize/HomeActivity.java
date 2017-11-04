@@ -1,10 +1,13 @@
 package edu.sjsu.posturize.posturize;
 
-import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.Notification;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -23,19 +26,16 @@ import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
-
-import static edu.sjsu.posturize.posturize.R.menu.navigation;
+import edu.sjsu.posturize.posturize.reminder.NotificationPublisher;
 
 public class HomeActivity extends AppCompatActivity
         implements DatePickerDialog.OnDateSetListener,
@@ -166,7 +166,7 @@ public class HomeActivity extends AppCompatActivity
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.settings_button:
-                startActivity((new Intent(this, MainActivity.class)));
+                startActivity((new Intent(this, SettingsActivity.class)));
                 break;
         }
     }

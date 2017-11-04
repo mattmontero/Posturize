@@ -1,12 +1,7 @@
-package edu.sjsu.posturize.posturize.PostureData;
-
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+package edu.sjsu.posturize.posturize.data;
 
 import java.util.ArrayList;
 import java.util.Date;
-
-import edu.sjsu.posturize.posturize.SignInActivity;
 
 /**
  * Created by Matthew on 8/28/2017.
