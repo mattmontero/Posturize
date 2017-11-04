@@ -75,7 +75,7 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     /*
-     * workaround to get getDefaultSharedPreferences(context) in any non-activity class
+     * workaround to get context in any non-activity class
      */
     public static Context getAppContext(){
         return appContext;
