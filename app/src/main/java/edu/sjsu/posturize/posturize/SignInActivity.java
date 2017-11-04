@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.Status;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
+import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
@@ -125,9 +126,7 @@ public class SignInActivity extends AppCompatActivity implements
                     @Override
                     public void onResult(@NonNull Status status) {
                         Log.d(TAG, "Sign out status: " + status.toString());
-                        SharedPreferences.Editor editor = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE).edit();
-                        editor.putString("current_user", "");
-                        editor.commit();
+                        PosturizeUserInfo.getInstance().setUser(null);
                         // [START_EXCLUDE]
                         updateUI(false);
                         // [END_EXCLUDE]
@@ -177,21 +176,16 @@ public class SignInActivity extends AppCompatActivity implements
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         Log.d(TAG, "Result toString: " + result.toString());
 
-        SharedPreferences.Editor editor = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE).edit();
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
             ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
-            //((PosturizeUserInfo)getApplicationContext()).setUser(account);
+            PosturizeUserInfo.getInstance().setUser(account);
 
-            editor.putString("current_user", account.getEmail());
-            editor.commit();
             updateUI(true);
             setDailyUpdate();
         } else {
-            //Signed out, show authenticated UI.
-            editor.putString("current_user", "");
-            editor.commit();
+            PosturizeUserInfo.getInstance().setUser(null);
             updateUI(false);
         }
     }

@@ -22,7 +22,7 @@ public class DailyPosture {
             date = new Date();
             measurements.clear();
         }*/
-        measurements.add(new PostureMeasurement(new Date(), distance));
+        //measurements.add(new PostureMeasurement(new Date(), distance));
     }
 
     @Override

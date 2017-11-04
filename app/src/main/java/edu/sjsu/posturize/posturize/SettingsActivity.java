@@ -2,6 +2,7 @@ package edu.sjsu.posturize.posturize;
 
 import edu.sjsu.posturize.posturize.data.PostureManager;
 import edu.sjsu.posturize.posturize.bluetooth.*;
+import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -61,8 +62,8 @@ public class SettingsActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        this.setTitle(getString(R.string.signed_in_greeting, "User"));
-        setupSharedPreferences();
+        this.setTitle(getString(R.string.signed_in_greeting, PosturizeUserInfo.getInstance().getFirstName()));
+        //setupSharedPreferences();
         setViewsAndListeners();
 
         mBluetoothConnection = BluetoothConnection.getInstance();
@@ -82,14 +83,6 @@ public class SettingsActivity extends AppCompatActivity
 
         mTextView = (TextView) findViewById(R.id.numberViewer);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
         Log.d("onCreate","Done");
     }
 

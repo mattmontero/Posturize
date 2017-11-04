@@ -13,8 +13,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import edu.sjsu.posturize.posturize.data.PostureManager;
 import edu.sjsu.posturize.posturize.SignInActivity;
+import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
+import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 /**
  * Created by matthewmontero on 8/6/17.
@@ -32,7 +33,7 @@ public class BluetoothConnection {
     private static final String BLUETOOTH = "Connection Setup";
 
     private BluetoothConnection(){
-        mPostureManager = PostureManager.getManager();
+        mPostureManager = new PostureManager(SignInActivity.getAppContext());
     }
 
     public static BluetoothConnection getInstance(){
@@ -187,9 +188,7 @@ public class BluetoothConnection {
          * @return
          */
         private void cancel() {
-
             Log.d(BLUETOOTH, "ConnectedThread breakdown");
-
             if (mmInStream != null && mmOutStream != null && mmSocket != null) {
                 try {
                     mmInStream.close();
@@ -211,7 +210,6 @@ public class BluetoothConnection {
             while(true) {
                 if(mmInStream != null) {
                     try {
-                        //Log.d("bytes", Integer.toString(bytes));
                         bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
                         for (int i = begin; i < bytes; i++) {
                             if (buffer[i] == "#".getBytes()[0]) {
@@ -253,14 +251,14 @@ public class BluetoothConnection {
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
                     //Kill connection if sign out
-                    if(SignInActivity.getAppContext().getSharedPreferences("USER_DATA", SignInActivity.getAppContext().MODE_PRIVATE).getString("current_user", "") == ""){
+                    if(PosturizeUserInfo.getInstance().getEmail() == null){
                         kill();
                         Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
-                        mTextView.setText("ERROR: No user found.");
                     } else {
                         if(isNumeric(writeMessage)){
-                            mPostureManager.writeDistance(Float.parseFloat(writeMessage));
-                            mPostureManager.commit();
+                            mPostureManager.openDB();
+                            mPostureManager.insert(Float.parseFloat(writeMessage));
+                            mPostureManager.closeDB();
                         }
                         mTextView.setText(writeMessage);
                         Log.d("receiving", writeMessage);

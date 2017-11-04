@@ -5,7 +5,7 @@ package edu.sjsu.posturize.posturize.data;
  *
  *  TODO:
  *  DONE - Create PostureManager to manage daily/monthly reports
- *  Create write method to track measurements to daily object
+ *  Create insert method to track measurements to daily object
  *      ->Requires getDate from DailyPosture
  *  Create getter for current days measurements
  *      ->Requires getter for PostureMeasurements from DailyPosture

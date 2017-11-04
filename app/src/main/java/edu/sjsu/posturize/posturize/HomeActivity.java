@@ -127,6 +127,10 @@ public class HomeActivity extends AppCompatActivity
         navigation.setSelectedItemId(R.id.navigation_daily);
     }
 
+    public void onClick_Test(View v){
+        startActivity((new Intent(this, TestActivity.class)));
+    }
+
     /**
      * This callback method, call DatePickerFragment class,
      * DatePickerFragment class returns calendar view.
