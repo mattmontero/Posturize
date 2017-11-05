@@ -188,8 +188,6 @@ public class SignInActivity extends AppCompatActivity implements
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
-            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
-            //((PosturizeUserInfo)getApplicationContext()).setUser(account);
 
             if (!FirebaseHelper.getInstance().userExists(account.getId())) {
                 FirebaseHelper.getInstance().addUserToFirestore(account.getId(), account.getGivenName(), account.getFamilyName());
