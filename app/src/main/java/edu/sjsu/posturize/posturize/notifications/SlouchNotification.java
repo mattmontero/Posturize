@@ -58,7 +58,7 @@ public class SlouchNotification extends ContextWrapper {
     private void vibrate(){
         Vibrator vibrator = (Vibrator)context.getSystemService(VIBRATOR_SERVICE);
         if(vibrator.hasVibrator()){
-            vibrator.vibrate(1000);
+            vibrator.vibrate(800);
         }
     }
 }
