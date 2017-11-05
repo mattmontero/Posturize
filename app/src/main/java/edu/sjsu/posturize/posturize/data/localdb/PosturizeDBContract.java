@@ -77,6 +77,11 @@ public final class PosturizeDBContract {
         return mDb.insert(PostureEntry.TABLE_NAME, null, values);
     }
 
+    public boolean deleteUser(String user){
+        String where = PostureEntry.KEY_USER + " = '" + user + "'";
+        return mDb.delete(PostureEntry.TABLE_NAME, where, null) != 0;
+    }
+
     public boolean deleteRow(long rowId){
         String where = PostureEntry._ID + "=" + rowId;
         return mDb.delete(PostureEntry.TABLE_NAME, where, null) != 0;
