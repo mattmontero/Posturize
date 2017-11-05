@@ -26,6 +26,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
+import edu.sjsu.posturize.posturize.data.FirebaseHelper;
 import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
 
 public class SignInActivity extends AppCompatActivity implements
@@ -183,6 +184,10 @@ public class SignInActivity extends AppCompatActivity implements
             GoogleSignInAccount account = result.getSignInAccount();
             ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
             //((PosturizeUserInfo)getApplicationContext()).setUser(account);
+
+            if (!FirebaseHelper.getInstance().userExists(account.getId())) {
+                FirebaseHelper.getInstance().addUserToFirestore(account.getId(), account.getGivenName(), account.getFamilyName());
+            }
 
             editor.putString("current_user", account.getEmail());
             editor.commit();
