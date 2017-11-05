@@ -42,6 +42,14 @@ public class PostureManager {
         return newId;
     }
 
+    public void delete(String user){
+        if (db.deleteUser(user)) {
+            Log.d("PostureManager", "User: " + PosturizeUserInfo.getInstance().getEmail() + " deleted");
+        } else {
+            Log.d("Posturemanager", "Something happened and " + PosturizeUserInfo.getInstance().getEmail() + "was NOT deleted");
+        }
+    }
+
     public ArrayList<PostureMeasurement> get(Calendar day){
         return construct(db.getDay(day));
     }

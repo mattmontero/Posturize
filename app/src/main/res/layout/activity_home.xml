@@ -32,12 +32,6 @@
                         android:layout_height="wrap_content"
                         android:text="Settings"/>
                     <Button
-                        android:id="@+id/test_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Test"
-                        android:onClick="onClick_Test"/>
-                    <Button
                         android:id="@+id/sign_out_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
