@@ -85,7 +85,6 @@ public class PostureManager {
             Log.d("SLOUCH DETECTED", "slouchCounter : " + Integer.toString(slouchCounter));
             //Log.d("SLOUCH DETECTED", "YOU BITCH");
             if(slouchCounter >= consistentSlouchThreshold){
-                Log.d("SLOUCH DETECTED", "YOU BITCH, NOW I NEED TO SEND A NOTIFICATION");
                 sendNotification();
             }
             return;
@@ -96,15 +95,6 @@ public class PostureManager {
     private void sendNotification(){
         SlouchNotification sn = new SlouchNotification(SignInActivity.getAppContext());
         sn.notify(1001);
-    }
-
-    /**
-     * Get todays posture data
-     * @return ArrayList<PostureMeasurement> of measurements
-     */
-    public ArrayList<PostureMeasurement> getTodaysPosture(){
-        //return mDailyPosture.getMeasurements(); //return arraylist of postureMeasurements
-        return null;
     }
 
     public String toString(String simpleDate){

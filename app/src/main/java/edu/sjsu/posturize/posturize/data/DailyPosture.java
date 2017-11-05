@@ -18,10 +18,6 @@ public class DailyPosture {
     }
 
     public void addMeasurement(float distance){
-        /*if((new Date()).compareTo(date) != 0){ //different day, reset daily object
-            date = new Date();
-            measurements.clear();
-        }*/
         //measurements.add(new PostureMeasurement(new Date(), distance));
     }
 
