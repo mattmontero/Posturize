@@ -12,6 +12,7 @@ public class PosturizeUserInfo {
     private String firstName = null;
     private String lastName = null;
     private String email = null;
+    public boolean signingOut = false;
 
     private PosturizeUserInfo() {
     }
@@ -42,5 +43,10 @@ public class PosturizeUserInfo {
             lastName = ga.getFamilyName();
             firstName = ga.getGivenName();
         }
+        signingOut = false;
+    }
+
+    public void signOut(){
+        signingOut = true;
     }
 }
