@@ -1,12 +1,10 @@
 package edu.sjsu.posturize.posturize;
 
-import edu.sjsu.posturize.posturize.data.PostureManager;
 import edu.sjsu.posturize.posturize.bluetooth.*;
 import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
@@ -27,10 +25,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Set;
 
 public class SettingsActivity extends AppCompatActivity
@@ -84,23 +78,6 @@ public class SettingsActivity extends AppCompatActivity
         mTextView = (TextView) findViewById(R.id.numberViewer);
 
         Log.d("onCreate","Done");
-    }
-
-    private void setupSharedPreferences() {
-        sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE);
-        String simpleDate = new SimpleDateFormat("MM/dd/yyyy").format(new Date());
-        Log.d("SHARED PREFERENCES", "Simple Date: " + simpleDate);
-        Log.d("SHARED PREFERENCES", "Current User: " + sharedPreferences.getString("current_user", ""));
-        String userEmail = sharedPreferences.getString("current_user", "");
-
-        if (!sharedPreferences.contains(userEmail)) {//create new object
-            String json = new Gson().toJson(new PostureManager());
-            SharedPreferences.Editor spEditor = sharedPreferences.edit();
-            spEditor.putString(userEmail, json); //Instead of simpleDate use user identifier
-            spEditor.commit();
-        }
-        String json = sharedPreferences.getString(userEmail, "");
-        Log.d("SHARED PREFERENCES", "json: " + json);
     }
 
     private void updateUI(){
