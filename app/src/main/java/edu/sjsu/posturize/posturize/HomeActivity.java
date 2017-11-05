@@ -121,7 +121,6 @@ public class HomeActivity extends AppCompatActivity
 
         findViewById(R.id.settings_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.test_view).setOnClickListener(this);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_daily);
@@ -171,9 +170,6 @@ public class HomeActivity extends AppCompatActivity
             case R.id.sign_out_button:
                 PosturizeUserInfo.getInstance().signOut();
                 finish();
-                break;
-            case R.id.test_view:
-                startActivity((new Intent(this, TestActivity.class)));
                 break;
         }
     }
