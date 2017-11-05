@@ -8,12 +8,6 @@
     android:fitsSystemWindows="true"
     tools:context="edu.sjsu.posturize.posturize.SettingsActivity">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -43,40 +37,58 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Connect" />
-
-        <Button
-            android:id="@+id/refreshButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Refresh" />
-
         <Button
             android:id="@+id/calibrateButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Calibrate"
             android:enabled="false"/>
-
-        <!--
-        <Button
-            android:id="@+id/signoutButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/action_google_sign_out"/>
-        -->
-        <!--
-        <Button
-            android:id="@+id/frontporch_signInButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/label_sign_in" />
-        -->
-
         <TextView
             android:id="@+id/numberViewer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nothing Happened Yet" />
+            android:text="No value received yet" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="3">
+
+            <Button
+                android:id="@+id/add_record"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ADD"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/display_records"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Display All"
+                android:layout_weight="1"/>
+            <Button
+                android:id="@+id/delete_records"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FF0000"
+                android:textSize="12sp"
+                android:text="Remove User Data"
+                android:layout_weight="1"/>
+        </LinearLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#EEEEEE">
+            <TextView
+                android:id="@+id/textDisplay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#111111"
+                android:text="DB stuff"
+                android:scrollbarAlwaysDrawVerticalTrack="true"/>
+        </ScrollView>
+
     </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>

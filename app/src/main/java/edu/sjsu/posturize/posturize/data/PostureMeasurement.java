@@ -10,17 +10,17 @@ import java.util.Date;
  * PostureMeasurement stores a distant measurement (float) and with a timestamp.
  */
 public class PostureMeasurement {
-    private Date timestamp;
-    private float distance;
+    public final long timestamp;
+    public final float distance;
 
-    public PostureMeasurement(Date date, float distance){
+    public PostureMeasurement(long date, float distance){
         this.timestamp = date;
         this.distance = distance;
     }
 
     @Override
     public String toString(){
-        return "[" + distance + ", " + timestamp.toString() + "]";
+        return "[" + distance + ", " + timestamp + "]";
     }
 
 }

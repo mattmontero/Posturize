@@ -23,12 +23,21 @@
                 android:layout_height="match_parent"
                 android:gravity="center_horizontal"
                 android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/settings_button"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Settings"/>
+                    android:layout_height="wrap_content">
+                    <Button
+                        android:id="@+id/settings_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Settings"/>
+                    <Button
+                        android:id="@+id/sign_out_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sign Out"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/test"
