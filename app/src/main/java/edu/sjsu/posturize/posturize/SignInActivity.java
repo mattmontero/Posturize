@@ -193,7 +193,6 @@ public class SignInActivity extends AppCompatActivity implements
             }
 
             PosturizeUserInfo.getInstance().setUser(result.getSignInAccount());
-
             updateUI(true);
             setDailyUpdate();
         } else {

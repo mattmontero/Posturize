@@ -28,4 +28,6 @@
     <string name="server_client_id">513031166011-sr6s6kgvp6off9hb7m7hq19l8r2o4cbm.apps.googleusercontent.com</string>
     <string name="signed_out">Signed Out</string>
     <string name="signed_in_greeting">Welcome, %s!</string>
+
+    <string name="title_activity_test">TestActivity</string>
 </resources>
