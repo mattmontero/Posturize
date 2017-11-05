@@ -18,7 +18,7 @@ public class DailyPosture {
     }
 
     public void addMeasurement(float distance){
-        measurements.add(new PostureMeasurement(new Date(), distance));
+        //measurements.add(new PostureMeasurement(new Date(), distance));
     }
 
     @Override

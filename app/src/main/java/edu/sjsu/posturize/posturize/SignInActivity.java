@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.bluetooth.BluetoothAdapter;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,12 +28,15 @@ import com.google.android.gms.common.api.Status;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
+import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 public class SignInActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         View.OnClickListener {
 
     private static final int USER_SIGN_IN = 9001;
+    private static final int USER_SIGN_OUT = 9002;
     private static final String TAG = "SignInActivity";
 
     private static Context appContext;
@@ -46,8 +50,6 @@ public class SignInActivity extends AppCompatActivity implements
         appContext = this.getApplicationContext();
         sharedPreferences = getSharedPreferences("SAVED_LOGIN", Context.MODE_PRIVATE);
         findViewById(R.id.google_sign_in_button).setOnClickListener(this);
-        findViewById(R.id.google_sign_out_button).setOnClickListener(this);
-        findViewById(R.id.continue_button).setOnClickListener(this);
 
         setGoogleApiClient();
 
@@ -67,7 +69,6 @@ public class SignInActivity extends AppCompatActivity implements
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(GoogleSignInResult googleSignInResult) {
-                    //hideProgressDialog();
                     handleSignInResult(googleSignInResult);
                 }
             });
@@ -75,7 +76,7 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     /*
-     * workaround to get getDefaultSharedPreferences(context) in any non-activity class
+     * workaround to get context in any non-activity class
      */
     public static Context getAppContext(){
         return appContext;
@@ -103,6 +104,8 @@ public class SignInActivity extends AppCompatActivity implements
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .addOnConnectionFailedListener(this)
+                .addConnectionCallbacks(this)
                 .build();
         Log.d(TAG, "GoogleApiClient:" + mGoogleApiClient.toString());
     }
@@ -126,13 +129,8 @@ public class SignInActivity extends AppCompatActivity implements
                     @Override
                     public void onResult(@NonNull Status status) {
                         Log.d(TAG, "Sign out status: " + status.toString());
-                        SharedPreferences.Editor editor = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE).edit();
-                        editor.putString("current_user", "");
-                        editor.commit();
-                        // [START_EXCLUDE]
+                        PosturizeUserInfo.getInstance().setUser(null);
                         updateUI(false);
-                        // [END_EXCLUDE]
-
                     }
                 });
     }
@@ -144,16 +142,22 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if(PosturizeUserInfo.getInstance().signingOut){
+            googleSignOut();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        //
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.google_sign_in_button:
                 googleSignIn();
-                break;
-            case R.id.google_sign_out_button:
-                googleSignOut();
-                break;
-            case R.id.continue_button:
-                startActivity((new Intent(this, HomeActivity.class)));
                 break;
             default:
                 break;
@@ -169,11 +173,10 @@ public class SignInActivity extends AppCompatActivity implements
         switch(requestCode){
             case USER_SIGN_IN:
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                Log.d(TAG, "GoogleSignInResult:" + result.getSignInAccount());
+                Log.d(TAG, "GoogleSignIn:" + result.getSignInAccount());
                 handleSignInResult(result);
                 break;
         }
-
     }
 
     private void handleSignInResult(GoogleSignInResult result){
@@ -181,21 +184,13 @@ public class SignInActivity extends AppCompatActivity implements
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         Log.d(TAG, "Result toString: " + result.toString());
 
-        SharedPreferences.Editor editor = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE).edit();
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
-            GoogleSignInAccount account = result.getSignInAccount();
-            ((TextView) findViewById(R.id.account_status)).setText(getString(R.string.signed_in_fmt, account.getDisplayName()) + "\n" + account.getEmail());
-            //((PosturizeUserInfo)getApplicationContext()).setUser(account);
-
-            editor.putString("current_user", account.getEmail());
-            editor.commit();
+            PosturizeUserInfo.getInstance().setUser(result.getSignInAccount());
             updateUI(true);
             setDailyUpdate();
         } else {
-            //Signed out, show authenticated UI.
-            editor.putString("current_user", "");
-            editor.commit();
+            PosturizeUserInfo.getInstance().setUser(null);
             updateUI(false);
         }
     }
@@ -204,21 +199,13 @@ public class SignInActivity extends AppCompatActivity implements
         if(signedIn) {
             BluetoothConnection btConnection = BluetoothConnection.getInstance();
             btConnection.setBluetoothAdapter(BluetoothAdapter.getDefaultAdapter());
-            Log.d("BLUETOOTH", "Connection Created");
 
-            startActivity((new Intent(this, HomeActivity.class)));
-
+            startActivity(new Intent(this, HomeActivity.class));
             findViewById(R.id.google_sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.remember_me).setVisibility(View.GONE);
-            findViewById(R.id.google_sign_out_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.continue_button).setVisibility(View.VISIBLE);
-
         } else {
-            ((TextView) findViewById(R.id.account_status)).setText(R.string.signed_out);
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.remember_me).setVisibility(View.VISIBLE);
-            findViewById(R.id.google_sign_out_button).setVisibility(View.GONE);
-            findViewById(R.id.continue_button).setVisibility(View.GONE);
         }
     }
 

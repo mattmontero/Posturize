@@ -18,8 +18,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
-
-
 import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
 import android.widget.Toast;
@@ -35,7 +33,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
-import edu.sjsu.posturize.posturize.reminder.NotificationPublisher;
+import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 public class HomeActivity extends AppCompatActivity
         implements DatePickerDialog.OnDateSetListener,
@@ -121,7 +119,9 @@ public class HomeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        ((Button) findViewById(R.id.settings_button)).setOnClickListener(this);
+        findViewById(R.id.settings_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.test_view).setOnClickListener(this);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_daily);
@@ -168,7 +168,20 @@ public class HomeActivity extends AppCompatActivity
             case R.id.settings_button:
                 startActivity((new Intent(this, SettingsActivity.class)));
                 break;
+            case R.id.sign_out_button:
+                PosturizeUserInfo.getInstance().signOut();
+                finish();
+                break;
+            case R.id.test_view:
+                startActivity((new Intent(this, TestActivity.class)));
+                break;
         }
+    }
+
+    @Override
+    public void onBackPressed(){
+        PosturizeUserInfo.getInstance().signOut();
+        finish();
     }
 
     /**
