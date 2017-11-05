@@ -34,11 +34,6 @@
         <activity android:name=".NotificationActivity"></activity>
 
         <receiver android:name=".reminder.AlarmNotificationReceiver" />
-
-        <activity
-            android:name=".TestActivity"
-            android:label="@string/title_activity_test"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

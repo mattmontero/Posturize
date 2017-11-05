@@ -27,6 +27,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
+import edu.sjsu.posturize.posturize.data.FirebaseHelper;
 import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
 import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
@@ -186,7 +187,13 @@ public class SignInActivity extends AppCompatActivity implements
 
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
+            GoogleSignInAccount account = result.getSignInAccount();
+            if (!FirebaseHelper.getInstance().userExists(account.getId())) {
+                FirebaseHelper.getInstance().addUserToFirestore(account.getId(), account.getGivenName(), account.getFamilyName());
+            }
+
             PosturizeUserInfo.getInstance().setUser(result.getSignInAccount());
+
             updateUI(true);
             setDailyUpdate();
         } else {
