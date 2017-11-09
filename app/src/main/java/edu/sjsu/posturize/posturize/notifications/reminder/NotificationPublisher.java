@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.reminder;
+package edu.sjsu.posturize.posturize.notifications.reminder;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

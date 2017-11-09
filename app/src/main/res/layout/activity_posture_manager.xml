@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="edu.sjsu.posturize.posturize.SettingsActivity">
+    tools:context="edu.sjsu.posturize.posturize.PostureManagerActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -31,23 +31,6 @@
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.AppBarLayout>
-
-        <Button
-            android:id="@+id/connectButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Connect" />
-        <Button
-            android:id="@+id/calibrateButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Calibrate"
-            android:enabled="false"/>
-        <TextView
-            android:id="@+id/numberViewer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="No value received yet" />
 
         <LinearLayout
             android:layout_width="match_parent"

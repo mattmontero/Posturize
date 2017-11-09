@@ -1,6 +1,12 @@
-package edu.sjsu.posturize.posturize.reminder;
+package edu.sjsu.posturize.posturize.notifications.reminder;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
@@ -64,5 +70,21 @@ public class DailyUpdateActivity extends AppCompatActivity {
      */
     private String[] splitDataIntoDays(String data) {
         return new String[]{data.substring(0, data.length() / 2), data.substring(data.length() / 2, data.length() - 1)};
+    }
+
+    /**
+     * sets the daily update on and off depending on the shared preferences value for "pref_key_daily_update"
+     * @param context the activity calling the function
+     */
+    public static void setDailyUpdate(Context context) {
+        AlarmManager manager = (AlarmManager) context.getSystemService(context.getApplicationContext().ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmNotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,0,intent,0);
+        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_key_daily_update", true)) {
+            // TODO: ALLOW FOR SPECIFIC TIME SETTING
+            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000/*AlarmManager.INTERVAL_DAY*/, 5000/*AlarmManager.INTERVAL_DAY*/, pendingIntent);
+        } else {
+            manager.cancel(pendingIntent);
+        }
     }
 }

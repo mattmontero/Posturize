@@ -1,11 +1,8 @@
 package edu.sjsu.posturize.posturize;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.bluetooth.BluetoothAdapter;
 import android.support.annotation.Nullable;
@@ -14,7 +11,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -28,7 +24,6 @@ import com.google.android.gms.common.api.Status;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 import edu.sjsu.posturize.posturize.data.FirebaseHelper;
-import edu.sjsu.posturize.posturize.reminder.AlarmNotificationReceiver;
 import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 public class SignInActivity extends AppCompatActivity implements
@@ -194,7 +189,6 @@ public class SignInActivity extends AppCompatActivity implements
 
             PosturizeUserInfo.getInstance().setUser(result.getSignInAccount());
             updateUI(true);
-            setDailyUpdate();
         } else {
             PosturizeUserInfo.getInstance().setUser(null);
             updateUI(false);
@@ -213,15 +207,6 @@ public class SignInActivity extends AppCompatActivity implements
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.remember_me).setVisibility(View.VISIBLE);
         }
-    }
-
-    private void setDailyUpdate() {
-        AlarmManager manager = (AlarmManager) getSystemService(getApplicationContext().ALARM_SERVICE);
-        Intent intent;
-        PendingIntent pendingIntent;
-        intent = new Intent(this, AlarmNotificationReceiver.class);
-        pendingIntent = PendingIntent.getBroadcast(this,0,intent,0);
-        manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + AlarmManager.INTERVAL_DAY, AlarmManager.INTERVAL_DAY, pendingIntent);
     }
 }
 

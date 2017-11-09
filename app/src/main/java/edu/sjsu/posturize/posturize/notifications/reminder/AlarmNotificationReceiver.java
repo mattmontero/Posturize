@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.reminder;
+package edu.sjsu.posturize.posturize.notifications.reminder;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -22,7 +22,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Don't Forget to Posturize!")
+                .setContentTitle("Posturize Daily Update")
                 .setContentText("Analysis Stuff")//make call to get analysis from Firebase
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                 .setContentInfo("Info");

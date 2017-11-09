@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content"
+                  android:layout_width="wrap_content">
+
+    <PreferenceCategory
+        android:title="@string/pref_notifications"
+        android:key="pref_key_notifications">
+        <CheckBoxPreference
+            android:key="pref_key_daily_update"
+            android:summary="@string/pref_summary_daily_update"
+            android:title="@string/pref_title_daily_update"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="pref_key_weekly_update"
+            android:summary="@string/pref_summary_weekly_update"
+            android:title="@string/pref_title_weekly_update"
+            android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="pref_key_monthly_update"
+            android:summary="@string/pref_summary_monthly_update"
+            android:title="@string/pref_title_monthly_update"
+            android:defaultValue="false" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_slouch_detection"
+        android:key="pref_key_slouch_detection">
+        <ListPreference
+            android:key="pref_key_slouch_detection_tolerance"
+            android:title="@string/pref_slouch_detection_tolerance"
+            android:entries="@array/pref_slouch_tolerances"
+            android:entryValues="@array/pref_slouch_tolerances"
+            android:defaultValue="@string/pref_slouch_tolerance_default" />
+        <!--TODO: implement a slouch vibration delay-->
+    </PreferenceCategory>
+
+
+</PreferenceScreen>
