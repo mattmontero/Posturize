@@ -30,4 +30,24 @@
     <string name="signed_in_greeting">Welcome, %s!</string>
 
     <string name="title_activity_test">TestActivity</string>
+
+    <!--Preferences-->
+    <string name="pref_notifications">Notifications</string>
+    <string name="pref_summary_daily_update">Daily progress updates</string>
+    <string name="pref_title_daily_update">Daily Update</string>
+    <string name="pref_summary_weekly_update">Weekly progress updates</string>
+    <string name="pref_title_weekly_update">Weekly Update</string>
+    <string name="pref_summary_monthly_update">Monthly progress updates</string>
+    <string name="pref_title_monthly_update">Monthly Update</string>
+    <string name="pref_slouch_detection">Slouch Detection</string>
+    <string name="pref_slouch_detection_tolerance">Tolerance</string>
+    <string name="pref_slouch_tolerance_default">5%</string>
+
+    <string-array name="pref_slouch_tolerances">
+        <item>5%</item>
+        <item>10%</item>
+        <item>15%</item>
+    </string-array>
+
 </resources>
+

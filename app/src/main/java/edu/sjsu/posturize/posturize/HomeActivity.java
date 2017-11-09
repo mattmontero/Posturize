@@ -1,21 +1,22 @@
 package edu.sjsu.posturize.posturize;
 
-import android.app.AlarmManager;
 import android.app.DatePickerDialog;
-import android.app.Notification;
-import android.app.PendingIntent;
-import android.content.Context;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import android.app.Dialog;
@@ -33,6 +34,8 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
+import edu.sjsu.posturize.posturize.bluetooth.BluetoothActivity;
+import edu.sjsu.posturize.posturize.bluetooth.CalibrateActivity;
 import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 public class HomeActivity extends AppCompatActivity
@@ -121,10 +124,14 @@ public class HomeActivity extends AppCompatActivity
 
         findViewById(R.id.settings_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
+        findViewById(R.id.preferences_button).setOnClickListener(this);
+        findViewById(R.id.calibration_button).setOnClickListener(this);
+        findViewById(R.id.bluetooth_button).setOnClickListener(this);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_daily);
     }
+
 
     /**
      * This callback method, call DatePickerFragment class,
@@ -165,7 +172,16 @@ public class HomeActivity extends AppCompatActivity
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.settings_button:
-                startActivity((new Intent(this, SettingsActivity.class)));
+                startActivity((new Intent(this, PostureManagerActivity.class)));
+                break;
+            case R.id.preferences_button:
+                startActivity((new Intent(this, PreferencesActivity.class)));
+                break;
+            case R.id.calibration_button:
+                startActivity((new Intent(this, CalibrateActivity.class)));
+                break;
+            case R.id.bluetooth_button:
+                startActivity((new Intent(this, BluetoothActivity.class)));
                 break;
             case R.id.sign_out_button:
                 PosturizeUserInfo.getInstance().signOut();
