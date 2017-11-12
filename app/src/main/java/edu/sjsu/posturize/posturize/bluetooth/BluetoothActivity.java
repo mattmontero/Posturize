@@ -13,6 +13,7 @@ import android.widget.TextView;
 import java.util.Set;
 
 import edu.sjsu.posturize.posturize.R;
+import edu.sjsu.posturize.posturize.bluetooth.BluetoothActivity;
 
 /**
  * Created by markbragg on 11/8/17.
@@ -29,13 +30,19 @@ implements View.OnClickListener {
     protected void onCreate(Bundle savedInstance) {
         super.onCreate(savedInstance);
         setContentView(R.layout.activity_bluetooth);
-        setmConnectButton();
-        mConnectionStatusTextView = (TextView)findViewById(R.id.connectionStatus);
+        setViews();
         mBluetoothConnection = BluetoothConnection.getInstance();
         mBluetoothConnection.setActivity(this);
     }
 
-    private void setmConnectButton(){
+    @Override
+    protected  void onStart(){
+        super.onStart();
+        updateUI();
+    }
+
+    private void setViews(){
+        mConnectionStatusTextView = (TextView)findViewById(R.id.connectionStatus);
         mConnectButton = (Button) findViewById(R.id.connectButton);
         mConnectButton.setOnClickListener(this);
     }
@@ -48,12 +55,10 @@ implements View.OnClickListener {
 
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
-            mBluetoothConnection.kill();
+            mBluetoothConnection.kill(false);
         } else {
             mConnectionStatusTextView.setText("Connecting...");
-            if(connectBLE()){
-                mConnectionStatusTextView.setText("Connected!");
-            } else {
+            if(!connectBLE()){
                 mConnectionStatusTextView.setText("Something bad happened.");
             }
         }
@@ -77,44 +82,18 @@ implements View.OnClickListener {
         } else {
             Log.d(BLUETOOTH, "Bluetooth is enabled");
         }
-
-        //3. Get the Bluetooth module device
-        Set<BluetoothDevice> pairedDevices = mBluetoothConnection.getBluetoothAdapter().getBondedDevices();
-        //mDevice should end up being HC-06
-        BluetoothDevice mDevice = null;
-        if(pairedDevices.size() > 0){
-            for(BluetoothDevice device : pairedDevices) {
-                if(device.getName().equals("HC-06")){
-                    //This is our bluetooth device.
-                    mDevice = device;
-                    Log.d(BLUETOOTH, device.getName());
-                    Log.d(BLUETOOTH, device.toString());
-                    break;
-                }
-            }
+        if(mBluetoothConnection.connect()){
+            mConnectButton.setEnabled(false);
+            return true;
         }
-        if(mDevice == null){
-            Log.d(BLUETOOTH, "No device found");
-            mConnectButton.setText("Connect");
-            updateUI();
-            return false;
-        }
-        Log.d(BLUETOOTH, mDevice.getName());
-        Log.d(BLUETOOTH, mDevice.toString());
-
-        //4. Create the connection thread
-        mBluetoothConnection.connectThread(mDevice);
-        Log.d("ConnectThread", "created");
-        mBluetoothConnection.startConnectThread();
-        Log.d("ConnectThread", "Running...");
-        mConnectButton.setText("Disconnect"); //TODO: move to onConnected method when Bt replies with confirmtion
-        updateUI();
-        return true;
+        return false;
     }
 
     public void updateUI(){
+        mConnectButton.setEnabled(true);
         if(mBluetoothConnection.isConnected()){
             mConnectButton.setText("Disconnect");
+            mConnectionStatusTextView.setText("Connected!");
         } else {
             mConnectButton.setText("Connect");
         }
