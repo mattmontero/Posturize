@@ -32,6 +32,7 @@ implements View.OnClickListener {
         setmConnectButton();
         mConnectionStatusTextView = (TextView)findViewById(R.id.connectionStatus);
         mBluetoothConnection = BluetoothConnection.getInstance();
+        mBluetoothConnection.setActivity(this);
     }
 
     private void setmConnectButton(){
@@ -48,14 +49,10 @@ implements View.OnClickListener {
     private void connectButtonPressed() {
         if(mBluetoothConnection.isConnected()){
             mBluetoothConnection.kill();
-            updateUI();
-            mConnectionStatusTextView.setText("Disconnected");
-            ((Button)findViewById(R.id.connectButton)).setText("Connect");
         } else {
             mConnectionStatusTextView.setText("Connecting...");
             if(connectBLE()){
                 mConnectionStatusTextView.setText("Connected!");
-                ((Button)findViewById(R.id.connectButton)).setText("Disconnect");//TODO: Move to onConnect method when Bt replies with confrimation
             } else {
                 mConnectionStatusTextView.setText("Something bad happened.");
             }
@@ -115,12 +112,10 @@ implements View.OnClickListener {
         return true;
     }
 
-    private void updateUI(){
+    public void updateUI(){
         if(mBluetoothConnection.isConnected()){
-            findViewById(R.id.calibrateButton).setEnabled(true);
             mConnectButton.setText("Disconnect");
         } else {
-            findViewById(R.id.calibrateButton).setEnabled(false);
             mConnectButton.setText("Connect");
         }
     }
