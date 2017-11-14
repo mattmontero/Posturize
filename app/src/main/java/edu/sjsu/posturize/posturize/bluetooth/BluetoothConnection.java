@@ -121,7 +121,7 @@ public class BluetoothConnection {
                 Log.d("Sending", valueToWrite.substring(i,i+1));
                 mConnectedThread.write(valueToWrite.substring(i,i+1).getBytes());
             }
-            Log.d("ConnectedThread.Write", valueToWrite.getBytes().toString());
+            Log.d("ConnectedThread.Write", valueToWrite);
         } catch (NullPointerException e) {
             Log.d("Null ConnectedThread", e.toString());
         }
@@ -160,6 +160,11 @@ public class BluetoothConnection {
             mConnectedThread = new ConnectedThread(mmSocket);
             Log.d("Connected Thread", "Created");
             mConnectedThread.start();
+            try {
+                Thread.sleep(1000);
+                Log.d("Sleep before write", "Writing: " + CONNECT_CHAR.getBytes());
+            } catch (Exception e){}
+            mConnectedThread.write("q".getBytes());
             mConnectedThread.write(CONNECT_CHAR.getBytes());
             Log.d("Connected Thread", "Running...");
         }
@@ -199,6 +204,7 @@ public class BluetoothConnection {
 
             mmInStream = inTmp;
             mmOutStream = outTemp;
+            Log.d("Bluetooth created", "in and out stream set");
         }
 
         /**
@@ -300,7 +306,7 @@ public class BluetoothConnection {
                                 Log.d(HANDLER_TAG, "* =  " + lastChar);
                                 mCalibrateActivity.updateUI();
                                 break;
-                            case "c": //calibrate
+                            case "c": //connect
                                 Log.d(HANDLER_TAG, "c =  " + lastChar);
                                 mBluetoothActivity.updateUI();
                                 break;
