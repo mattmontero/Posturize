@@ -9,6 +9,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 public class PosturizeUserInfo {
     private static PosturizeUserInfo singleton;
 
+    private String id = null;
     private String firstName = null;
     private String lastName = null;
     private String email = null;
@@ -22,6 +23,8 @@ public class PosturizeUserInfo {
             singleton = new PosturizeUserInfo();
         return singleton;
     }
+
+    public String getId() { return id; }
 
     public String getFirstName() {
         return firstName;
@@ -37,8 +40,9 @@ public class PosturizeUserInfo {
 
     public void setUser(GoogleSignInAccount ga) {
         if (ga == null) {
-            email = lastName = firstName = null;
+            email = lastName = firstName = id = null;
         } else {
+            id = ga.getId();
             email = ga.getEmail();
             lastName = ga.getFamilyName();
             firstName = ga.getGivenName();
