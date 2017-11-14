@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import javax.security.auth.callback.Callback;
+
 import edu.sjsu.posturize.posturize.R;
+import edu.sjsu.posturize.posturize.data.FirebaseHelper;
 
 /**
  * Created by markbragg on 10/26/17.
@@ -23,7 +26,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("Posturize Daily Update")
-                .setContentText("Analysis Stuff")//make call to get analysis from Firebase
+                .setContentText(FirebaseHelper.getInstance().getDailyAnalysis())
                 .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                 .setContentInfo("Info");
         NotificationManager nm = (NotificationManager) context.getSystemService((Context.NOTIFICATION_SERVICE));
