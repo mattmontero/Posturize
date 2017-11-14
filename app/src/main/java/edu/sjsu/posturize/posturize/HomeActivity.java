@@ -48,7 +48,6 @@ public class HomeActivity extends AppCompatActivity
     Button changeDate;
     int month;
 
-    TextView mTextMessage;
     String tab;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -56,7 +55,6 @@ public class HomeActivity extends AppCompatActivity
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            mTextMessage = (TextView)findViewById(R.id.test);
             System.out.println(item.getItemId());
             System.out.println(R.id.navigation_daily);
             System.out.println(R.id.navigation_weekly);
@@ -65,17 +63,14 @@ public class HomeActivity extends AppCompatActivity
             switch (item.getItemId()) {
                 case R.id.navigation_daily:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectDaily));
-                    mTextMessage.setText(getString(R.string.selectDaily));
                     setDataView(100);
                     return true;
                 case R.id.navigation_weekly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectWeekly));
-                    mTextMessage.setText((R.string.selectWeekly));
                     setDataView(500);
                     return true;
                 case R.id.navigation_monthly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectMonthly));
-                    mTextMessage.setText((R.string.selectMonthly));
                     setDataView(1000);
                     return true;
             }
