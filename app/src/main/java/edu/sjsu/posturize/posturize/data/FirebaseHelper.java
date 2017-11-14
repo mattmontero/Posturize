@@ -170,6 +170,6 @@ public class FirebaseHelper {
                         }
                     }
                 });
-        return analysis[0].toString();
+        return "derp derp";//analysis[0].toString();
     }
 }
