@@ -19,7 +19,6 @@
 //create instance of SoftwareSerial
 SoftwareSerial bluetooth(RXPIN, TXPIN);
 
-
 //define button pin
 const short buttonPin = 12;
 
@@ -36,7 +35,6 @@ void showDeviceInfo() {
   Serial.print("Device mode: "); Serial.println(msg);
 }
 
-
   static boolean isCalibrated = false;
   static int calibrationTriggerCounter = 0;
   static int isCalibrating = false;
@@ -49,6 +47,8 @@ void showDeviceInfo() {
   static int pollCounter = 0;
   static boolean lastPollSlouch = false;
   static int conSecSlouch = 0;
+  static float slouchValues[CON_SEC_SLOUCH_NUM];
+  
 void setup() {
   Serial.begin(9600);
   delay(1000);
@@ -57,7 +57,6 @@ void setup() {
   pinMode(RELAY_PIN, OUTPUT);
   pinMode(CALIBRATE, INPUT);  
 
-  
   // Define pin #12 as input and activate the internal pull-up resistor
   pinMode(buttonPin, INPUT_PULLUP);
   
@@ -67,7 +66,6 @@ void setup() {
   //Setupt Bluetooth serial connection to android
   bluetooth.begin(9600); //Start software Serial
   
-
   DW1000Ranging.initCommunication(9, 10); //Reset and CS pin
   showDeviceInfo();
   //define the sketch as anchor. It will be great to dynamically change the type of module
@@ -83,7 +81,13 @@ void checkForBTData(char inData){
   switch(inData){
   case '*':
     bluetoothCalibration = true;
+    Serial.print("*#");
     break;
+   case 'c':
+    Serial.print("c#");
+    if(isCalibrated){
+      Serial.print("*#");
+    }
   default:
     break;
   }
@@ -109,14 +113,13 @@ void loop() {
         Serial.print("*");
         Serial.print("#");
       }
-
       isCalibrating = true;
       calibratedValue = 0;
     }
   }else{
     calibrationTriggerCounter = 0;
   }
-
+  
   if(bluetooth.available()> 0){
     checkForBTData(bluetooth.read());
   }
@@ -151,18 +154,15 @@ void newRange() {
           if(calibrationAry[a] > calibrationAry[maxIndex]){
             maxIndex = a;
           }
-  
           if(calibrationAry[a] < calibrationAry[minIndex]){
             minIndex = a;
           }
-          
           if(outlierCounter == 0){//takes the running sum of all 25 polled values
             currentSum += calibrationAry[a];
           }
         }
-
-          currentSum -= calibrationAry[maxIndex];
-          currentSum -= calibrationAry[minIndex];
+        currentSum -= calibrationAry[maxIndex];
+        currentSum -= calibrationAry[minIndex];
 
         //swapping the max and min to the edge of array so it wont be used next iteration.
         tempVal = calibrationAry[maxIndex];
@@ -183,20 +183,16 @@ void newRange() {
       calibrationCounter = 0;
 
       bluetoothCalibration = false;
-      Serial.print("#");Serial.println("CALIBRATION COMPLETED.......");Serial.println(calibratedValue);Serial.println("C");Serial.print("#");
+      Serial.print("#");Serial.println("CALIBRATION COMPLETED.......");Serial.println(calibratedValue);Serial.println("#");Serial.print("*#");
       digitalWrite(RELAY_PIN, HIGH);
       delay(800);
       digitalWrite(RELAY_PIN, LOW);
     }
-
-    
   }else if(isCalibrated){//not calibrating....means need to check reading...
-    
     if(pollCounter < POLLING_SIZE){
         calibrationAry[pollCounter] = DW1000Ranging.getDistantDevice()->getRange();
         pollCounter++;
     }else{
-
         currentSum = 0;
         //iterate the array to find total, and find current iteration outlier
         for(int outlierCounter = 0; outlierCounter < 3; outlierCounter++){
@@ -234,6 +230,7 @@ void newRange() {
         if(calibratedValue + threshold < currentSum ||
             calibratedValue - threshold > currentSum ){
             if(lastPollSlouch){
+              slouchValues[conSecSlouch] = currentSum;
               conSecSlouch++;
             }else{
               conSecSlouch=0;
@@ -248,6 +245,13 @@ void newRange() {
               digitalWrite(RELAY_PIN, HIGH);
               delay(400);
               digitalWrite(RELAY_PIN, LOW);
+              
+              for(int i = 0; i < CON_SEC_SLOUCH_NUM; i++){
+                Serial.print(slouchValues[i]);
+                Serial.print(',');
+              }
+              Serial.print("#");
+              
               conSecSlouch=0;
             }
             Serial.print("...SLOUCH DETECTED.... ");Serial.print(currentSum);Serial.println("#");
@@ -255,16 +259,10 @@ void newRange() {
             lastPollSlouch = false;
             Serial.print("...WITH IN RANGE...NOTHING TO WORRY... ");Serial.print(currentSum);Serial.println("#");
             digitalWrite(RELAY_PIN, LOW);
-
         }
-        
         pollCounter = 0;
         currentSum = 0;
     }
-  
-  
-  
-  
-  
   }
 }
+
