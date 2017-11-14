@@ -15,7 +15,6 @@ import edu.sjsu.posturize.posturize.R;
 /**
  * Created by Matt on 10/29/2017.
  */
-
 public class SlouchNotification extends ContextWrapper {
     private NotificationManager mNotificationManager;
     private Context context; //app context
