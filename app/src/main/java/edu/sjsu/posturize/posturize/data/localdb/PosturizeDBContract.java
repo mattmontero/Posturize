@@ -158,7 +158,7 @@ public final class PosturizeDBContract {
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         long start = c.getTimeInMillis();
-        c.set(Calendar.HOUR, 24);
+        c.set(Calendar.HOUR, 23);
         c.set(Calendar.MINUTE, 59);
         c.set(Calendar.SECOND, 59);
         long end =  c.getTimeInMillis();

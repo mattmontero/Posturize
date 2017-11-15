@@ -17,6 +17,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.sjsu.posturize.posturize.notifications.reminder.DailyUpdateActivity;
 import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 import static android.content.ContentValues.TAG;
@@ -29,10 +30,12 @@ public class FirebaseHelper {
     private final String USERS = "users";
     private final String FIRST = "first";
     private final String LAST = "last";
-    private final String USER_SLOUCHES = "user_slouches";
+    private final String USER_SLOUCHES = "slouches";
     private final String EMAIL = "email";
     private final String ANALYSIS = "analysis";
     private final String DAILY = "daily";
+    private final String IS_SYNCED = "isSynced";
+    private final String CURRENT = "current";
 
     private static FirebaseHelper instance;
     private FirebaseFirestore db;
@@ -44,7 +47,6 @@ public class FirebaseHelper {
     private FirebaseHelper() {
         sUserInfo = PosturizeUserInfo.getInstance();
         db = FirebaseFirestore.getInstance();
-        setFirestoreReferenceListeners();
     }
 
     public static FirebaseHelper getInstance() {
@@ -54,7 +56,7 @@ public class FirebaseHelper {
         return instance;
     }
 
-    private void setFirestoreReferenceListeners() {
+    public void setFirestoreReferenceListeners() {
         setUserListener();
         setDailyAnalysisListener();
     }
@@ -81,21 +83,24 @@ public class FirebaseHelper {
     }
 
     private void setDailyAnalysisListener() {
-//        dailyAnalysisCollectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-//            @Override
-//            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-//                if (e != null) {
-//                    Log.w(TAG, "Listen failed.", e);
-//                    return;
-//                }
-//
-//                if (documentSnapshots != null && documentSnapshots.exists()) {
-//                    Log.d(TAG, "Current data: " + documentSnapshots.getData());
-//                } else {
-//                    Log.d(TAG, "Current data: null");
-//                }
-//            }
-//        });
+        final DocumentReference dailyAnalysisReference = db.collection(ANALYSIS).document(sUserInfo.getId()).collection(DAILY).document(CURRENT);
+        dailyAnalysisReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    Log.d(TAG, "Current data: " + snapshot.getData().get("analysis"));
+                    DailyUpdateActivity.setAnalysis((String) snapshot.getData().get("analysis"));
+                } else {
+                    Log.d(TAG, "Current data: null");
+                }
+            }
+        });
     }
 
     /**
@@ -120,17 +125,33 @@ public class FirebaseHelper {
     }
 
     /**
-     * adds slouches to the
-     * @param id
-     * @param slouches
+     * adds slouches to the slouches collection, <userId> document
+     * @param data slouch data for user from sqlite
      */
-    public void addSlouchesToFirestoreForUser(String id, HashMap<String, Object> slouches) {
-        DocumentReference slouchesRef = db.collection(USER_SLOUCHES).document(id);
-        if (slouchesExistForUser()) {
-            slouchesRef.update(slouches);
-        } else {
-            slouchesRef.set(slouches);
-        }
+    public void addSlouchesToFirestoreForUser(final HashMap<String, Object> data) {
+        getSlouchesForUser().get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().exists()) {
+                            DocumentReference slouchesRef = db.collection(USER_SLOUCHES).document(sUserInfo.getId());
+                            slouchesRef.set(data);
+                        }
+                    }
+                });
+        getUser(sUserInfo.getId()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists()) {
+                            Map<String, Object> user = new HashMap<>();
+                            user.put(IS_SYNCED, true);
+
+                            DocumentReference userRef = db.collection(USERS).document(sUserInfo.getId());
+                            userRef.update(user);
+                        }
+                    }
+                });
     }
 
     public DocumentReference getUser(String id) {
@@ -139,20 +160,6 @@ public class FirebaseHelper {
 
     public DocumentReference getSlouchesForUser() {
         return db.collection(USER_SLOUCHES).document(sUserInfo.getId());
-    }
-
-    public boolean slouchesExistForUser() {
-        final boolean[] result = new boolean[1];
-        getSlouchesForUser().get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            result[0] = task.getResult().exists();
-                        }
-                    }
-                });
-        return result[0];
     }
 
     public String getDailyAnalysis() {
@@ -170,6 +177,6 @@ public class FirebaseHelper {
                         }
                     }
                 });
-        return analysis[0].toString();
+        return "derp derp";//analysis[0].toString();
     }
 }

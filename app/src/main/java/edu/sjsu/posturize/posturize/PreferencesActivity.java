@@ -1,10 +1,15 @@
 package edu.sjsu.posturize.posturize;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 
-import edu.sjsu.posturize.posturize.notifications.reminder.DailyUpdateActivity;
+import edu.sjsu.posturize.posturize.notifications.reminder.AlarmNotificationReceiver;
 
 /**
  * Created by markbragg on 11/7/17.
@@ -43,6 +48,14 @@ public class PreferencesActivity extends PreferenceActivity
     }
 
     private void setDailyUpdate() {
-        DailyUpdateActivity.setDailyUpdate(this);
+        AlarmManager manager = (AlarmManager) getSystemService(getApplicationContext().ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmNotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this,0,intent,0);
+        if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean("pref_key_daily_update", true)) {
+            // TODO: ALLOW FOR SPECIFIC TIME SETTING
+            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000/*AlarmManager.INTERVAL_DAY*/, 5000/*AlarmManager.INTERVAL_DAY*/, pendingIntent);
+        } else {
+            manager.cancel(pendingIntent);
+        }
     }
 }
