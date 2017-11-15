@@ -53,7 +53,7 @@
                 android:id="@+id/delete_records"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#FF0000"
+                android:backgroundTint="#FF0000"
                 android:textSize="12sp"
                 android:text="Remove User Data"
                 android:layout_weight="1"/>
