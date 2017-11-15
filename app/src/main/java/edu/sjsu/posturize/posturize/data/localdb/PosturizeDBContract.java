@@ -101,22 +101,9 @@ public final class PosturizeDBContract {
         c.close();
     }
 
-    // Return all data in the database.
+    // select * from posturize.
     public Cursor getAllRows() {
         String where = null;
-        Cursor c = 	mDb.query(true, PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
-                where, null, null, null, null, null);
-        if (c != null) {
-            c.moveToFirst();
-        }
-        return c;
-    }
-
-    /*
-     * Get single row by rowId
-     */
-    public Cursor getRow(long rowId) {
-        String where = PostureEntry._ID + "=" + rowId;
         Cursor c = 	mDb.query(true, PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
                 where, null, null, null, null, null);
         if (c != null) {
