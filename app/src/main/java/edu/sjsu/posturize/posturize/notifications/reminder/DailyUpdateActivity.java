@@ -77,14 +77,6 @@ public class DailyUpdateActivity extends AppCompatActivity {
      * @param context the activity calling the function
      */
     public static void setDailyUpdate(Context context) {
-        AlarmManager manager = (AlarmManager) context.getSystemService(context.getApplicationContext().ALARM_SERVICE);
-        Intent intent = new Intent(context, AlarmNotificationReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,0,intent,0);
-        if (PreferenceManager.getDefaultSharedPreferences(context).getBoolean("pref_key_daily_update", true)) {
-            // TODO: ALLOW FOR SPECIFIC TIME SETTING
-            manager.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000/*AlarmManager.INTERVAL_DAY*/, 5000/*AlarmManager.INTERVAL_DAY*/, pendingIntent);
-        } else {
-            manager.cancel(pendingIntent);
-        }
+
     }
 }
