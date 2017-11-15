@@ -37,7 +37,7 @@ public class PostureManager {
     }
 
     public long insert(float value){
-        Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
+        //Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
         long newId = db.insertRow(PosturizeUserInfo.getInstance().getId(), PosturizeUserInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
         return newId;
     }
