@@ -12,6 +12,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.RetryStrategy;
+import com.firebase.jobdispatcher.Trigger;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -22,11 +27,13 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import java.util.Date;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 import edu.sjsu.posturize.posturize.data.FirebaseHelper;
+import edu.sjsu.posturize.posturize.scheduledjob.DailySync;
 import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
 public class SignInActivity extends AppCompatActivity implements
@@ -188,6 +195,33 @@ public class SignInActivity extends AppCompatActivity implements
             GoogleSignInAccount account = result.getSignInAccount();
             PosturizeUserInfo.getInstance().setUser(result.getSignInAccount());
             FirebaseHelper.getInstance().addUserToFirestore();
+
+            FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
+            int curTimeMilis = (int) new Date().getTime();
+            Job myJob = dispatcher.newJobBuilder()
+                    .setReplaceCurrent(true)
+                    // the JobService that will be called
+                    .setService(DailySync.class)
+                    // uniquely identifies the job
+                    .setTag("PosturizeDailySync")
+                    // one-off job
+                    .setRecurring(false)
+                    // start between 0 and 60 seconds from now
+                    .setTrigger(Trigger.executionWindow(0,(curTimeMilis/86400000+1) * 86400000 - curTimeMilis))
+                    //.setTrigger(Trigger.executionWindow(0, 60))
+                    // don't overwrite an existing job with the same the
+                    .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                    // constraints that need to be satisfied for the job to run
+//                    .setConstraints(
+//                            // only run on an unmetered network
+//                            Constraint.ON_UNMETERED_NETWORK,
+//                            // only run when the device is charging
+//                            Constraint.DEVICE_CHARGING
+//                    )
+//                    .setExtras(myExtrasBundle)
+                    .build();
+
+            dispatcher.mustSchedule(myJob);
 
             updateUI(true);
         } else {

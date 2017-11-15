@@ -14,6 +14,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,10 +32,11 @@ public class FirebaseHelper {
     private final String USERS = "users";
     private final String FIRST = "first";
     private final String LAST = "last";
-    private final String USER_SLOUCHES = "user_slouches";
+    private final String USER_SLOUCHES = "slouches";
     private final String EMAIL = "email";
     private final String ANALYSIS = "analysis";
     private final String DAILY = "daily";
+    private final String IS_SYNCED = "isSynced";
 
     private static FirebaseHelper instance;
     private FirebaseFirestore db;
@@ -120,17 +124,33 @@ public class FirebaseHelper {
     }
 
     /**
-     * adds slouches to the
-     * @param id
-     * @param slouches
+     * adds slouches to the slouches collection, <userId> document
+     * @param data
      */
-    public void addSlouchesToFirestoreForUser(String id, HashMap<String, Object> slouches) {
-        DocumentReference slouchesRef = db.collection(USER_SLOUCHES).document(id);
-        if (slouchesExistForUser()) {
-            slouchesRef.update(slouches);
-        } else {
-            slouchesRef.set(slouches);
-        }
+    public void addSlouchesToFirestoreForUser(final HashMap<String, Object> data) {
+        getSlouchesForUser().get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && !task.getResult().exists()) {
+                            DocumentReference slouchesRef = db.collection(USER_SLOUCHES).document(sUserInfo.getId());
+                            slouchesRef.set(data);
+                        }
+                    }
+                });
+        getUser(sUserInfo.getId()).get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists()) {
+                            Map<String, Object> user = new HashMap<>();
+                            user.put(IS_SYNCED, true);
+
+                            DocumentReference userRef = db.collection(USERS).document(sUserInfo.getId());
+                            userRef.update(user);
+                        }
+                    }
+                });
     }
 
     public DocumentReference getUser(String id) {

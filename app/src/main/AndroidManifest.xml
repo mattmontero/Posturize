@@ -38,6 +38,15 @@
                   android:theme="@style/AppTheme.NoActionBar" />
 
         <receiver android:name=".notifications.reminder.AlarmNotificationReceiver" />
+
+        <service
+            android:exported="false"
+            android:name=".DailySync">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>
+            </intent-filter>
+        </service>
+        <service android:name=".scheduledjob.DailySync" />
     </application>
 
 </manifest>
