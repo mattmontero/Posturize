@@ -195,6 +195,7 @@ public class SignInActivity extends AppCompatActivity implements
             GoogleSignInAccount account = result.getSignInAccount();
             PosturizeUserInfo.getInstance().setUser(result.getSignInAccount());
             FirebaseHelper.getInstance().addUserToFirestore();
+            FirebaseHelper.getInstance().setFirestoreReferenceListeners();
 
             FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(this));
             int curTimeMilis = (int) new Date().getTime();
