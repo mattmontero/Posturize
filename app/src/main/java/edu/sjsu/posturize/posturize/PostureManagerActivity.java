@@ -64,7 +64,7 @@ public class PostureManagerActivity extends AppCompatActivity
 
     private void deleteUserRecords(){
         tempPm.openDB();
-        tempPm.delete(PosturizeUserInfo.getInstance().getEmail());
+        tempPm.delete(PosturizeUserInfo.getInstance().getId());
         tempPm.closeDB();
         displayRecords();
     }

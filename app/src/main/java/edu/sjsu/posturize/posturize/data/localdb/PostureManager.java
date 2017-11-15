@@ -38,12 +38,12 @@ public class PostureManager {
 
     public long insert(float value){
         Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
-        long newId = db.insertRow(PosturizeUserInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
+        long newId = db.insertRow(PosturizeUserInfo.getInstance().getId(), PosturizeUserInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
         return newId;
     }
 
-    public void delete(String user){
-        if (db.deleteUser(user)) {
+    public void delete(String userId){
+        if (db.deleteUser(userId)) {
             Log.d("PostureManager", "User: " + PosturizeUserInfo.getInstance().getEmail() + " deleted");
         } else {
             Log.d("Posturemanager", "Something happened and " + PosturizeUserInfo.getInstance().getEmail() + "was NOT deleted");
