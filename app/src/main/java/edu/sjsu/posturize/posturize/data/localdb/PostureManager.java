@@ -36,7 +36,7 @@ public class PostureManager {
 
     public long insert(float value){
         Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
-        long newId = db.insertRow(GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
+        long newId = db.insertRow(GoogleAccountInfo.getInstance().getId(), GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
         return newId;
     }
 

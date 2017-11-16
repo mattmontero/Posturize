@@ -41,7 +41,7 @@ public final class PosturizeDBContract {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + PostureEntry.TABLE_NAME + " (" +
                     PostureEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    PostureEntry.KEY_USER_ID + " TEXT NOT NULL " +
+                    PostureEntry.KEY_USER_ID + " TEXT NOT NULL, " +
                     PostureEntry.KEY_USER + " TEXT NOT NULL, " +
                     PostureEntry.KEY_DATETIME + " LONG NOT NULL, " +
                     PostureEntry.KEY_VALUE + " FLOAT NOT NULL)";
@@ -118,7 +118,7 @@ public final class PosturizeDBContract {
 
         String where = PostureEntry.KEY_DATETIME + " >= " + startEnd[0] + " AND " +
                         PostureEntry.KEY_DATETIME + " < " + startEnd[1] + " AND " +
-                        PostureEntry.KEY_USER + " = '" + GoogleAccountInfo.getInstance().getId() + "'";
+                        PostureEntry.KEY_USER_ID + " = '" + GoogleAccountInfo.getInstance().getId() + "'";
         Log.d(TAG, "WHERE: " + where);
 
         Cursor c = mDb.query(PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
