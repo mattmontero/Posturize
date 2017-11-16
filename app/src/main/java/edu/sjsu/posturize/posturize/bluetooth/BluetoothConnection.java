@@ -6,11 +6,13 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Set;
 import java.util.UUID;
 
 import edu.sjsu.posturize.posturize.SignInActivity;
@@ -27,13 +29,17 @@ public class BluetoothConnection {
     private BluetoothAdapter mBluetoothAdapter;
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
-    private TextView mTextView;
     private PostureManager mPostureManager;
+    private BluetoothActivity mBluetoothActivity;
+    private CalibrateActivity mCalibrateActivity;
+    private boolean isKilling;
 
     private static final String BLUETOOTH = "Connection Setup";
+    private final String CONNECT_CHAR = "c";
 
     private BluetoothConnection(){
         mPostureManager = new PostureManager(SignInActivity.getAppContext());
+        isKilling = false;
     }
 
     public static BluetoothConnection getInstance(){
@@ -51,58 +57,73 @@ public class BluetoothConnection {
         return mBluetoothAdapter;
     }
 
-    public void connectThread(BluetoothDevice device){
-        Log.d(BLUETOOTH, device.getName());
-        mConnectThread = new ConnectThread(device);
+    public void setActivity(BluetoothActivity activity){
+        mBluetoothActivity = activity;
+    }
+
+    public void setActivity(CalibrateActivity activity){
+        mCalibrateActivity = activity;
+    }
+
+    public boolean isConnected(){
+        return mConnectThread != null;
+    }
+
+    public boolean connect(){
+        //3. Get the Bluetooth module device
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        //mDevice should end up being HC-06
+        BluetoothDevice mDevice = null;
+        if(pairedDevices.size() > 0){
+            for(BluetoothDevice device : pairedDevices) {
+                if(device.getName().equals("HC-06")){
+                    //This is our bluetooth device.
+                    mDevice = device;
+                    Log.d(BLUETOOTH, device.getName());
+                    Log.d(BLUETOOTH, device.toString());
+                    break;
+                }
+            }
+        }
+        if(mDevice == null){
+            mBluetoothActivity.updateUI();
+            return false;
+        }
+        Log.d(BLUETOOTH, mDevice.getName());
+        Log.d(BLUETOOTH, mDevice.toString());
+
+        //4. Create the connection thread
+        mConnectThread = new ConnectThread(mDevice);
+        Log.d(BLUETOOTH, "ConnectThread: Created: ");
+        mConnectThread.start();
+        Log.d(BLUETOOTH, "ConnectThread: Running...");
+        return true;
+    }
+
+    public void kill(boolean connectionDropped) {
+        isKilling = true;
+        mConnectThread.interrupt();
+        mConnectThread.cancel();
+        mConnectThread = null;
+        mBluetoothAdapter.startDiscovery();
+        isKilling = false;
+        if(!connectionDropped){
+            mBluetoothActivity.updateUI();
+        }
     }
 
     public void write(String valueToWrite){
         //Send * to arduino
         Log.d("sending message", valueToWrite);
 
-        //Log.d("byte[]", msg.getBytes().toString());
         try {
             for(int i = 0; i < valueToWrite.length(); i++){
                 Log.d("Sending", valueToWrite.substring(i,i+1));
                 mConnectedThread.write(valueToWrite.substring(i,i+1).getBytes());
             }
-            Log.d("ConnectedThread.Write", valueToWrite.getBytes().toString());
+            Log.d("ConnectedThread.Write", valueToWrite);
         } catch (NullPointerException e) {
             Log.d("Null ConnectedThread", e.toString());
-        }
-    }
-
-    public void setTextView(TextView tv){
-        mTextView = tv;
-    }
-
-    public boolean isConnected(){
-        if(mConnectThread != null) {
-            Log.d("isConnected", "Connected");
-            Log.d("isConnected", "Thread State: " + mConnectThread.getState().toString());
-        } else {
-            Log.d("isConnected", "Not Connnected");
-        }
-
-        return mConnectThread != null;
-    }
-
-    public void kill() {
-        Log.d(BLUETOOTH, "Thread State: " + mConnectThread.getState().toString());
-
-        mConnectThread.interrupt();
-        Log.d(BLUETOOTH, "ConnectedThread: " + mConnectThread.getState().toString());
-
-        mConnectThread.cancel();
-        mConnectThread = null;
-        mBluetoothAdapter.startDiscovery();
-    }
-
-    public void startConnectThread(){
-        if(mConnectThread != null){
-            Log.d(BLUETOOTH, "mConnectThread " + mConnectThread.toString());
-            mConnectThread.start();
-            Log.d(BLUETOOTH, "Thread Status: " + mConnectThread.getState().toString());
         }
     }
 
@@ -139,6 +160,12 @@ public class BluetoothConnection {
             mConnectedThread = new ConnectedThread(mmSocket);
             Log.d("Connected Thread", "Created");
             mConnectedThread.start();
+            try {
+                Thread.sleep(1000);
+                Log.d("Sleep before write", "Writing: " + CONNECT_CHAR.getBytes());
+            } catch (Exception e){}
+            mConnectedThread.write("q".getBytes());
+            mConnectedThread.write(CONNECT_CHAR.getBytes());
             Log.d("Connected Thread", "Running...");
         }
 
@@ -157,9 +184,6 @@ public class BluetoothConnection {
             }
         }
     }
-
-
-
 
     private class ConnectedThread extends Thread{
         private BluetoothSocket mmSocket;
@@ -180,6 +204,7 @@ public class BluetoothConnection {
 
             mmInStream = inTmp;
             mmOutStream = outTemp;
+            Log.d("Bluetooth created", "in and out stream set");
         }
 
         /**
@@ -224,7 +249,11 @@ public class BluetoothConnection {
                             }
                         }
                     } catch (IOException e) {
-                        Log.d("ConnectedThread run()", e.toString());
+                        if(!isKilling){ //Connection dropped
+                            Log.d("ConnectedThread run()", e.toString());
+                            kill(true);
+                            break;
+                        }
                     }
                 }
             }
@@ -239,34 +268,72 @@ public class BluetoothConnection {
     }
 
     private Handler mHandler = new Handler() {
+        String HANDLER_TAG = "Message Received";
+        final int ARDUINO_COLLECTION_INTERVAL = 1000;
         @Override
         public void handleMessage(Message msg) {
             byte[] writeBuf = (byte[]) msg.obj;
             int begin = (int) msg.arg1;
             int end = (int) msg.arg2;
-            Log.d("Handler", "Message");
-            Log.d("BING handler", msg.toString());
+            Log.d(HANDLER_TAG, msg.toString());
             switch(msg.what){
                 case 1:
                     String writeMessage = new String(writeBuf);
                     writeMessage = writeMessage.substring(begin, end);
+                    String lastChar = "";
                     //Kill connection if sign out
                     if(GoogleAccountInfo.getInstance().getEmail() == null){
                         kill();
                         Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
                     } else {
-                        if(isNumeric(writeMessage)){
-                            mPostureManager.openDB();
-                            mPostureManager.insert(Float.parseFloat(writeMessage));
-                            mPostureManager.closeDB();
+                        Log.d(HANDLER_TAG, writeMessage);
+                        lastChar = writeMessage.substring(writeMessage.length()-1);
+                        Log.d(HANDLER_TAG, "lastChar: " + lastChar);
+                        switch (lastChar){
+                            case ",":
+                                Log.d(HANDLER_TAG, ", = " + lastChar);
+                                float[] values = parseMessage(writeMessage);
+                                mPostureManager.openDB();
+                                long time = Calendar.getInstance().getTimeInMillis() - values.length*ARDUINO_COLLECTION_INTERVAL;
+                                for(int i = 0; i < values.length; i++){
+                                    mPostureManager.insert(values[i], time);
+                                    time += ARDUINO_COLLECTION_INTERVAL;
+                                }
+                                mPostureManager.closeDB();
+                                Log.d(HANDLER_TAG, "Values received: " + Arrays.toString(values));
+                                break;
+                            case "*": //calibrate
+                                Log.d(HANDLER_TAG, "* =  " + lastChar);
+                                mCalibrateActivity.updateUI();
+                                break;
+                            case "c": //connect
+                                Log.d(HANDLER_TAG, "c =  " + lastChar);
+                                mBluetoothActivity.updateUI();
+                                break;
                         }
-                        mTextView.setText(writeMessage);
-                        Log.d("receiving", writeMessage);
                     }
                     break;
             }
         }
     };
+
+    private float[] parseMessage(String message){
+        String[] strValues;
+        if(message.endsWith(",")){
+            message = message.substring(0, message.length()-1); //chop last comma
+            strValues = message.split(",");
+            float[] fvalues = new float[strValues.length];
+            for(int i = 0; i < strValues.length; i++){
+                if(isNumeric(strValues[i])){
+                    fvalues[i] = Float.parseFloat(strValues[i]);
+                } else {
+                    //something went wrong, dump?
+                }
+            }
+            return fvalues;
+        }
+        return null;
+    }
 
     private boolean isNumeric(String str){
         try{

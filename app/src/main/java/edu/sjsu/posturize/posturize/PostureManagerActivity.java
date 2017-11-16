@@ -64,14 +64,14 @@ public class PostureManagerActivity extends AppCompatActivity
 
     private void deleteUserRecords(){
         tempPm.openDB();
-        tempPm.delete(GoogleAccountInfo.getInstance().getEmail());
+        tempPm.delete(GoogleAccountInfo.getInstance().getId());
         tempPm.closeDB();
         displayRecords();
     }
 
     private  void addRecord() {
         tempPm.openDB();
-        tempPm.insert((float)(Math.random() * (70 - 65) + 65));
+        tempPm.insert((float)(Math.random() * (70 - 65) + 65), Calendar.getInstance().getTimeInMillis());
         ((TextView) findViewById(R.id.textDisplay)).setText(tempPm.get(Calendar.getInstance()).toString());
         tempPm.closeDB();
     }

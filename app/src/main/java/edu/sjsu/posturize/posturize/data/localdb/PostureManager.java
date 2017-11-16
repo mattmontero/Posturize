@@ -40,8 +40,8 @@ public class PostureManager {
         return newId;
     }
 
-    public void delete(String user){
-        if (db.deleteUser(user)) {
+    public void delete(String userId){
+        if (db.deleteUser(userId)) {
             Log.d("PostureManager", "User: " + GoogleAccountInfo.getInstance().getEmail() + " deleted");
         } else {
             Log.d("Posturemanager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + "was NOT deleted");

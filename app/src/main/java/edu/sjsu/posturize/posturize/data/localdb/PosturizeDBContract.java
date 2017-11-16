@@ -21,10 +21,11 @@ public final class PosturizeDBContract {
     private static final String TAG = "PosturizeBDContract";
 
     public static final String DATABASE_NAME = "PosturizeDB";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     public static class PostureEntry implements BaseColumns {
         public static final String TABLE_NAME = "posturize";
+        public static final String KEY_USER_ID = "userid";
         public static final String KEY_USER = "user";
         public static final String KEY_DATETIME = "datetime";
         public static final String KEY_VALUE = "value";
@@ -40,6 +41,7 @@ public final class PosturizeDBContract {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + PostureEntry.TABLE_NAME + " (" +
                     PostureEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    PostureEntry.KEY_USER_ID + " TEXT NOT NULL " +
                     PostureEntry.KEY_USER + " TEXT NOT NULL, " +
                     PostureEntry.KEY_DATETIME + " LONG NOT NULL, " +
                     PostureEntry.KEY_VALUE + " FLOAT NOT NULL)";
@@ -67,8 +69,9 @@ public final class PosturizeDBContract {
         mDbHelper.close();
     }
 
-    public long insertRow(String user, long datestamp, float value){
+    public long insertRow(String userId, String user, long datestamp, float value){
         ContentValues values = new ContentValues();
+        values.put(PostureEntry.KEY_USER_ID, userId);
         values.put(PostureEntry.KEY_USER, user);
         values.put(PostureEntry.KEY_DATETIME, datestamp);
         values.put(PostureEntry.KEY_VALUE, value);
@@ -76,8 +79,8 @@ public final class PosturizeDBContract {
         return mDb.insert(PostureEntry.TABLE_NAME, null, values);
     }
 
-    public boolean deleteUser(String user){
-        String where = PostureEntry.KEY_USER + " = '" + user + "'";
+    public boolean deleteUser(String userId){
+        String where = PostureEntry.KEY_USER_ID + " = '" + userId + "'";
         return mDb.delete(PostureEntry.TABLE_NAME, where, null) != 0;
     }
 
@@ -97,22 +100,9 @@ public final class PosturizeDBContract {
         c.close();
     }
 
-    // Return all data in the database.
+    // select * from posturize.
     public Cursor getAllRows() {
         String where = null;
-        Cursor c = 	mDb.query(true, PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
-                where, null, null, null, null, null);
-        if (c != null) {
-            c.moveToFirst();
-        }
-        return c;
-    }
-
-    /*
-     * Get single row by rowId
-     */
-    public Cursor getRow(long rowId) {
-        String where = PostureEntry._ID + "=" + rowId;
         Cursor c = 	mDb.query(true, PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
                 where, null, null, null, null, null);
         if (c != null) {
@@ -128,7 +118,7 @@ public final class PosturizeDBContract {
 
         String where = PostureEntry.KEY_DATETIME + " >= " + startEnd[0] + " AND " +
                         PostureEntry.KEY_DATETIME + " < " + startEnd[1] + " AND " +
-                        PostureEntry.KEY_USER + " = '" + GoogleAccountInfo.getInstance().getEmail() + "'";
+                        PostureEntry.KEY_USER + " = '" + GoogleAccountInfo.getInstance().getId() + "'";
         Log.d(TAG, "WHERE: " + where);
 
         Cursor c = mDb.query(PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
@@ -146,7 +136,7 @@ public final class PosturizeDBContract {
 
         String where = PostureEntry.KEY_DATETIME + " >= " + startMillis + " AND " +
                 PostureEntry.KEY_DATETIME + " < " + endMillis + " AND " +
-                PostureEntry.KEY_USER + " = '" + GoogleAccountInfo.getInstance().getEmail() + "'";
+                PostureEntry.KEY_USER + " = '" + GoogleAccountInfo.getInstance().getId() + "'";
         Log.d(TAG, "WHERE: " + where);
 
         Cursor c = mDb.query(PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
@@ -161,8 +151,8 @@ public final class PosturizeDBContract {
      * @param day
      * @return long[] First millisecond of day and last millisecond of day
      */
-    private long[] dayStartAndEndInMillis(Calendar day){
-        Calendar c = Calendar.getInstance();
+    private long[] dayStartAndEndInMillis(Calendar c){
+        //Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
