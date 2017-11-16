@@ -17,7 +17,7 @@ import java.util.UUID;
 
 import edu.sjsu.posturize.posturize.SignInActivity;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by matthewmontero on 8/6/17.
@@ -282,7 +282,7 @@ public class BluetoothConnection {
                     writeMessage = writeMessage.substring(begin, end);
                     String lastChar = "";
                     //Kill connection if sign out
-                    if(PosturizeUserInfo.getInstance().getEmail() == null){
+                    if(GoogleAccountInfo.getInstance().getEmail() == null){
                         kill(false);
                         Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
                     } else {

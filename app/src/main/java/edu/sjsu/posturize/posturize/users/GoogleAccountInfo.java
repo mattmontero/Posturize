@@ -6,38 +6,60 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
  * Created by Matt on 10/28/2017.
  */
 
-public class PosturizeUserInfo {
-    private static PosturizeUserInfo singleton;
+public class GoogleAccountInfo {
+    private static GoogleAccountInfo singleton;
 
     private String id = null;
     private String firstName = null;
     private String lastName = null;
     private String email = null;
-    public boolean signingOut = false;
+    public static boolean signingOut = false;
 
-    private PosturizeUserInfo() {
+    /************************ Singleton ************************/
+    private GoogleAccountInfo() {
     }
 
-    public static PosturizeUserInfo getInstance() {
+    public static GoogleAccountInfo getInstance() {
         if (singleton == null)
-            singleton = new PosturizeUserInfo();
+            singleton = new GoogleAccountInfo();
         return singleton;
     }
 
+
+    /**
+     *
+     * @return account id
+     */
     public String getId() { return id; }
 
+    /**
+     *
+     * @return account first name
+     */
     public String getFirstName() {
         return firstName;
     }
 
+    /**
+     *
+     * @return account last name
+     */
     public String getLastName() {
         return lastName;
     }
 
+    /**
+     *
+     * @return account email
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     *
+     * @param ga google account with user properties
+     */
     public void setUser(GoogleSignInAccount ga) {
         if (ga == null) {
             email = lastName = firstName = id = null;

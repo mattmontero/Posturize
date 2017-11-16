@@ -6,11 +6,9 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 import edu.sjsu.posturize.posturize.data.PostureMeasurement;
-import edu.sjsu.posturize.posturize.users.PosturizeUser;
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by Matt on 11/3/2017.
@@ -37,16 +35,16 @@ public class PostureManager {
     }
 
     public long insert(float value){
-        //Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
-        long newId = db.insertRow(PosturizeUserInfo.getInstance().getId(), PosturizeUserInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
+        Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
+        long newId = db.insertRow(GoogleAccountInfo.getInstance().getId(), GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
         return newId;
     }
 
     public void delete(String userId){
         if (db.deleteUser(userId)) {
-            Log.d("PostureManager", "User: " + PosturizeUserInfo.getInstance().getEmail() + " deleted");
+            Log.d("PostureManager", "User: " + GoogleAccountInfo.getInstance().getEmail() + " deleted");
         } else {
-            Log.d("Posturemanager", "Something happened and " + PosturizeUserInfo.getInstance().getEmail() + "was NOT deleted");
+            Log.d("Posturemanager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + "was NOT deleted");
         }
     }
 

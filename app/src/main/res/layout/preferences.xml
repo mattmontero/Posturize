@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content"
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_height="wrap_content"
                   android:layout_width="wrap_content">
 
     <PreferenceCategory
         android:title="@string/pref_notifications"
-        android:key="pref_key_notifications">
+        android:key="pref_key_notifications"
+         >
         <CheckBoxPreference
             android:key="pref_key_daily_update"
             android:summary="@string/pref_summary_daily_update"
