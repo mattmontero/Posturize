@@ -1,6 +1,5 @@
 package edu.sjsu.posturize.posturize.scheduledjob;
 
-import android.os.Bundle;
 import android.util.Log;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
@@ -13,9 +12,10 @@ import java.util.HashMap;
 import edu.sjsu.posturize.posturize.data.FirebaseHelper;
 import edu.sjsu.posturize.posturize.data.PostureMeasurement;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
 
-/** A very simple JobService that merely stores its result and immediately finishes. */
+/**
+ * move yesterday's slouch data from sqlite to firestore
+ */
 public class DailySync extends JobService {
     @Override
     public boolean onStartJob(JobParameters job) {
