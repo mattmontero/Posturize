@@ -9,9 +9,8 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 
 /**
@@ -119,7 +118,7 @@ public final class PosturizeDBContract {
 
         String where = PostureEntry.KEY_DATETIME + " >= " + startEnd[0] + " AND " +
                         PostureEntry.KEY_DATETIME + " < " + startEnd[1] + " AND " +
-                        PostureEntry.KEY_USER_ID + " = '" + PosturizeUserInfo.getInstance().getId() + "'";
+                        PostureEntry.KEY_USER + " = '" + GoogleAccountInfo.getInstance().getId() + "'";
         Log.d(TAG, "WHERE: " + where);
 
         Cursor c = mDb.query(PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
@@ -136,8 +135,8 @@ public final class PosturizeDBContract {
         Log.d(TAG, "End  : " + endMillis);
 
         String where = PostureEntry.KEY_DATETIME + " >= " + startMillis + " AND " +
-                        PostureEntry.KEY_DATETIME + " < " + endMillis + " AND " +
-                        PostureEntry.KEY_USER_ID + " = '" + PosturizeUserInfo.getInstance().getId() + "'";
+                PostureEntry.KEY_DATETIME + " < " + endMillis + " AND " +
+                PostureEntry.KEY_USER + " = '" + GoogleAccountInfo.getInstance().getId() + "'";
         Log.d(TAG, "WHERE: " + where);
 
         Cursor c = mDb.query(PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,

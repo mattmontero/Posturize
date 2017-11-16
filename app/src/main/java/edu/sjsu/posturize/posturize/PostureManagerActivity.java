@@ -1,7 +1,7 @@
 package edu.sjsu.posturize.posturize;
 
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 import android.support.v7.app.AppCompatActivity;
 
@@ -30,7 +30,7 @@ public class PostureManagerActivity extends AppCompatActivity
     }
 
     private void setViewsAndListeners(){
-        this.setTitle(getString(R.string.signed_in_greeting, PosturizeUserInfo.getInstance().getFirstName()));
+        this.setTitle(getString(R.string.signed_in_greeting, GoogleAccountInfo.getInstance().getFirstName()));
         findViewById(R.id.add_record).setOnClickListener(this);
         findViewById(R.id.delete_records).setOnClickListener(this);
         findViewById(R.id.display_records).setOnClickListener(this);
@@ -64,7 +64,7 @@ public class PostureManagerActivity extends AppCompatActivity
 
     private void deleteUserRecords(){
         tempPm.openDB();
-        tempPm.delete(PosturizeUserInfo.getInstance().getId());
+        tempPm.delete(GoogleAccountInfo.getInstance().getId());
         tempPm.closeDB();
         displayRecords();
     }

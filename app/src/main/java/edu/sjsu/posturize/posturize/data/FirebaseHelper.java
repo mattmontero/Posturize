@@ -6,19 +6,17 @@ import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.sjsu.posturize.posturize.notifications.reminder.DailyUpdateActivity;
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 import static android.content.ContentValues.TAG;
 
@@ -38,15 +36,12 @@ public class FirebaseHelper {
     private final String CURRENT = "current";
 
     private static FirebaseHelper instance;
-    private FirebaseFirestore db;
-    private PosturizeUserInfo sUserInfo;
-
-    // document references
-//    final CollectionReference dailyAnalysisCollectionReference = db.collection(ANALYSIS).document(sUserInfo.getId()).collection(DAILY);
+    private FirebaseFirestore firestore;
+    private GoogleAccountInfo sUserInfo;
 
     private FirebaseHelper() {
-        sUserInfo = PosturizeUserInfo.getInstance();
-        db = FirebaseFirestore.getInstance();
+        sUserInfo = GoogleAccountInfo.getInstance();
+        firestore = FirebaseFirestore.getInstance();
     }
 
     public static FirebaseHelper getInstance() {
@@ -62,66 +57,59 @@ public class FirebaseHelper {
     }
 
     private void setUserListener() {
-        final CollectionReference usersReference = db.collection(USERS);
-        DocumentReference userDocumentReference = usersReference.document(sUserInfo.getId());
-        userDocumentReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
+        if (isSignedIn()) {
 
-                if (snapshot != null && snapshot.exists()) {
-                    Log.d(TAG, "Current data: " + snapshot.getData());
-                } else {
-                    Log.d(TAG, "Current data: null");
-                }
-            }
-        });
+            getUserReference().addSnapshotListener(
+                    new EventListener<DocumentSnapshot>()
+                    {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (e != null) {
+                                Log.w(TAG, "Listen failed.", e);
+                                return;
+                            }
+
+                            if (snapshot != null && snapshot.exists()) {
+                                Log.d(TAG, "Snapshot listener -> Current data: " + snapshot.getData());
+                            } else {
+                                Log.d(TAG, "Current data: null");
+                            }
+                        }
+                    });
+        }
     }
 
     private void setDailyAnalysisListener() {
-        final DocumentReference dailyAnalysisReference = db.collection(ANALYSIS).document(sUserInfo.getId()).collection(DAILY).document(CURRENT);
-        dailyAnalysisReference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
-
-                if (snapshot != null && snapshot.exists()) {
-                    Log.d(TAG, "Current data: " + snapshot.getData().get("analysis"));
-                    DailyUpdateActivity.setAnalysis((String) snapshot.getData().get("analysis"));
-                } else {
-                    Log.d(TAG, "Current data: null");
-                }
-            }
-        });
+        if (isSignedIn()) {
+            getCurrentDailyAnalysisReference().addSnapshotListener(
+                    new EventListener<DocumentSnapshot>()
+                    {
+                        @Override
+                        public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                            @Nullable FirebaseFirestoreException e) {
+                            if (snapshot != null && snapshot.exists())
+                                DailyUpdateActivity.setAnalysis((String) snapshot.getData().get("analysis"));
+                        }
+                    });
+        }
     }
 
     /**
-     * adds a new user to Firestore using PosturizeUserInfo properties
+     * adds a new user to Firestore using GoogleAccountInfo properties after they log in
      */
     public void addUserToFirestore() {
-        getUser(sUserInfo.getId()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful() && !task.getResult().exists()) {
-                            Map<String, Object> user = new HashMap<>();
-                            user.put(FIRST, sUserInfo.getFirstName());
-                            user.put(LAST, sUserInfo.getLastName());
-                            user.put(EMAIL, sUserInfo.getEmail());
-
-                            DocumentReference userRef = db.collection(USERS).document(sUserInfo.getId());
-                            userRef.set(user);
+        if (isSignedIn()) {
+            getUserTask().addOnCompleteListener(
+                    new OnCompleteListener<DocumentSnapshot>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && !task.getResult().exists())
+                                setUser(userMap(false));
                         }
-                    }
-                });
+                    });
+        }
     }
 
     /**
@@ -129,54 +117,134 @@ public class FirebaseHelper {
      * @param data slouch data for user from sqlite
      */
     public void addSlouchesToFirestoreForUser(final HashMap<String, Object> data) {
-        getSlouchesForUser().get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful() && !task.getResult().exists()) {
-                            DocumentReference slouchesRef = db.collection(USER_SLOUCHES).document(sUserInfo.getId());
-                            slouchesRef.set(data);
+        if (isSignedIn()) {
+            getUserSlouchesTask().addOnCompleteListener(
+                    new OnCompleteListener<DocumentSnapshot>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && !task.getResult().exists())
+                                setUser(data);
                         }
-                    }
-                });
-        getUser(sUserInfo.getId()).get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful() && task.getResult().exists()) {
-                            Map<String, Object> user = new HashMap<>();
-                            user.put(IS_SYNCED, true);
-
-                            DocumentReference userRef = db.collection(USERS).document(sUserInfo.getId());
-                            userRef.update(user);
+                    });
+            getUserTask().addOnCompleteListener(
+                    new OnCompleteListener<DocumentSnapshot>()
+                    {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful() && task.getResult().exists())
+                                setUser(userMap(true));
                         }
-                    }
-                });
+                    });
+        }
     }
 
-    public DocumentReference getUser(String id) {
-        return db.collection(USERS).document(id);
+
+
+    /*************************** FIRESTORE GETTERS ***************************/
+    /**
+     *
+     * @return userReference
+     */
+    public DocumentReference getUserReference() {
+        return firestore
+                .collection(USERS)
+                .document(sUserInfo.getId());
     }
 
-    public DocumentReference getSlouchesForUser() {
-        return db.collection(USER_SLOUCHES).document(sUserInfo.getId());
+    /**
+     *
+     * @return userTask
+     */
+    private Task<DocumentSnapshot> getUserTask() {
+        return getUserReference().get();
     }
 
-    public String getDailyAnalysis() {
-        final QuerySnapshot[] analysis = new QuerySnapshot[1];
-        db.collection("analysis")
-                .document(sUserInfo.getId())
-                .collection("daily")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("daily analysis query", "success!");
-                            analysis[0] = task.getResult();
-                        }
-                    }
-                });
-        return "derp derp";//analysis[0].toString();
+    /**
+     *
+     * @return userSlouchesReference
+     */
+    private DocumentReference getUserSlouchesReference() {
+        return firestore
+                .collection(USER_SLOUCHES)
+                .document(sUserInfo.getId());
     }
+
+    /**
+     *
+     * @return userSlouchesTask
+     */
+    public Task<DocumentSnapshot> getUserSlouchesTask() {
+        return getUserSlouchesReference().get();
+    }
+
+    /**
+     *
+     * @return document reference for current daily analysis from firestore
+     */
+    private DocumentReference getCurrentDailyAnalysisReference() {
+        return firestore.
+                collection(ANALYSIS).
+                document(ID()).
+                collection(DAILY).
+                document(CURRENT);
+    }
+    /*********************************************************************************/
+
+
+
+
+    /*************************** FIRESTORE SETTERS ***************************/
+    /**
+     * sets user in firestore
+     * @param data map to set user to
+     */
+    private void setUser(Map<String, Object> data) {
+        firestore
+                .collection(USER_SLOUCHES)
+                .document(ID())
+                .set(data);
+    }
+    /*********************************************************************************/
+
+
+
+
+    /*************************** POSTURIZE USER INFO ***************************/
+    /**
+     *
+     * @return true is user is signed into google account
+     */
+    private boolean isSignedIn() {
+        // TODO: extend to every possible login, may need to be done in GoogleAccountInfo.java
+        return sUserInfo != null && !GoogleAccountInfo.signingOut;
+    }
+
+    /**
+     *
+     * @return user id
+     */
+    private String ID() {
+        return sUserInfo.getId();
+    }
+    /*********************************************************************************/
+
+
+
+
+    /**
+     * creates a user map from GoogleAccountInfo
+     * @param synced if true put key "issynced" in map and set value to true
+     * @return user map
+     */
+    private Map<String, Object> userMap(boolean synced) {
+        Map<String, Object> user = new HashMap<>();
+        user.put(FIRST, sUserInfo.getFirstName());
+        user.put(LAST, sUserInfo.getLastName());
+        user.put(EMAIL, sUserInfo.getEmail());
+        if (synced) user.put(IS_SYNCED, synced);
+        return user;
+    }
+
+
 }

@@ -1,22 +1,16 @@
 package edu.sjsu.posturize.posturize;
 
 import android.app.DatePickerDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import android.app.Dialog;
@@ -36,7 +30,7 @@ import com.jjoe64.graphview.series.Series;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothActivity;
 import edu.sjsu.posturize.posturize.bluetooth.CalibrateActivity;
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 public class HomeActivity extends AppCompatActivity
         implements DatePickerDialog.OnDateSetListener,
@@ -78,6 +72,11 @@ public class HomeActivity extends AppCompatActivity
         }
     };
 
+    //FIXME: JAVADOCS
+    /**
+     *
+     * @param numPoints
+     */
     private void setDataView(int numPoints){
 
         //DATA GRAPH THINGS
@@ -179,7 +178,7 @@ public class HomeActivity extends AppCompatActivity
                 startActivity((new Intent(this, BluetoothActivity.class)));
                 break;
             case R.id.sign_out_button:
-                PosturizeUserInfo.getInstance().signOut();
+                GoogleAccountInfo.getInstance().signOut();
                 finish();
                 break;
         }
@@ -187,7 +186,7 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed(){
-        PosturizeUserInfo.getInstance().signOut();
+        GoogleAccountInfo.getInstance().signOut();
         finish();
     }
 

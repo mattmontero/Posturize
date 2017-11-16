@@ -28,13 +28,11 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
 import java.util.Date;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.ReentrantLock;
 
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 import edu.sjsu.posturize.posturize.data.FirebaseHelper;
 import edu.sjsu.posturize.posturize.scheduledjob.DailySync;
-import edu.sjsu.posturize.posturize.users.PosturizeUserInfo;
+import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -69,25 +67,29 @@ public class SignInActivity extends AppCompatActivity implements
         if (opr.isDone()) {
             Log.d(TAG, "Got cached sign-in");
             GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
+            handleGoogleSignInResult(result);
         } else {
             //showProgressDialog();
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(GoogleSignInResult googleSignInResult) {
-                    handleSignInResult(googleSignInResult);
+                    handleGoogleSignInResult(googleSignInResult);
                 }
             });
         }
     }
 
-    /*
+    /**
      * workaround to get context in any non-activity class
+     * @return app context
      */
     public static Context getAppContext(){
         return appContext;
     }
 
+    /**
+     * Define a mGoogleApiClient and get access to the Google Sign-In API
+     */
     private void setGoogleApiClient(){
         /*
          * Configure Google Sign-In and the GoogleApiClient Object
@@ -116,12 +118,17 @@ public class SignInActivity extends AppCompatActivity implements
         Log.d(TAG, "GoogleApiClient:" + mGoogleApiClient.toString());
     }
 
+    /**
+     *
+     * @param rememberMe value to be stored in shared preferences with key "REMEMBER_ME"
+     */
     private void saveUserLogin(boolean rememberMe){
-        SharedPreferences.Editor spEditor = sharedPreferences.edit();
-        spEditor.putBoolean("REMEMBER_ME", rememberMe);
-        spEditor.commit();
+        sharedPreferences.edit().putBoolean("REMEMBER_ME", rememberMe).commit();
     }
 
+    /**
+     * activate google sign in activity
+     */
     private void googleSignIn(){
         saveUserLogin(((CheckBox) findViewById(R.id.remember_me)).isChecked());
         Intent googleSignInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
@@ -129,13 +136,16 @@ public class SignInActivity extends AppCompatActivity implements
         startActivityForResult(googleSignInIntent, USER_SIGN_IN);
     }
 
+    /**
+     * sign user out of google
+     */
     private void googleSignOut(){
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(@NonNull Status status) {
                         Log.d(TAG, "Sign out status: " + status.toString());
-                        PosturizeUserInfo.getInstance().setUser(null);
+                        GoogleAccountInfo.getInstance().setUser(null);
                         updateUI(false);
                     }
                 });
@@ -149,7 +159,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if(PosturizeUserInfo.getInstance().signingOut){
+        if(GoogleAccountInfo.getInstance().signingOut){
             googleSignOut();
         }
     }
@@ -180,12 +190,16 @@ public class SignInActivity extends AppCompatActivity implements
             case USER_SIGN_IN:
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
                 Log.d(TAG, "GoogleSignIn:" + result.getSignInAccount());
-                handleSignInResult(result);
+                handleGoogleSignInResult(result);
                 break;
         }
     }
 
-    private void handleSignInResult(GoogleSignInResult result){
+    /**
+     * setup app to pertain to user's google account
+     * @param result
+     */
+    private void handleGoogleSignInResult(GoogleSignInResult result){
         Log.d(TAG, "result status message: " + result.getStatus().getStatusCode());
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         Log.d(TAG, "Result toString: " + result.toString());
@@ -193,7 +207,7 @@ public class SignInActivity extends AppCompatActivity implements
         if(result.isSuccess()) {
             //Sign in successfully, show authenticated UI.
             GoogleSignInAccount account = result.getSignInAccount();
-            PosturizeUserInfo.getInstance().setUser(result.getSignInAccount());
+            GoogleAccountInfo.getInstance().setUser(result.getSignInAccount());
             FirebaseHelper.getInstance().addUserToFirestore();
             FirebaseHelper.getInstance().setFirestoreReferenceListeners();
 
@@ -226,11 +240,15 @@ public class SignInActivity extends AppCompatActivity implements
 
             updateUI(true);
         } else {
-            PosturizeUserInfo.getInstance().setUser(null);
+            GoogleAccountInfo.getInstance().setUser(null);
             updateUI(false);
         }
     }
 
+    /**
+     * update UI to current state
+     * @param signedIn state of user account
+     */
     private void updateUI(boolean signedIn){
         if(signedIn) {
             BluetoothConnection btConnection = BluetoothConnection.getInstance();
