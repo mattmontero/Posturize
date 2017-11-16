@@ -48,8 +48,27 @@ public class PostureManager {
         }
     }
 
+    public ArrayList<String> getAllUser(){
+        ArrayList<String> values = new ArrayList<>();
+        Cursor cursor = db.getUniqueUserId();
+        //Cursor cursor = db.getAllRows();
+        if(cursor.moveToFirst()) {
+            while (true) {
+                values.add(cursor.getString(0));
+                if(!cursor.moveToNext())
+                    break;
+            }
+        }
+        cursor.close();
+        return values;
+    }
+
     public ArrayList<PostureMeasurement> get(Calendar day){
         return construct(db.getDay(day));
+    }
+
+    public ArrayList<PostureMeasurement> get(String id, Calendar day){
+        return construct(db.getDay(id, day));
     }
 
     public ArrayList<PostureMeasurement> get(Calendar start, Calendar end){
