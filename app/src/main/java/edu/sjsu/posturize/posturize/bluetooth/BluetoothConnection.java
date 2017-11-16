@@ -294,10 +294,10 @@ public class BluetoothConnection {
                                 Log.d(HANDLER_TAG, ", = " + lastChar);
                                 float[] values = parseMessage(writeMessage);
                                 mPostureManager.openDB();
-                                long time = Calendar.getInstance().getTimeInMillis() - values.length*ARDUINO_COLLECTION_INTERVAL;
+                                //long time = Calendar.getInstance().getTimeInMillis() - values.length*ARDUINO_COLLECTION_INTERVAL;
                                 for(int i = 0; i < values.length; i++){
-                                    mPostureManager.insert(values[i], time);
-                                    time += ARDUINO_COLLECTION_INTERVAL;
+                                    mPostureManager.insert(values[i]);
+                                    //time += ARDUINO_COLLECTION_INTERVAL;
                                 }
                                 mPostureManager.closeDB();
                                 Log.d(HANDLER_TAG, "Values received: " + Arrays.toString(values));

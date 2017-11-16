@@ -42,7 +42,7 @@ public final class PosturizeDBContract {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + PostureEntry.TABLE_NAME + " (" +
                     PostureEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    PostureEntry.KEY_USER_ID + " TEXT NOT NULL " +
+                    PostureEntry.KEY_USER_ID + " TEXT NOT NULL, " +
                     PostureEntry.KEY_USER + " TEXT NOT NULL, " +
                     PostureEntry.KEY_DATETIME + " LONG NOT NULL, " +
                     PostureEntry.KEY_VALUE + " FLOAT NOT NULL)";
