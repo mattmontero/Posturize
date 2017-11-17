@@ -5,7 +5,7 @@
     <!--Group of Items for Side Nav View-->
     <!--TODO: Update item images-->
 
-    q<group android:checkableBehavior="single">
+    <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_settings_button"
             android:icon="@drawable/googleg_disabled_color_18"
