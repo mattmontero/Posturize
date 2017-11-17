@@ -7,88 +7,44 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="edu.sjsu.posturize.posturize.HomeActivity"
-    android:background="@drawable/orange_coral_background_gradient">
+    android:background="@drawable/background">
 
     <FrameLayout
         android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.27"
-        >
-
-        <ScrollView
+        android:layout_height="match_parent"
+        android:layout_weight="0.27">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <Button
-                        android:id="@+id/preferences_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/preferences"/>
-
-                    <Button
-                        android:id="@+id/calibration_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/calibration"/>
-
-                    <Button
-                        android:id="@+id/bluetooth_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/bluetooth"/>
-
-                    <Button
-                        android:id="@+id/settings_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings"/>
-
-                    <Button
-                        android:id="@+id/sign_out_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sign_out"/>
-
-                </LinearLayout>
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
                 <Button
                     android:id="@+id/picDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:onClick="datePicker"/>
+                    android:onClick="datePicker" />
 
                 <TextView
                     android:id="@+id/showDate"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="18sp"/>
+                    android:textSize="18sp" />
 
                 <com.jjoe64.graphview.GraphView
                     android:id="@+id/graph"
                     android:layout_width="match_parent"
-                    android:layout_height="400dip"/>
+                    android:layout_height="400dp" />
 
                 <android.support.design.widget.BottomNavigationView
                     android:id="@+id/navigation"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="bottom"
+                    android:layout_marginTop="20dp"
                     android:background="?android:attr/windowBackground"
-                    app:menu="@menu/navigation"/>
-            </LinearLayout>
-        </ScrollView>
+                    app:menu="@menu/bottom_nav_menu" />
+        </LinearLayout>
     </FrameLayout>
-
 </LinearLayout>
