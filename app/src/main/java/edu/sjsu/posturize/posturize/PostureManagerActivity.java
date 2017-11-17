@@ -71,6 +71,7 @@ public class PostureManagerActivity extends AppCompatActivity
 
     private  void addRecord() {
         tempPm.openDB();
+        //tempPm.insert((float)(Math.random() * (70 - 65) + 65), Calendar.getInstance().getTimeInMillis());
         tempPm.insert((float)(Math.random() * (70 - 65) + 65));
         ((TextView) findViewById(R.id.textDisplay)).setText(tempPm.get(Calendar.getInstance()).toString());
         tempPm.closeDB();

@@ -2,10 +2,16 @@ package edu.sjsu.posturize.posturize;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 
 import android.view.View;
@@ -34,7 +40,7 @@ import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 public class HomeActivity extends AppCompatActivity
         implements DatePickerDialog.OnDateSetListener,
-                    View.OnClickListener{
+                    NavigationView.OnNavigationItemSelectedListener{
 
     //DATE PICKER THINGS
     DatePicker datePicker;
@@ -43,6 +49,35 @@ public class HomeActivity extends AppCompatActivity
     int month;
 
     String tab;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+        setSideNavDrawer();
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        navigation.setSelectedItemId(R.id.navigation_daily);
+    }
+
+    private void setSideNavDrawer(){
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        Log.d("Toggle", toggle.toString());
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        navigationView.setItemBackgroundResource(R.drawable.item_background);
+
+        View navHeader = navigationView.getHeaderView(0);
+        ((TextView)navHeader.findViewById(R.id.side_nav_username)).setText(GoogleAccountInfo.getInstance().getFirstName() + " " + GoogleAccountInfo.getInstance().getLastName());
+        ((TextView)navHeader.findViewById(R.id.side_nav_email)).setText(GoogleAccountInfo.getInstance().getEmail());
+    }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -110,23 +145,6 @@ public class HomeActivity extends AppCompatActivity
         });
     }
 
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-
-        findViewById(R.id.settings_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.preferences_button).setOnClickListener(this);
-        findViewById(R.id.calibration_button).setOnClickListener(this);
-        findViewById(R.id.bluetooth_button).setOnClickListener(this);
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        navigation.setSelectedItemId(R.id.navigation_daily);
-    }
-
-
     /**
      * This callback method, call DatePickerFragment class,
      * DatePickerFragment class returns calendar view.
@@ -163,31 +181,36 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.settings_button:
-                startActivity((new Intent(this, PostureManagerActivity.class)));
-                break;
-            case R.id.preferences_button:
-                startActivity((new Intent(this, PreferencesActivity.class)));
-                break;
-            case R.id.calibration_button:
-                startActivity((new Intent(this, CalibrateActivity.class)));
-                break;
-            case R.id.bluetooth_button:
-                startActivity((new Intent(this, BluetoothActivity.class)));
-                break;
-            case R.id.sign_out_button:
-                GoogleAccountInfo.getInstance().signOut();
-                finish();
-                break;
+    public void onBackPressed(){
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            GoogleAccountInfo.getInstance().signOut();
+            finish();
         }
     }
 
     @Override
-    public void onBackPressed(){
-        GoogleAccountInfo.getInstance().signOut();
-        finish();
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_settings_button) {
+            startActivity((new Intent(this, PostureManagerActivity.class)));
+        } else if (id == R.id.nav_preferences_button_button) {
+            startActivity((new Intent(this, PreferencesActivity.class)));
+        } else if (id == R.id.nav_calibration_button) {
+            startActivity((new Intent(this, CalibrateActivity.class)));
+        } else if (id == R.id.nav_bluetooth_button) {
+            startActivity((new Intent(this, BluetoothActivity.class)));
+        } else if (id == R.id.nav_sign_out_button) {
+            GoogleAccountInfo.getInstance().signOut();
+            finish();
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     /**
