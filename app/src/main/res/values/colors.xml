@@ -3,4 +3,30 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <!--We dont need all of these.
+        I was just messing around.-->
+    <color name="colorPrimary7">#FF7F00</color>
+    <color name="colorPrimary6">#FF8C25</color>
+    <color name="colorPrimary5">#FF9F48</color>
+    <color name="colorPrimary4">#FFB26C</color>
+    <color name="colorPrimary3">#FFE994</color>
+    <color name="colorPrimary2">#FFD7B3</color>
+    <color name="colorPrimary1">#FFEBDA</color>
+    <color name="colorPrimaryDark7">#FE0000</color>
+    <color name="colorPrimaryDark6">#FF4848</color>
+    <color name="colorPrimaryDark5">#FF4848</color>
+    <color name="colorPrimaryDark4">#FF6D6E</color>
+    <color name="colorPrimaryDark3">#FF908F</color>
+    <color name="colorPrimaryDark2">#FFB6B7</color>
+    <color name="colorPrimaryDark1">#FFFED8</color>
+    <color name="colorAccent7">#0080FF</color>
+    <color name="colorAccent6">#279FFF</color>
+    <color name="colorAccent5">#4AADFF</color>
+    <color name="colorAccent4">#6FBEFF</color>
+    <color name="colorAccent3">#92CEFF</color>
+    <color name="colorAccent2">#B7DBFD</color>
+    <color name="colorAccent1">#B6DFFF</color>
+
 </resources>

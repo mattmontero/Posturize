@@ -3,7 +3,7 @@
     <!--Gradient for Side Nav View-->
     <gradient
         android:angle="270"
-        android:endColor="#FF9F66"
-        android:startColor="#FF792F"
+        android:startColor="@color/colorPrimaryDark5"
+        android:endColor="@color/colorPrimaryDark3"
         android:type="linear" />
 </shape>
