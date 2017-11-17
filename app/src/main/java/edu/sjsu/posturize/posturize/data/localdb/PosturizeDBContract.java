@@ -100,6 +100,17 @@ public final class PosturizeDBContract {
         c.close();
     }
 
+
+    //selecct unique userId from posturize
+    public Cursor getUniqueUserId(){
+        String where = null;
+        Cursor c = mDb.rawQuery("SELECT DISTINCT userid FROM posturize", null);
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
+    }
+
     // select * from posturize.
     public Cursor getAllRows() {
         String where = null;
@@ -112,13 +123,18 @@ public final class PosturizeDBContract {
     }
 
     public Cursor getDay(Calendar day){
+        return this.getDay(GoogleAccountInfo.getInstance().getId(), day);
+    }
+
+    public Cursor getDay(String id, Calendar day){
         long[] startEnd = dayStartAndEndInMillis(day);
         Log.d(TAG, "Start: " + startEnd[0]);
         Log.d(TAG, "End  : " + startEnd[1]);
 
-        String where = PostureEntry.KEY_DATETIME + " >= " + startEnd[0] + " AND " +
-                        PostureEntry.KEY_DATETIME + " < " + startEnd[1] + " AND " +
-                        PostureEntry.KEY_USER_ID + " = '" + GoogleAccountInfo.getInstance().getId() + "'";
+        String where = PostureEntry.KEY_USER_ID + " = '" + id + "'" + " AND " +
+                        PostureEntry.KEY_DATETIME + " >= " + startEnd[0] + " AND " +
+                        PostureEntry.KEY_DATETIME + " < " + startEnd[1];
+
         Log.d(TAG, "WHERE: " + where);
 
         Cursor c = mDb.query(PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,

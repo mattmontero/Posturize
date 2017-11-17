@@ -12,6 +12,8 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +36,7 @@ public class FirebaseHelper {
     private final String DAILY = "daily";
     private final String IS_SYNCED = "isSynced";
     private final String CURRENT = "current";
+    private final String TIMES = "times";
 
     private static FirebaseHelper instance;
     private FirebaseFirestore firestore;
@@ -88,8 +91,13 @@ public class FirebaseHelper {
                         @Override
                         public void onEvent(@Nullable DocumentSnapshot snapshot,
                                             @Nullable FirebaseFirestoreException e) {
-                            if (snapshot != null && snapshot.exists())
-                                DailyUpdateActivity.setAnalysis((String) snapshot.getData().get("analysis"));
+                            if (snapshot != null && snapshot.exists()) {
+                                ArrayList<String> analysisList = (ArrayList<String>) snapshot.getData().get("daily");
+                                if(analysisList != null && !analysisList.isEmpty())
+                                    DailyUpdateActivity.setAnalysis(analysisList.get(0));
+                                else
+                                    DailyUpdateActivity.setAnalysis("NO ANALYSIS FOUND");
+                            }
                         }
                     });
         }
@@ -105,8 +113,11 @@ public class FirebaseHelper {
                     {
                         @Override
                         public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && !task.getResult().exists())
+                            if (task.isSuccessful() && !task.getResult().exists()) {
                                 setUser(userMap(false));
+                                setAnalysis(analysisMap(new ArrayList<String>()));
+                                setSlouches(slouchMap(new ArrayList<Date>(), new ArrayList<Double>()));
+                            }
                         }
                     });
         }
@@ -116,27 +127,26 @@ public class FirebaseHelper {
      * adds slouches to the slouches collection, <userId> document
      * @param data slouch data for user from sqlite
      */
-    public void addSlouchesToFirestoreForUser(final HashMap<String, Object> data) {
-        if (isSignedIn()) {
-            getUserSlouchesTask().addOnCompleteListener(
-                    new OnCompleteListener<DocumentSnapshot>()
-                    {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && !task.getResult().exists())
-                                setUser(data);
-                        }
-                    });
-            getUserTask().addOnCompleteListener(
-                    new OnCompleteListener<DocumentSnapshot>()
-                    {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful() && task.getResult().exists())
-                                setUser(userMap(true));
-                        }
-                    });
-        }
+    public void addSlouchesToFirestoreForUser(final String id, final HashMap<String, Object> data) {
+        Log.i("DAILY SYNC", id);
+        //if(isSignedIn()){
+        getUserSlouchesTask(id).addOnCompleteListener(
+                new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists())
+                            updateSlouches(id, data);
+                    }
+                });
+        getUserTask(id).addOnCompleteListener(
+                new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful() && task.getResult().exists())
+                            updateUser(id, userMap(true));
+                    }
+                });
+        //}
     }
 
 
@@ -152,12 +162,21 @@ public class FirebaseHelper {
                 .document(sUserInfo.getId());
     }
 
+    public DocumentReference getUserReference(String id) {
+        return firestore
+                .collection(USERS)
+                .document(id);
+    }
+
     /**
      *
      * @return userTask
      */
     private Task<DocumentSnapshot> getUserTask() {
         return getUserReference().get();
+    }
+    private Task<DocumentSnapshot> getUserTask(String id) {
+        return getUserReference(id).get();
     }
 
     /**
@@ -167,7 +186,12 @@ public class FirebaseHelper {
     private DocumentReference getUserSlouchesReference() {
         return firestore
                 .collection(USER_SLOUCHES)
-                .document(sUserInfo.getId());
+                .document(ID());
+    }
+    private DocumentReference getUserSlouchesReference(String id) {
+        return firestore
+                .collection(USER_SLOUCHES)
+                .document(id);
     }
 
     /**
@@ -177,17 +201,17 @@ public class FirebaseHelper {
     public Task<DocumentSnapshot> getUserSlouchesTask() {
         return getUserSlouchesReference().get();
     }
-
+    public Task<DocumentSnapshot> getUserSlouchesTask(String id) {
+        return getUserSlouchesReference(id).get();
+    }
     /**
      *
      * @return document reference for current daily analysis from firestore
      */
     private DocumentReference getCurrentDailyAnalysisReference() {
-        return firestore.
-                collection(ANALYSIS).
-                document(ID()).
-                collection(DAILY).
-                document(CURRENT);
+        return firestore
+                .collection(ANALYSIS)
+                .document(ID());
     }
     /*********************************************************************************/
 
@@ -200,10 +224,58 @@ public class FirebaseHelper {
      * @param data map to set user to
      */
     private void setUser(Map<String, Object> data) {
+        this.setUser(ID(), data);
+    }
+
+    private void setUser(String id, Map<String, Object> data) {
+        firestore
+                .collection(USERS)
+                .document(id)
+                .set(data);
+    }
+
+    private void updateUser( Map<String, Object> data){
+        this.updateUser(ID(), data);
+    }
+
+    private void updateUser(String id, Map<String, Object> data) {
+        firestore
+                .collection(USERS)
+                .document(id)
+                .update(data);
+    }
+
+    private void setAnalysis(Map<String, Object> data){
+        this.setAnalysis(ID(), data);
+    }
+
+    private void setAnalysis(String id, Map<String, Object> data) {
+        firestore
+                .collection(ANALYSIS)
+                .document(id)
+                .set(data);
+    }
+
+    private void setSlouches(Map<String, Object> data){
+        this.setSlouches(ID(), data);
+    }
+
+    private void setSlouches(String id, Map<String, Object> data) {
         firestore
                 .collection(USER_SLOUCHES)
-                .document(ID())
+                .document(id)
                 .set(data);
+    }
+
+    private void updateSlouches(Map<String, Object> data){
+        this.updateSlouches(ID(), data);
+    }
+
+    private void updateSlouches(String id, Map<String, Object> data) {
+        firestore
+                .collection(USER_SLOUCHES)
+                .document(id)
+                .update(data);
     }
     /*********************************************************************************/
 
@@ -239,12 +311,37 @@ public class FirebaseHelper {
      */
     private Map<String, Object> userMap(boolean synced) {
         Map<String, Object> user = new HashMap<>();
-        user.put(FIRST, sUserInfo.getFirstName());
-        user.put(LAST, sUserInfo.getLastName());
-        user.put(EMAIL, sUserInfo.getEmail());
-        if (synced) user.put(IS_SYNCED, synced);
+        user.put(IS_SYNCED, synced);
+        if(!synced) {
+            user.put(FIRST, sUserInfo.getFirstName());
+            user.put(LAST, sUserInfo.getLastName());
+            user.put(EMAIL, sUserInfo.getEmail());
+        }
         return user;
     }
 
 
+    /**
+     * creates a user map from GoogleAccountInfo
+     * @param synced if true put key "issynced" in map and set value to true
+     * @return user map
+     */
+    private Map<String, Object> analysisMap(ArrayList<String> data) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(DAILY, data);
+        return map;
+    }
+
+
+    /**
+     * creates a user map from GoogleAccountInfo
+     * @param synced if true put key "issynced" in map and set value to true
+     * @return user map
+     */
+    private Map<String, Object> slouchMap(ArrayList<Date> times, ArrayList<Double> slouches) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(USER_SLOUCHES, slouches);
+        map.put(TIMES, slouches);
+        return map;
+    }
 }
