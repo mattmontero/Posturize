@@ -12,7 +12,6 @@ import java.util.Calendar;
 
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
-
 /**
  * Created by Matt on 11/2/2017.
  */
@@ -33,9 +32,10 @@ public final class PosturizeDBContract {
                 _ID, KEY_USER, KEY_DATETIME, KEY_VALUE};
 
         public static final int COL__ID = 0;
-        public static final int COL_USER = 1;
-        public static final int COL_DATETIME = 2;
-        public static final int COL_VALUE = 3;
+        public static final int COL_USER_ID = 1;
+        public static final int COL_USER = 2;
+        public static final int COL_DATETIME = 3;
+        public static final int COL_VALUE = 4;
     }
 
     private static final String SQL_CREATE_ENTRIES =
@@ -60,6 +60,11 @@ public final class PosturizeDBContract {
         this.context = context;
         mDbHelper = new DBHelper(context);
     }
+
+    /**
+     * Opens SQLite database. This should not be called from the main thread.
+     * @return PosturizeDBContract singleton
+     */
     public PosturizeDBContract open(){
         mDb = mDbHelper.getWritableDatabase();
         return this;
@@ -69,6 +74,14 @@ public final class PosturizeDBContract {
         mDbHelper.close();
     }
 
+    /**
+     * Insert new row
+     * @param userId
+     * @param user
+     * @param datestamp
+     * @param value
+     * @return the row ID of the newly inserted row, or -1 if an error occurred
+     */
     public long insertRow(String userId, String user, long datestamp, float value){
         ContentValues values = new ContentValues();
         values.put(PostureEntry.KEY_USER_ID, userId);
@@ -79,16 +92,29 @@ public final class PosturizeDBContract {
         return mDb.insert(PostureEntry.TABLE_NAME, null, values);
     }
 
+    /**
+     * Deletes user from table
+     * @param userId
+     * @return the number of rows affected if a whereClause is passed in, 0 otherwise. To remove all rows and get a count pass "1" as the whereClause.
+     */
     public boolean deleteUser(String userId){
         String where = PostureEntry.KEY_USER_ID + " = '" + userId + "'";
         return mDb.delete(PostureEntry.TABLE_NAME, where, null) != 0;
     }
 
+    /**
+     * Deletes single row by rowID in posturize
+     * @param rowId
+     * @return the number of rows affected if a whereClause is passed in, 0 otherwise. To remove all rows and get a count pass "1" as the whereClause.
+     */
     public boolean deleteRow(long rowId){
         String where = PostureEntry._ID + "=" + rowId;
         return mDb.delete(PostureEntry.TABLE_NAME, where, null) != 0;
     }
 
+    /**
+     * Deletes all rows in table posturize
+     */
     public void deleteAll() {
         Cursor c = getAllRows();
         long rowId = c.getColumnIndexOrThrow(PostureEntry._ID);
@@ -100,7 +126,6 @@ public final class PosturizeDBContract {
         c.close();
     }
 
-
     //selecct unique userId from posturize
     public Cursor getUniqueUserId(){
         String where = null;
@@ -111,7 +136,10 @@ public final class PosturizeDBContract {
         return c;
     }
 
-    // select * from posturize.
+    /**
+     * Select * from posturize
+     * @return Cursor for query
+     */
     public Cursor getAllRows() {
         String where = null;
         Cursor c = 	mDb.query(true, PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
@@ -144,6 +172,11 @@ public final class PosturizeDBContract {
         return c;
     }
 
+    /**
+     * @param start Starting Day
+     * @param end Ending Day
+     * @return Cursor for the query to grab all keys where time stamp is in between start and end.
+     */
     public Cursor getDays(Calendar start, Calendar end){
         long startMillis = dayStartAndEndInMillis(start)[0];
         long endMillis = dayStartAndEndInMillis(end)[1];
@@ -168,7 +201,6 @@ public final class PosturizeDBContract {
      * @return long[] First millisecond of day and last millisecond of day
      */
     private long[] dayStartAndEndInMillis(Calendar c){
-        //Calendar c = Calendar.getInstance();
         c.set(Calendar.HOUR, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
@@ -197,8 +229,6 @@ public final class PosturizeDBContract {
                     " to " + newVersion + ", which will destroy all old data");
 
             mmDb.execSQL(SQL_DROP_ENTRIES);
-
-            // TODO: sync data.
 
             onCreate(mmDb);
         }

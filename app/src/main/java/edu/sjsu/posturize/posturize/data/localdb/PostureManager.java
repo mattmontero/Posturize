@@ -25,21 +25,35 @@ public class PostureManager {
         this.context = context;
     }
 
+    /**
+     * Opens SQLite database. This should not be called on the main thread
+     */
     public void openDB(){
         db = new PosturizeDBContract(context);
         db.open();
     }
 
+    /**
+     * Closed SQLite database.
+     */
     public void closeDB(){
         db.close();
     }
 
+    /**
+     * Inserts a row with current user ID, email, time, and provided value
+     * @param value float received from wearables.
+     * @return the row ID of the newly inserted row, or -1 if an error occurred
+     */
     public long insert(float value){
-        Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
-        long newId = db.insertRow(GoogleAccountInfo.getInstance().getId(), GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
-        return newId;
+        //Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
+        return db.insertRow(GoogleAccountInfo.getInstance().getId(), GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
     }
 
+    /**
+     * Deletes where user_id = userId
+     * @param userId current userID
+     */
     public void delete(String userId){
         if (db.deleteUser(userId)) {
             Log.d("PostureManager", "User: " + GoogleAccountInfo.getInstance().getEmail() + " deleted");
@@ -63,6 +77,10 @@ public class PostureManager {
         return values;
     }
 
+    /**
+     * @param day Calendar day to grab all measurements for the current user
+     * @return ArrayList<PostureMeasurement> all received slouch values for the current user
+     */
     public ArrayList<PostureMeasurement> get(Calendar day){
         return construct(db.getDay(day));
     }
