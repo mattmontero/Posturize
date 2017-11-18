@@ -32,7 +32,7 @@ public class SideNavDrawer
 
     /**
      * Adds a SideNavDrawer to activity. The activity contentView should contain a NavigationView
-     * @param activity - activity to add sive nav drawer
+     * @param activity - activity to add side nav drawer
      */
     public static void create(Activity activity){
         sideNavDrawer = new SideNavDrawer(activity);
