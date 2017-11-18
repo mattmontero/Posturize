@@ -28,11 +28,11 @@ public class BluetoothSideNavModal extends DialogFragment {
     private TextView mConnectionStatusTextView;
 
     public static BluetoothSideNavModal newInstance(){
-        BluetoothSideNavModal btFragment = new BluetoothSideNavModal();
+        BluetoothSideNavModal btModal = new BluetoothSideNavModal();
         Bundle args = new Bundle();
         mBluetoothConnection = BluetoothConnection.getInstance();
-        btFragment.setArguments(args);
-        return btFragment;
+        btModal.setArguments(args);
+        return btModal;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class BluetoothSideNavModal extends DialogFragment {
         final Dialog dialog = builder.create();
 
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            final String TAG = "AlertDialog";
+            final String TAG = "BluetoothModal";
             @Override
             public void onShow(DialogInterface dialogInterface) {
                 final Button close = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEUTRAL);
