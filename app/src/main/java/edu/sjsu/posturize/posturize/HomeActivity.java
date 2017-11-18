@@ -2,7 +2,6 @@ package edu.sjsu.posturize.posturize;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -34,8 +33,8 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
-import edu.sjsu.posturize.posturize.bluetooth.BluetoothActivity;
 import edu.sjsu.posturize.posturize.bluetooth.CalibrateActivity;
+import edu.sjsu.posturize.posturize.sidenavmodals.BluetoothSideNavModal;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 public class HomeActivity extends AppCompatActivity
@@ -202,7 +201,7 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_calibration_button) {
             startActivity((new Intent(this, CalibrateActivity.class)));
         } else if (id == R.id.nav_bluetooth_button) {
-            startActivity((new Intent(this, BluetoothActivity.class)));
+            BluetoothSideNavModal.newInstance().show(getFragmentManager(), "BluetoothModal");
         } else if (id == R.id.nav_sign_out_button) {
             GoogleAccountInfo.getInstance().signOut();
             finish();
@@ -230,6 +229,5 @@ public class HomeActivity extends AppCompatActivity
                     (DatePickerDialog.OnDateSetListener)
                             getActivity(), year, month, day);
         }
-
     }
 }
