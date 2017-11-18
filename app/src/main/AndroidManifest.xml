@@ -29,7 +29,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".PreferencesActivity" />
-        <activity android:name=".bluetooth.BluetoothActivity" />
         <activity android:name=".bluetooth.CalibrateActivity" />
 
         <receiver android:name=".notifications.reminder.AlarmNotificationReceiver" />
