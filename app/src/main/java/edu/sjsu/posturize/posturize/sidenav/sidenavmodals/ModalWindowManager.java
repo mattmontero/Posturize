@@ -1,4 +1,4 @@
-package edu.sjsu.posturize.posturize.sidenavmodals;
+package edu.sjsu.posturize.posturize.sidenav.sidenavmodals;
 
 import android.app.Dialog;
 import android.view.Window;

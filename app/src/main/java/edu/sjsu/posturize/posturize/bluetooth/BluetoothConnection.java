@@ -16,8 +16,8 @@ import java.util.UUID;
 
 import edu.sjsu.posturize.posturize.SignInActivity;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
-import edu.sjsu.posturize.posturize.sidenavmodals.BluetoothSideNavModal;
-import edu.sjsu.posturize.posturize.sidenavmodals.CalibrateSideNavModal;
+import edu.sjsu.posturize.posturize.sidenav.sidenavmodals.BluetoothSideNavModal;
+import edu.sjsu.posturize.posturize.sidenav.sidenavmodals.CalibrateSideNavModal;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
