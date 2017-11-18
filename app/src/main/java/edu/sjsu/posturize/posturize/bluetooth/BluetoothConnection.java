@@ -17,6 +17,7 @@ import java.util.UUID;
 import edu.sjsu.posturize.posturize.SignInActivity;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
 import edu.sjsu.posturize.posturize.sidenavmodals.BluetoothSideNavModal;
+import edu.sjsu.posturize.posturize.sidenavmodals.CalibrateSideNavModal;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
@@ -31,7 +32,7 @@ public class BluetoothConnection {
     private ConnectedThread mConnectedThread;
     private PostureManager mPostureManager;
     private BluetoothSideNavModal mBluetoothSideNavModal;
-    private CalibrateActivity mCalibrateActivity;
+    private CalibrateSideNavModal mCalibrateSideNavModal;
     private boolean isKilling;
 
     private static final String BLUETOOTH = "Connection Setup";
@@ -61,9 +62,8 @@ public class BluetoothConnection {
         mBluetoothSideNavModal = activity;
     }
 
-
-    public void setActivity(CalibrateActivity activity){
-        mCalibrateActivity = activity;
+    public void setActivity(CalibrateSideNavModal activity) {
+        mCalibrateSideNavModal = activity;
     }
 
     public boolean isConnected(){
@@ -305,7 +305,7 @@ public class BluetoothConnection {
                                 break;
                             case "*": //calibrate
                                 Log.d(HANDLER_TAG, "* =  " + lastChar);
-                                mCalibrateActivity.updateUI();
+                                //mCalibrateSideNavModal.updateUI();
                                 break;
                             case "c": //connect
                                 Log.d(HANDLER_TAG, "c =  " + lastChar);

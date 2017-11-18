@@ -33,8 +33,8 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
-import edu.sjsu.posturize.posturize.bluetooth.CalibrateActivity;
 import edu.sjsu.posturize.posturize.sidenavmodals.BluetoothSideNavModal;
+import edu.sjsu.posturize.posturize.sidenavmodals.CalibrateSideNavModal;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 public class HomeActivity extends AppCompatActivity
@@ -199,7 +199,7 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_preferences_button_button) {
             startActivity((new Intent(this, PreferencesActivity.class)));
         } else if (id == R.id.nav_calibration_button) {
-            startActivity((new Intent(this, CalibrateActivity.class)));
+            CalibrateSideNavModal.newInstance().show(getFragmentManager(), "CalibrationModal");
         } else if (id == R.id.nav_bluetooth_button) {
             BluetoothSideNavModal.newInstance().show(getFragmentManager(), "BluetoothModal");
         } else if (id == R.id.nav_sign_out_button) {
