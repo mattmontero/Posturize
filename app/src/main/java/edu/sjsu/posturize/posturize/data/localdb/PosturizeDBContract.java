@@ -20,7 +20,7 @@ public final class PosturizeDBContract {
     private static final String TAG = "PosturizeBDContract";
 
     public static final String DATABASE_NAME = "PosturizeDB";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
 
     public static class PostureEntry implements BaseColumns {
         public static final String TABLE_NAME = "posturize";
@@ -29,7 +29,7 @@ public final class PosturizeDBContract {
         public static final String KEY_DATETIME = "datetime";
         public static final String KEY_VALUE = "value";
         public static final String[] ALL_KEYS = new String[] {
-                _ID, KEY_USER, KEY_DATETIME, KEY_VALUE};
+                _ID, KEY_USER_ID, KEY_USER, KEY_DATETIME, KEY_VALUE};
 
         public static final int COL__ID = 0;
         public static final int COL_USER_ID = 1;
