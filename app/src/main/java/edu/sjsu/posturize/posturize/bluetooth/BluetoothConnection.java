@@ -11,12 +11,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Set;
 import java.util.UUID;
 
 import edu.sjsu.posturize.posturize.SignInActivity;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
+import edu.sjsu.posturize.posturize.sidenav.sidenavmodals.BluetoothSideNavModal;
+import edu.sjsu.posturize.posturize.sidenav.sidenavmodals.CalibrateSideNavModal;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
@@ -30,8 +31,8 @@ public class BluetoothConnection {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private PostureManager mPostureManager;
-    private BluetoothActivity mBluetoothActivity;
-    private CalibrateActivity mCalibrateActivity;
+    private BluetoothSideNavModal mBluetoothSideNavModal;
+    private CalibrateSideNavModal mCalibrateSideNavModal;
     private boolean isKilling;
 
     private static final String BLUETOOTH = "Connection Setup";
@@ -57,12 +58,12 @@ public class BluetoothConnection {
         return mBluetoothAdapter;
     }
 
-    public void setActivity(BluetoothActivity activity){
-        mBluetoothActivity = activity;
+    public void setActivity(BluetoothSideNavModal activity) {
+        mBluetoothSideNavModal = activity;
     }
 
-    public void setActivity(CalibrateActivity activity){
-        mCalibrateActivity = activity;
+    public void setActivity(CalibrateSideNavModal activity) {
+        mCalibrateSideNavModal = activity;
     }
 
     public boolean isConnected(){
@@ -86,7 +87,7 @@ public class BluetoothConnection {
             }
         }
         if(mDevice == null){
-            mBluetoothActivity.updateUI();
+            mBluetoothSideNavModal.updateUI();
             return false;
         }
         Log.d(BLUETOOTH, mDevice.getName());
@@ -108,7 +109,7 @@ public class BluetoothConnection {
         mBluetoothAdapter.startDiscovery();
         isKilling = false;
         if(!connectionDropped){
-            mBluetoothActivity.updateUI();
+            mBluetoothSideNavModal.updateUI();
         }
     }
 
@@ -304,11 +305,11 @@ public class BluetoothConnection {
                                 break;
                             case "*": //calibrate
                                 Log.d(HANDLER_TAG, "* =  " + lastChar);
-                                mCalibrateActivity.updateUI();
+                                //mCalibrateSideNavModal.updateUI();
                                 break;
                             case "c": //connect
                                 Log.d(HANDLER_TAG, "c =  " + lastChar);
-                                mBluetoothActivity.updateUI();
+                                mBluetoothSideNavModal.updateUI();
                                 break;
                         }
                     }

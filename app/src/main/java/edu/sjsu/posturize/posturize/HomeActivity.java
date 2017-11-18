@@ -2,7 +2,6 @@ package edu.sjsu.posturize.posturize;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -34,13 +33,13 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
-import edu.sjsu.posturize.posturize.bluetooth.BluetoothActivity;
-import edu.sjsu.posturize.posturize.bluetooth.CalibrateActivity;
+import edu.sjsu.posturize.posturize.sidenav.SideNavDrawer;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 public class HomeActivity extends AppCompatActivity
-        implements DatePickerDialog.OnDateSetListener,
-                    NavigationView.OnNavigationItemSelectedListener{
+        implements DatePickerDialog.OnDateSetListener//,
+                    //NavigationView.OnNavigationItemSelectedListener
+        {
 
     //DATE PICKER THINGS
     DatePicker datePicker;
@@ -54,29 +53,11 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        setSideNavDrawer();
+        SideNavDrawer.create(this); //Add SideNavDrawer to activity
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_daily);
-    }
-
-    private void setSideNavDrawer(){
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        Log.d("Toggle", toggle.toString());
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        navigationView.setItemBackgroundResource(R.drawable.item_background);
-
-        View navHeader = navigationView.getHeaderView(0);
-        ((TextView)navHeader.findViewById(R.id.side_nav_username)).setText(GoogleAccountInfo.getInstance().getFirstName() + " " + GoogleAccountInfo.getInstance().getLastName());
-        ((TextView)navHeader.findViewById(R.id.side_nav_email)).setText(GoogleAccountInfo.getInstance().getEmail());
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -191,28 +172,6 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.nav_settings_button) {
-            startActivity((new Intent(this, PostureManagerActivity.class)));
-        } else if (id == R.id.nav_preferences_button_button) {
-            startActivity((new Intent(this, PreferencesActivity.class)));
-        } else if (id == R.id.nav_calibration_button) {
-            startActivity((new Intent(this, CalibrateActivity.class)));
-        } else if (id == R.id.nav_bluetooth_button) {
-            startActivity((new Intent(this, BluetoothActivity.class)));
-        } else if (id == R.id.nav_sign_out_button) {
-            GoogleAccountInfo.getInstance().signOut();
-            finish();
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
     /**
      * Create a DatePickerFragment class that extends DialogFragment.
      * Define the onCreateDialog() method to return an instance of DatePickerDialog
@@ -230,6 +189,5 @@ public class HomeActivity extends AppCompatActivity
                     (DatePickerDialog.OnDateSetListener)
                             getActivity(), year, month, day);
         }
-
     }
 }
