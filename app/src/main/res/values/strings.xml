@@ -45,6 +45,15 @@
     <string name="settings">Settings</string>
     <string name="sign_out">Sign Out</string>
 
+    <!--Wearable States-->
+    <string name="connect">Connect</string>
+    <string name="connected">Connected!</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="calibrate">Calibrate</string>
+    <string name="calibrated">Calibrated!</string>
+    <string name="not_calibrated">Not calibrated</string>
+
     <!--Side Navigation view-->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
