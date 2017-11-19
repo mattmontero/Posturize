@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 
@@ -31,15 +32,15 @@ public class BluetoothConnection {
     private ConnectThread mConnectThread;
     private ConnectedThread mConnectedThread;
     private PostureManager mPostureManager;
-    private BluetoothSideNavModal mBluetoothSideNavModal;
-    private CalibrateSideNavModal mCalibrateSideNavModal;
     private boolean isKilling;
 
     private static final String BLUETOOTH = "Connection Setup";
     private final String CONNECT_CHAR = "c";
+    private final Handler killHandler;
 
     private BluetoothConnection(){
         mPostureManager = new PostureManager(SignInActivity.getAppContext());
+        killHandler = new Handler(Looper.getMainLooper());
         isKilling = false;
     }
 
@@ -56,14 +57,6 @@ public class BluetoothConnection {
 
     public BluetoothAdapter getBluetoothAdapter(){
         return mBluetoothAdapter;
-    }
-
-    public void setActivity(BluetoothSideNavModal activity) {
-        mBluetoothSideNavModal = activity;
-    }
-
-    public void setActivity(CalibrateSideNavModal activity) {
-        mCalibrateSideNavModal = activity;
     }
 
     public boolean isConnected(){
@@ -87,7 +80,7 @@ public class BluetoothConnection {
             }
         }
         if(mDevice == null){
-            mBluetoothSideNavModal.updateUI();
+            WearableState.getInstance().setIsConnected(false);
             return false;
         }
         Log.d(BLUETOOTH, mDevice.getName());
@@ -101,16 +94,29 @@ public class BluetoothConnection {
         return true;
     }
 
-    public void kill(boolean connectionDropped) {
+    public void kill() {
         isKilling = true;
         mConnectThread.interrupt();
         mConnectThread.cancel();
         mConnectThread = null;
         mBluetoothAdapter.startDiscovery();
         isKilling = false;
-        if(!connectionDropped){
-            mBluetoothSideNavModal.updateUI();
-        }
+
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run(){
+                WearableState.getInstance().setIsCalibrated(false);
+                WearableState.getInstance().setIsConnected(false);
+            }
+        });
+    }
+
+    /**
+     * Queues kill() on main thread
+     * @param r
+     */
+    private void runOnUiThread(Runnable r){
+        killHandler.post(r);
     }
 
     public void write(String valueToWrite){
@@ -252,7 +258,7 @@ public class BluetoothConnection {
                     } catch (IOException e) {
                         if(!isKilling){ //Connection dropped
                             Log.d("ConnectedThread run()", e.toString());
-                            kill(true);
+                            kill();
                             break;
                         }
                     }
@@ -284,7 +290,7 @@ public class BluetoothConnection {
                     String lastChar = "";
                     //Kill connection if sign out
                     if(GoogleAccountInfo.getInstance().getEmail() == null){
-                        kill(false);
+                        kill();
                         Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
                     } else {
                         Log.d(HANDLER_TAG, writeMessage);
@@ -305,11 +311,13 @@ public class BluetoothConnection {
                                 break;
                             case "*": //calibrate
                                 Log.d(HANDLER_TAG, "* =  " + lastChar);
+                                WearableState.getInstance().setIsCalibrated(true);
                                 //mCalibrateSideNavModal.updateUI();
                                 break;
                             case "c": //connect
                                 Log.d(HANDLER_TAG, "c =  " + lastChar);
-                                mBluetoothSideNavModal.updateUI();
+                                WearableState.getInstance().setIsConnected(true);
+                                //mBluetoothSideNavModal.updateUI();
                                 break;
                         }
                     }

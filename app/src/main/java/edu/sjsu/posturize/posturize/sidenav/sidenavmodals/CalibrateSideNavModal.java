@@ -11,14 +11,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import edu.sjsu.posturize.posturize.R;
 import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
+import edu.sjsu.posturize.posturize.bluetooth.WearableState;
 
 /**
  * Created by Matt on 11/18/2017.
  */
 
-public class CalibrateSideNavModal extends DialogFragment {
+public class CalibrateSideNavModal extends DialogFragment
+    implements Observer{
 
     private static BluetoothConnection mBluetoothConnection;
     private Button mCalibrateButton;
@@ -35,7 +40,7 @@ public class CalibrateSideNavModal extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
-        mBluetoothConnection.setActivity(this);
+        WearableState.getInstance().addObserver(this);
 
         AlertDialog.Builder builder;
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
@@ -57,7 +62,7 @@ public class CalibrateSideNavModal extends DialogFragment {
                 final Button close = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEUTRAL);
                 setUI(dialog);
 
-                if(BluetoothConnection.getInstance().isConnected()){
+                if(WearableState.getInstance().isConnected()){
                     mCalibrateButton.setEnabled(true);
                     mCancelButton.setEnabled(true);
                 } else {
@@ -88,6 +93,12 @@ public class CalibrateSideNavModal extends DialogFragment {
         return dialog;
     }
 
+    @Override
+    public void onDismiss(DialogInterface dialogInterface){
+        WearableState.getInstance().deleteObserver(this);
+        super.dismiss();
+    }
+
     private void calibrate(){
         mCalibrationStatusTextView.setText("Calibrating...");
         BluetoothConnection.getInstance().write("*");
@@ -97,6 +108,23 @@ public class CalibrateSideNavModal extends DialogFragment {
         mCalibrateButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
         mCancelButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
         mCalibrationStatusTextView = (TextView)(dialog).findViewById(R.id.bt_calibration_status_modal);
-        //updateUI();
+
+        if(WearableState.getInstance().isCalibrated()){
+            mCalibrationStatusTextView.setText(R.string.calibrated);
+        } else {
+            mCalibrationStatusTextView.setText(R.string.not_calibrated);
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        switch (o.toString()){
+            case WearableState.CALIBRATED:
+                mCalibrationStatusTextView.setText(R.string.calibrated);
+                break;
+            case WearableState.NOT_CALIBRATED:
+                mCalibrationStatusTextView.setText(R.string.not_calibrated);
+                break;
+        }
     }
 }
