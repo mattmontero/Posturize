@@ -14,37 +14,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.27">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/picDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:onClick="datePicker" />
+                    <Button
+                        android:id="@+id/picDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:onClick="datePicker" />
 
-                <TextView
-                    android:id="@+id/showDate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp" />
+                    <TextView
+                        android:id="@+id/showDate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp" />
 
-                <com.jjoe64.graphview.GraphView
-                    android:id="@+id/graph"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp" />
+                    <com.jjoe64.graphview.GraphView
+                        android:id="@+id/graph"
+                        android:layout_width="match_parent"
+                        android:layout_height="400dp"/>
 
-                <android.support.design.widget.BottomNavigationView
-                    android:id="@+id/navigation"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="bottom"
-                    android:layout_marginTop="20dp"
-                    android:background="?android:attr/windowBackground"
-                    app:menu="@menu/bottom_nav_menu" />
-        </LinearLayout>
+                    <android.support.design.widget.BottomNavigationView
+                        android:id="@+id/navigation"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom"
+                        android:layout_marginTop="20dp"
+                        android:background="?android:attr/windowBackground"
+                        app:menu="@menu/bottom_nav_menu" />
+            </LinearLayout>
+        </ScrollView>
     </FrameLayout>
 </LinearLayout>
