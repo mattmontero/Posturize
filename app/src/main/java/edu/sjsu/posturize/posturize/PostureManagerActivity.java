@@ -11,7 +11,9 @@ import android.view.View;
 
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
+import java.util.logging.SimpleFormatter;
 
 public class PostureManagerActivity extends AppCompatActivity
         implements View.OnClickListener{
@@ -71,7 +73,9 @@ public class PostureManagerActivity extends AppCompatActivity
 
     private  void addRecord() {
         tempPm.openDB();
-        tempPm.insert((float)(Math.random() * (70 - 65) + 65));
+        DecimalFormat df = new DecimalFormat("#.00");
+        float value = Float.parseFloat(df.format((float)(Math.random() * (5 - 3) + 3)));
+        tempPm.insert(value);
         ((TextView) findViewById(R.id.textDisplay)).setText(tempPm.get(Calendar.getInstance()).toString());
         tempPm.closeDB();
     }

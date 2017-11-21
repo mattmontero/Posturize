@@ -55,6 +55,8 @@ public class DailySync extends JobService {
 
             Log.i("Daily Sync","scheduler job finished");
         }
+
+        postureManager.closeDB();
         return true; // No more work to do
     }
 

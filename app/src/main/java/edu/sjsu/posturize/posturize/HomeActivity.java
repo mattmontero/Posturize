@@ -105,16 +105,16 @@ public class HomeActivity extends AppCompatActivity
         graph.removeAllSeries();
         // set manual X bounds
         graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(-5);
-        graph.getViewport().setMaxY(0);
+        graph.getViewport().setMinY(-15); //percent off
+        graph.getViewport().setMaxY(0); //on track
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(4);
-        graph.getViewport().setMaxX(80);
+        graph.getViewport().setMaxX(numPoints);
 
         // enable scaling and scrolling
-        graph.getViewport().setScalable(true);
-        graph.getViewport().setScalableY(false);
+        graph.getViewport().setScalable(false);
+        graph.getViewport().setScrollable(false);
 
         graph.addSeries(series);
 
