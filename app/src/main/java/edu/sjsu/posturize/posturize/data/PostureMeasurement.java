@@ -22,5 +22,4 @@ public class PostureMeasurement {
     public String toString(){
         return "[" + distance + ", " + timestamp + "]";
     }
-
 }
