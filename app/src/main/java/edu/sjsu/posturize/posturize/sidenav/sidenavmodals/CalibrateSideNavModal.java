@@ -50,7 +50,7 @@ public class CalibrateSideNavModal extends DialogFragment
         }
         builder.setView(R.layout.alert_dialog_calibrate)
                 //Setting onClickListeners to null. Handling it in setOnShowListener
-                .setNegativeButton("Cancel", null)
+                //.setNegativeButton("Cancel", null)
                 .setPositiveButton("Calibrate",null)
                 .setNeutralButton("Close", null);
         final Dialog dialog = builder.create();

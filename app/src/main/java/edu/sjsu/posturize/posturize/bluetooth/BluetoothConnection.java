@@ -36,11 +36,9 @@ public class BluetoothConnection {
 
     private static final String BLUETOOTH = "Connection Setup";
     private final String CONNECT_CHAR = "c";
-    private final Handler killHandler;
 
     private BluetoothConnection(){
         mPostureManager = new PostureManager(SignInActivity.getAppContext());
-        killHandler = new Handler(Looper.getMainLooper());
         isKilling = false;
     }
 
@@ -102,13 +100,7 @@ public class BluetoothConnection {
         mBluetoothAdapter.startDiscovery();
         isKilling = false;
 
-        runOnUiThread(new Runnable(){
-            @Override
-            public void run(){
-                WearableState.getInstance().setIsCalibrated(false);
-                WearableState.getInstance().setIsConnected(false);
-            }
-        });
+        runOnUiThread(updateWearableState);
     }
 
     /**
@@ -116,8 +108,19 @@ public class BluetoothConnection {
      * @param r
      */
     private void runOnUiThread(Runnable r){
-        killHandler.post(r);
+        new Handler(Looper.getMainLooper()).post(r);
     }
+
+    /**
+     * Runnable to update ui connection/calibration to false;
+     */
+    private Runnable updateWearableState = new Runnable() {
+        @Override
+        public void run() {
+            WearableState.getInstance().setIsCalibrated(false);
+            WearableState.getInstance().setIsConnected(false);
+        }
+    };
 
     public void write(String valueToWrite){
         //Send * to arduino
@@ -158,6 +161,7 @@ public class BluetoothConnection {
                 Log.d("Connect Exception", connectException.toString());
                 try{
                     mmSocket.close();
+                    runOnUiThread(updateWearableState);
                 }catch (IOException closeException){
                     Log.d("Close Exception", closeException.toString());
                 }

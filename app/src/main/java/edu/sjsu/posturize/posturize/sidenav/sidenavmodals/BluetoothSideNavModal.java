@@ -50,7 +50,7 @@ public class BluetoothSideNavModal extends DialogFragment
         }
         builder.setView(R.layout.alert_dialog_bluetooth)
                 //Setting onClickListeners to null. Handling it in setOnShowListener
-                .setNegativeButton("Cancel", null)
+                //.setNegativeButton("Cancel", null)
                 .setPositiveButton("Connect",null)
                 .setNeutralButton("Close", null);
         final Dialog dialog = builder.create();
