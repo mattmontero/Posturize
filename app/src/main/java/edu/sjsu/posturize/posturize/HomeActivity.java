@@ -1,6 +1,8 @@
 package edu.sjsu.posturize.posturize;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntegerRes;
@@ -58,7 +60,6 @@ public class HomeActivity extends AppCompatActivity
     String tab;
     private static PostureManager tempPm; //TODO: Remove Temp
     ArrayList<DataPoint> points; //TODO: Remove Temp
-    private final int MINS_IN_DAY = 1440;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,120 +67,13 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         SideNavDrawer.create(this); //Add SideNavDrawer to activity
 
-        tempStuff();
-
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_daily);
+
+
+        //GraphManager gm = new GraphManager(this);
     }
-
-    /******************************************************************************/
-    /**********************************TEMP STUFF**********************************/
-    private void tempStuff(){
-        tempPm = new PostureManager(this.getApplicationContext()); //TODO: Remove Temp
-        points = new ArrayList<>();
-
-        View.OnClickListener temp = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switch (view.getId()){
-                    case R.id.add_point:
-                        addRecord();
-                        break;
-                    case R.id.delete_points:
-                        deleteUserRecords();
-                        break;
-                }
-            }
-        };
-        findViewById(R.id.add_point).setOnClickListener(temp);
-        findViewById(R.id.delete_points).setOnClickListener(temp);
-    }
-
-    public void updateGraph(){
-        tempPm.openDB();
-        ArrayList<DataPoint> dp = new ArrayList<>();
-        ArrayList<PostureMeasurement> postureMeasurements = tempPm.get(Calendar.getInstance());
-        Calendar c = new GregorianCalendar();
-        for(PostureMeasurement pm : postureMeasurements){
-            c.setTime(new Date(pm.timestamp));
-            dp.add(new DataPoint((double) timeInSeconds(c), -pm.distance));
-        }
-
-        tempPm.closeDB();
-        c.setTime(new Date( postureMeasurements.get(0).timestamp));
-        modifyData(c, dp);
-    }
-
-    private void modifyData(Calendar start, ArrayList<DataPoint> points){
-        int timeInSec = Calendar.getInstance().get(Calendar.HOUR_OF_DAY) * 60 + Calendar.getInstance().get(Calendar.MINUTE) + Calendar.getInstance().get(Calendar.SECOND);
-        //DATA GRAPH THINGS
-        GraphView graph = (GraphView) findViewById(R.id.graph);
-
-        PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points.toArray(new DataPoint[points.size()]));
-        graph.removeAllSeries();
-        // set manual X bounds
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(-10); //percent off
-        graph.getViewport().setMaxY(0); //on track
-
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(timeInSeconds(start));
-        graph.getViewport().setMaxX(timeInSeconds(Calendar.getInstance()));
-
-        // enable scaling and scrolling
-        graph.getViewport().setScalable(false);
-        graph.getViewport().setScrollable(false);
-
-        graph.addSeries(series);
-
-        series.setOnDataPointTapListener(new OnDataPointTapListener() {
-            @Override
-            public void onTap(Series series, DataPointInterface dataPoint) {
-                Toast.makeText(getApplicationContext(), "Series1: On Data Point clicked: "+dataPoint, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private long timeInSeconds(Calendar cal){
-        Calendar c = (Calendar) cal.clone();
-        long now = c.getTimeInMillis();
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        long passed = now - c.getTimeInMillis();
-        long secondsPassed = (int)passed / 1000;
-        return secondsPassed;
-    }
-
-    private int timeInMinutes(Calendar c){
-        long now = c.getTimeInMillis();
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        long passed = now - c.getTimeInMillis();
-        int minutesPassed = (int)passed / (1000*60);
-        return minutesPassed;
-    }
-
-    private void deleteUserRecords(){
-        tempPm.openDB();
-        tempPm.delete(GoogleAccountInfo.getInstance().getId());
-        tempPm.closeDB();
-    }
-
-    private  void addRecord() {
-        tempPm.openDB();
-        DecimalFormat df = new DecimalFormat("#.00");
-        float value = Float.parseFloat(df.format((float)(Math.random() * (5 - 3) + 3)));
-        tempPm.insert(value);
-        tempPm.closeDB();
-        updateGraph();
-    }
-    /**********************************TEMP STUFF**********************************/
-    /******************************************************************************/
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -309,6 +203,129 @@ public class HomeActivity extends AppCompatActivity
             return new DatePickerDialog(getActivity(),
                     (DatePickerDialog.OnDateSetListener)
                             getActivity(), year, month, day);
+        }
+    }
+
+    public static class GraphManager{
+
+        private PostureManager mmPostureManager;
+        private ArrayList<DataPoint> mmDatapoints;
+        private Activity mmActivity;
+        private GraphView mmGraphView;
+
+        GraphManager(Activity activity){
+            mmActivity = activity;
+            mmPostureManager = new PostureManager(activity.getApplicationContext());
+            mmDatapoints = new ArrayList<>();
+            constructGraph();
+
+            View.OnClickListener temp = new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    switch (view.getId()){
+                        case R.id.add_point:
+                            addRecord();
+                            break;
+                        case R.id.delete_points:
+                            deleteUserRecords();
+                            break;
+                    }
+                }
+            };
+            mmActivity.findViewById(R.id.add_point).setOnClickListener(temp);
+            mmActivity.findViewById(R.id.delete_points).setOnClickListener(temp);
+        }
+
+        private void constructGraph(){
+            mmGraphView = (GraphView) mmActivity.findViewById(R.id.graph);
+
+            //Manual Bounds
+            mmGraphView.getViewport().setXAxisBoundsManual(true);
+            mmGraphView.getViewport().setYAxisBoundsManual(true);
+
+            // Disable scaling and scrolling
+            mmGraphView.getViewport().setScalable(false);
+            mmGraphView.getViewport().setScrollable(false);
+
+            //Set Y min and max
+            mmGraphView.getViewport().setMinY(-10); //percent off
+            mmGraphView.getViewport().setMaxY(0);   //on track
+            //Set X min and max
+            viewportX(0,10); //Just some default values to construct
+        }
+
+        private void viewportX(int min, int max){
+            mmGraphView.getViewport().setMinX(min);
+            mmGraphView.getViewport().setMaxX(max);
+        }
+
+        public void addPoint(DataPoint dp){
+            mmDatapoints.add(dp);
+            updateGraph();
+        }
+
+        public void updateGraph(){
+            mmPostureManager.openDB();
+            ArrayList<DataPoint> dp = new ArrayList<>();
+            ArrayList<PostureMeasurement> postureMeasurements = mmPostureManager.get(Calendar.getInstance());
+            Calendar c = new GregorianCalendar();
+            for(PostureMeasurement pm : postureMeasurements){
+                c.setTime(new Date(pm.timestamp));
+                dp.add(new DataPoint((double) timeInSeconds(c), -pm.distance));
+            }
+            mmPostureManager.closeDB();
+            c.setTime(new Date( postureMeasurements.get(0).timestamp));
+            modifyData(c, dp);
+        }
+
+        public void modifyData(Calendar start, ArrayList<DataPoint> points){
+            /*
+                remove series from graph
+                Add newest datapoint
+                reset viewportX
+                add new series
+             */
+            mmGraphView.removeAllSeries();
+            PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points.toArray(new DataPoint[points.size()]));
+            mmGraphView.addSeries(series);
+        }
+
+        private long timeInSeconds(Calendar cal){
+            Calendar c = (Calendar) cal.clone();
+            long now = c.getTimeInMillis();
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            long passed = now - c.getTimeInMillis();
+            long secondsPassed = (int)passed / 1000;
+            return secondsPassed;
+        }
+
+        private int timeInMinutes(Calendar c){
+            long now = c.getTimeInMillis();
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            long passed = now - c.getTimeInMillis();
+            int minutesPassed = (int)passed / (1000*60);
+            return minutesPassed;
+        }
+
+        private void deleteUserRecords(){
+            mmPostureManager.openDB();
+            mmPostureManager.delete(GoogleAccountInfo.getInstance().getId());
+            mmPostureManager.closeDB();
+        }
+
+        private  void addRecord() {
+            mmPostureManager.openDB();
+            DecimalFormat df = new DecimalFormat("#.00");
+            float value = Float.parseFloat(df.format((float)(Math.random() * (5 - 3) + 3)));
+            mmPostureManager.insert(value);
+            mmPostureManager.closeDB();
+            updateGraph();
         }
     }
 }
