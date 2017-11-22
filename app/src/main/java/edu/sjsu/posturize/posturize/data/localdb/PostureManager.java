@@ -4,10 +4,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.jjoe64.graphview.series.DataPoint;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import edu.sjsu.posturize.posturize.data.PostureMeasurement;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
@@ -79,27 +80,27 @@ public class PostureManager {
 
     /**
      * @param day Calendar day to grab all measurements for the current user
-     * @return ArrayList<PostureMeasurement> all received slouch values for the current user
+     * @return ArrayList<DataPoint> all received slouch values for the current user
      */
-    public ArrayList<PostureMeasurement> get(Calendar day){
+    public ArrayList<DataPoint> get(Calendar day){
         return construct(db.getDay(day));
     }
 
-    public ArrayList<PostureMeasurement> get(String id, Calendar day){
+    public ArrayList<DataPoint> get(String id, Calendar day){
         return construct(db.getDay(id, day));
     }
 
-    public ArrayList<PostureMeasurement> get(Calendar start, Calendar end){
+    public ArrayList<DataPoint> get(Calendar start, Calendar end){
         return construct(db.getDays(start, end));
     }
 
-    private ArrayList<PostureMeasurement> construct(Cursor cursor){
-        ArrayList<PostureMeasurement> values = new ArrayList<>();
+    private ArrayList<DataPoint> construct(Cursor cursor){
+        ArrayList<DataPoint> values = new ArrayList<>();
         if(cursor.moveToFirst()) {
             while (true) {
-                values.add(new PostureMeasurement(
-                        cursor.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME),
-                        cursor.getFloat(PosturizeDBContract.PostureEntry.COL_VALUE)));
+                values.add(new DataPoint(
+                        (double) cursor.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), //time = x
+                        (double) cursor.getFloat(PosturizeDBContract.PostureEntry.COL_VALUE))); //slouch = y
                 if(!cursor.moveToNext())
                     break;
             }
