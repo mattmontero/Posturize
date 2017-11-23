@@ -307,7 +307,8 @@ public class BluetoothConnection {
                                 mPostureManager.openDB();
                                 //long time = Calendar.getInstance().getTimeInMillis() - values.length*ARDUINO_COLLECTION_INTERVAL;
                                 for(int i = 0; i < values.length; i++){
-                                    mPostureManager.insert(values[i]);
+                                    long row = mPostureManager.insert(values[i]);
+
                                     //time += ARDUINO_COLLECTION_INTERVAL;
                                 }
                                 mPostureManager.closeDB();

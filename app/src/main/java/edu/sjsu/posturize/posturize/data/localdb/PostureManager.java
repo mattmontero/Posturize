@@ -8,15 +8,16 @@ import com.jjoe64.graphview.series.DataPoint;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Observable;
 
-import edu.sjsu.posturize.posturize.data.PostureMeasurement;
+import edu.sjsu.posturize.posturize.HomeActivity;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by Matt on 11/3/2017.
  */
 
-public class PostureManager {
+public class PostureManager extends Observable{
     private Context context;
     private PosturizeDBContract db;
 
@@ -49,7 +50,13 @@ public class PostureManager {
      */
     public long insert(float value){
         //Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
-        return db.insertRow(GoogleAccountInfo.getInstance().getId(), GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
+        long row = db.insertRow(GoogleAccountInfo.getInstance().getId(), GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
+        Log.d("PostureManager", "Insert: " + row);
+        setChanged();
+        notifyObservers(row);
+        Log.d("PostureManager", "Observers notified: " + countObservers());
+
+        return row;
     }
 
     /**
@@ -60,7 +67,7 @@ public class PostureManager {
         if (db.deleteUser(userId)) {
             Log.d("PostureManager", "User: " + GoogleAccountInfo.getInstance().getEmail() + " deleted");
         } else {
-            Log.d("Posturemanager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + "was NOT deleted");
+            Log.d("PostureManager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + "was NOT deleted");
         }
     }
 
@@ -79,29 +86,34 @@ public class PostureManager {
         return values;
     }
 
+    public DataPoint getRow(long row){
+        Cursor c = db.getRow(row);
+        return new DataPoint((double) c.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), (double) PosturizeDBContract.PostureEntry.COL_VALUE);
+    }
+
     /**
      * @param day Calendar day to grab all measurements for the current user
-     * @return ArrayList<PostureMeasurement> all received slouch values for the current user
+     * @return ArrayList<DataPoint> all received slouch values for the current user
      */
-    public ArrayList<PostureMeasurement> get(Calendar day){
+    public ArrayList<DataPoint> get(Calendar day){
         return construct(db.getDay(day));
     }
 
-    public ArrayList<PostureMeasurement> get(String id, Calendar day){
+    public ArrayList<DataPoint> get(String id, Calendar day){
         return construct(db.getDay(id, day));
     }
 
-    public ArrayList<PostureMeasurement> get(Calendar start, Calendar end){
+    public ArrayList<DataPoint> get(Calendar start, Calendar end){
         return construct(db.getDays(start, end));
     }
 
-    private ArrayList<PostureMeasurement> construct(Cursor cursor){
-        ArrayList<PostureMeasurement> values = new ArrayList<>();
+    private ArrayList<DataPoint> construct(Cursor cursor){
+        ArrayList<DataPoint> values = new ArrayList<>();
         if(cursor.moveToFirst()) {
             while (true) {
-                values.add(new PostureMeasurement(
-                        cursor.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME),
-                        cursor.getFloat(PosturizeDBContract.PostureEntry.COL_VALUE)));
+                values.add(new DataPoint(
+                        (double) cursor.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), //time = x
+                        (double) cursor.getFloat(PosturizeDBContract.PostureEntry.COL_VALUE))); //slouch = y
                 if(!cursor.moveToNext())
                     break;
             }

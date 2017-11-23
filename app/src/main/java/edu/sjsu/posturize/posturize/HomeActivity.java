@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Observable;
+import java.util.Observer;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -43,6 +46,7 @@ import com.jjoe64.graphview.series.Series;
 
 import edu.sjsu.posturize.posturize.data.PostureMeasurement;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
+import edu.sjsu.posturize.posturize.data.localdb.PosturizeDBContract;
 import edu.sjsu.posturize.posturize.sidenav.SideNavDrawer;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
@@ -58,8 +62,7 @@ public class HomeActivity extends AppCompatActivity
     int month;
 
     String tab;
-    private static PostureManager tempPm; //TODO: Remove Temp
-    ArrayList<DataPoint> points; //TODO: Remove Temp
+    GraphManager gm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +70,24 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         SideNavDrawer.create(this); //Add SideNavDrawer to activity
 
+        gm = new GraphManager(this);
+
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         navigation.setSelectedItemId(R.id.navigation_daily);
+    }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+        gm.startObserving();
+        gm.updateGraph();
+    }
 
-        //GraphManager gm = new GraphManager(this);
+    @Override
+    protected void onPause(){
+        super.onPause();
+        gm.stopObserving();
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -88,15 +103,16 @@ public class HomeActivity extends AppCompatActivity
             switch (item.getItemId()) {
                 case R.id.navigation_daily:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectDaily));
-                    setDataView(100);
+                    gm.updateGraph();
+                    //setDataView(100);
                     return true;
                 case R.id.navigation_weekly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectWeekly));
-                    setDataView(500);
+                    //setDataView(500);
                     return true;
                 case R.id.navigation_monthly:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectMonthly));
-                    setDataView(1000);
+                    //setDataView(1000);
                     return true;
             }
             return false;
@@ -206,7 +222,7 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
-    public static class GraphManager{
+    public static class GraphManager implements Observer{
 
         private PostureManager mmPostureManager;
         private ArrayList<DataPoint> mmDatapoints;
@@ -216,7 +232,9 @@ public class HomeActivity extends AppCompatActivity
         GraphManager(Activity activity){
             mmActivity = activity;
             mmPostureManager = new PostureManager(activity.getApplicationContext());
-            mmDatapoints = new ArrayList<>();
+            mmPostureManager.openDB();
+            mmDatapoints = mmPostureManager.get(Calendar.getInstance());
+            mmPostureManager.closeDB();
             constructGraph();
 
             View.OnClickListener temp = new View.OnClickListener() {
@@ -249,33 +267,33 @@ public class HomeActivity extends AppCompatActivity
 
             //Set Y min and max
             mmGraphView.getViewport().setMinY(-10); //percent off
-            mmGraphView.getViewport().setMaxY(0);   //on track
+            mmGraphView.getViewport().setMaxY(1);   //on track
             //Set X min and max
             viewportX(0,10); //Just some default values to construct
         }
 
-        private void viewportX(int min, int max){
+        private void viewportX(long min, long max){
             mmGraphView.getViewport().setMinX(min);
             mmGraphView.getViewport().setMaxX(max);
         }
 
+        //Should be invoked by observable
         public void addPoint(DataPoint dp){
             mmDatapoints.add(dp);
             updateGraph();
         }
 
+
         public void updateGraph(){
             mmPostureManager.openDB();
-            ArrayList<DataPoint> dp = new ArrayList<>();
-            ArrayList<PostureMeasurement> postureMeasurements = mmPostureManager.get(Calendar.getInstance());
-            Calendar c = new GregorianCalendar();
-            for(PostureMeasurement pm : postureMeasurements){
-                c.setTime(new Date(pm.timestamp));
-                dp.add(new DataPoint((double) timeInSeconds(c), -pm.distance));
-            }
+            mmDatapoints = mmPostureManager.get(Calendar.getInstance());
             mmPostureManager.closeDB();
-            c.setTime(new Date( postureMeasurements.get(0).timestamp));
-            modifyData(c, dp);
+
+            if(!mmDatapoints.isEmpty()) {
+                Calendar c = new GregorianCalendar();
+                c.setTime(new Date((long) mmDatapoints.get(0).getX()));
+                modifyData(c, mmDatapoints);
+            }
         }
 
         public void modifyData(Calendar start, ArrayList<DataPoint> points){
@@ -286,7 +304,16 @@ public class HomeActivity extends AppCompatActivity
                 add new series
              */
             mmGraphView.removeAllSeries();
-            PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>(points.toArray(new DataPoint[points.size()]));
+
+            PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>();
+            long time;
+            Calendar c = new GregorianCalendar();
+            for(DataPoint dp : points){
+                c.setTime(new Date((long) dp.getX()));
+                time = timeInSeconds(c);
+                series.appendData(new DataPoint(time, dp.getY()), false, 80000);
+            }
+            viewportX(timeInSeconds(start), timeInSeconds(Calendar.getInstance()));
             mmGraphView.addSeries(series);
         }
 
@@ -322,10 +349,35 @@ public class HomeActivity extends AppCompatActivity
         private  void addRecord() {
             mmPostureManager.openDB();
             DecimalFormat df = new DecimalFormat("#.00");
-            float value = Float.parseFloat(df.format((float)(Math.random() * (5 - 3) + 3)));
+            float value = Float.parseFloat(df.format((float)(-(Math.random() * (5 - 3) + 3))));
+            //Log.d("New Record", Float.toString(value));
             mmPostureManager.insert(value);
             mmPostureManager.closeDB();
-            updateGraph();
+            //updateGraph();
+        }
+
+        public void startObserving(){
+            mmPostureManager.addObserver(this);
+            Log.d("GraphManager", "Observing PostureManager");
+        }
+
+        public void stopObserving(){
+            mmPostureManager.deleteObserver(this);
+
+            Log.d("GraphManager", "Stopped observing PostureManager");
+        }
+
+        @Override
+        public void update(Observable observable, Object o) {
+            Log.d("GraphManager", "Notified");
+            Log.d("GraphManager", o.toString());
+            if((long) o >= 0) {
+                mmPostureManager.openDB();
+                //mmPostureManager.getRow((long) o);
+                addPoint(mmPostureManager.getRow((long) o));
+                mmPostureManager.closeDB();
+                //addPoint(new DataPoint((double) c.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), (double) c.getFloat(PosturizeDBContract.PostureEntry.COL_VALUE)));
+            }
         }
     }
 }

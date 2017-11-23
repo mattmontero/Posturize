@@ -136,6 +136,16 @@ public final class PosturizeDBContract {
         return c;
     }
 
+    public Cursor getRow(long id){
+        String where = PostureEntry._ID + " = '" + id + "'";
+        Cursor c = mDb.query(true, PostureEntry.TABLE_NAME, PostureEntry.ALL_KEYS,
+                where, null, null, null, null, null);
+        if(c != null){
+            c.moveToFirst();
+        }
+        return c;
+    }
+
     /**
      * Select * from posturize
      * @return Cursor for query

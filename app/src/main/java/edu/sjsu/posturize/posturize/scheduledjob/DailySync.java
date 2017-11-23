@@ -4,13 +4,14 @@ import android.util.Log;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 
+import com.jjoe64.graphview.series.DataPoint;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
 import edu.sjsu.posturize.posturize.data.FirebaseHelper;
-import edu.sjsu.posturize.posturize.data.PostureMeasurement;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
@@ -38,10 +39,10 @@ public class DailySync extends JobService {
 
             Calendar yesterday = Calendar.getInstance();
             yesterday.setTimeInMillis(new Date().getTime()-3600000);
-            ArrayList<PostureMeasurement> postures = postureManager.get(id, yesterday);
-            for(PostureMeasurement p : postures){
-                times.add(new Date(p.timestamp));
-                slouches.add(new Double(p.distance));
+            ArrayList<DataPoint> postures = postureManager.get(id, yesterday);
+            for(DataPoint p : postures){
+                times.add(new Date((long) p.getX()));
+                slouches.add(p.getY());
             }
             HashMap<String, Object> data = new HashMap<>();
             data.put("times", times);
