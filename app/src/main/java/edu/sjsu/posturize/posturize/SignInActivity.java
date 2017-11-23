@@ -59,8 +59,9 @@ public class SignInActivity extends AppCompatActivity implements
 
         if(sharedPreferences.getBoolean("REMEMBER_ME", false)) {
             silentSignIn();
+        } else {
+            updateUI(false);
         }
-        updateUI(false);
     }
 
     private void silentSignIn(){
