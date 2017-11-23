@@ -2,17 +2,11 @@ package edu.sjsu.posturize.posturize;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -26,7 +20,6 @@ import android.app.Dialog;
 import android.support.v4.app.DialogFragment;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -44,9 +37,8 @@ import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.PointsGraphSeries;
 import com.jjoe64.graphview.series.Series;
 
-import edu.sjsu.posturize.posturize.data.PostureMeasurement;
+import edu.sjsu.posturize.posturize.bluetooth.BluetoothConnection;
 import edu.sjsu.posturize.posturize.data.localdb.PostureManager;
-import edu.sjsu.posturize.posturize.data.localdb.PosturizeDBContract;
 import edu.sjsu.posturize.posturize.sidenav.SideNavDrawer;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
@@ -103,7 +95,7 @@ public class HomeActivity extends AppCompatActivity
             switch (item.getItemId()) {
                 case R.id.navigation_daily:
                     ((Button) findViewById(R.id.picDate)).setText(getString(R.string.selectDaily));
-                    gm.updateGraph();
+                    //gm.updateGraph();
                     //setDataView(100);
                     return true;
                 case R.id.navigation_weekly:
@@ -231,7 +223,7 @@ public class HomeActivity extends AppCompatActivity
 
         GraphManager(Activity activity){
             mmActivity = activity;
-            mmPostureManager = new PostureManager(activity.getApplicationContext());
+            mmPostureManager = BluetoothConnection.getInstance().getPostureManager();
             mmPostureManager.openDB();
             mmDatapoints = mmPostureManager.get(Calendar.getInstance());
             mmPostureManager.closeDB();
@@ -277,17 +269,23 @@ public class HomeActivity extends AppCompatActivity
             mmGraphView.getViewport().setMaxX(max);
         }
 
-        //Should be invoked by observable
-        public void addPoint(DataPoint dp){
+        /*//Should be invoked by observable
+        private void addPoint(DataPoint dp){
             mmDatapoints.add(dp);
+            Log.d("GraphManager", "addPoint:\n" + mmDatapoints.toString());
             updateGraph();
         }
-
+        */
 
         public void updateGraph(){
-            mmPostureManager.openDB();
-            mmDatapoints = mmPostureManager.get(Calendar.getInstance());
-            mmPostureManager.closeDB();
+            if(!mmPostureManager.isDBopen()) {
+                mmPostureManager.openDB();
+                mmDatapoints = mmPostureManager.get(Calendar.getInstance());
+                Log.d("GraphManager", "updateGraph:\n" + mmDatapoints.toString());
+                mmPostureManager.closeDB();
+            } else {
+                mmDatapoints = mmPostureManager.get(Calendar.getInstance());
+            }
 
             if(!mmDatapoints.isEmpty()) {
                 Calendar c = new GregorianCalendar();
@@ -297,12 +295,6 @@ public class HomeActivity extends AppCompatActivity
         }
 
         public void modifyData(Calendar start, ArrayList<DataPoint> points){
-            /*
-                remove series from graph
-                Add newest datapoint
-                reset viewportX
-                add new series
-             */
             mmGraphView.removeAllSeries();
 
             PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>();
@@ -350,10 +342,8 @@ public class HomeActivity extends AppCompatActivity
             mmPostureManager.openDB();
             DecimalFormat df = new DecimalFormat("#.00");
             float value = Float.parseFloat(df.format((float)(-(Math.random() * (5 - 3) + 3))));
-            //Log.d("New Record", Float.toString(value));
             mmPostureManager.insert(value);
             mmPostureManager.closeDB();
-            //updateGraph();
         }
 
         public void startObserving(){
@@ -363,21 +353,13 @@ public class HomeActivity extends AppCompatActivity
 
         public void stopObserving(){
             mmPostureManager.deleteObserver(this);
-
             Log.d("GraphManager", "Stopped observing PostureManager");
         }
 
         @Override
         public void update(Observable observable, Object o) {
             Log.d("GraphManager", "Notified");
-            Log.d("GraphManager", o.toString());
-            if((long) o >= 0) {
-                mmPostureManager.openDB();
-                //mmPostureManager.getRow((long) o);
-                addPoint(mmPostureManager.getRow((long) o));
-                mmPostureManager.closeDB();
-                //addPoint(new DataPoint((double) c.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), (double) c.getFloat(PosturizeDBContract.PostureEntry.COL_VALUE)));
-            }
+            updateGraph();
         }
     }
 }

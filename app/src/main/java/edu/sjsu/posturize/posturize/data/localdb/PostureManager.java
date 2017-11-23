@@ -36,6 +36,10 @@ public class PostureManager extends Observable{
         db.open();
     }
 
+    public boolean isDBopen(){
+        return db.isOpen();
+    }
+
     /**
      * Closed SQLite database.
      */

@@ -53,6 +53,10 @@ public final class PosturizeDBContract {
     private DBHelper mDbHelper;
     private SQLiteDatabase mDb;
 
+    public boolean isOpen(){
+        return mDb.isOpen();
+    }
+
     //**********
     //* Public *
     //**********

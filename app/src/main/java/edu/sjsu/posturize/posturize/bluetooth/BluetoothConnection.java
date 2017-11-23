@@ -49,6 +49,10 @@ public class BluetoothConnection {
         return singleBluetoothConnection;
     }
 
+    public PostureManager getPostureManager(){
+        return mPostureManager;
+    }
+
     public void setBluetoothAdapter(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
     }
