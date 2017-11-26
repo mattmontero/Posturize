@@ -8,9 +8,12 @@ import com.jjoe64.graphview.series.DataPoint;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Observable;
 
 import edu.sjsu.posturize.posturize.HomeActivity;
+import edu.sjsu.posturize.posturize.predefined.Predefined;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
@@ -61,6 +64,27 @@ public class PostureManager extends Observable{
         Log.d("PostureManager", "Observers notified: " + countObservers());
 
         return row;
+    }
+
+    public void fakeIt(){
+        this.openDB();
+
+        this.delete(GoogleAccountInfo.getInstance().getId());
+
+        Calendar c = Calendar.getInstance();
+        for (DataPoint dp : Predefined.SQLiteEntries) {
+            c.setTime(new Date((long)(dp.getX())));
+            float value = (float)dp.getY();
+            long id = db.insertRow(GoogleAccountInfo.getInstance().getId(),
+                    GoogleAccountInfo.getInstance().getEmail(),
+                    c.getTimeInMillis(),value);
+            Log.d("FakeIt", "insert: time : " + c.getTimeInMillis());
+            Log.d("FakeIt", "insert: value: " + value);
+        }
+        setChanged();
+        notifyObservers();
+
+        this.closeDB();
     }
 
     /**

@@ -215,11 +215,12 @@ public final class PosturizeDBContract {
      * @return long[] First millisecond of day and last millisecond of day
      */
     private long[] dayStartAndEndInMillis(Calendar c){
-        c.set(Calendar.HOUR, 0);
+        c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
         long start = c.getTimeInMillis();
-        c.set(Calendar.HOUR, 23);
+        c.set(Calendar.HOUR_OF_DAY, 23);
         c.set(Calendar.MINUTE, 59);
         c.set(Calendar.SECOND, 59);
         long end =  c.getTimeInMillis();

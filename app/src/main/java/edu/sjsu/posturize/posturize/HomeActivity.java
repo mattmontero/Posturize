@@ -30,6 +30,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.DataPointInterface;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -239,11 +240,15 @@ public class HomeActivity extends AppCompatActivity
                         case R.id.delete_points:
                             deleteUserRecords();
                             break;
+                        case R.id.fake_data_button:
+                            populateSQLite();
+                            break;
                     }
                 }
             };
             mmActivity.findViewById(R.id.add_point).setOnClickListener(temp);
             mmActivity.findViewById(R.id.delete_points).setOnClickListener(temp);
+            mmActivity.findViewById(R.id.fake_data_button).setOnClickListener(temp);
         }
 
         private void constructGraph(){
@@ -264,18 +269,10 @@ public class HomeActivity extends AppCompatActivity
             viewportX(0,10); //Just some default values to construct
         }
 
-        private void viewportX(long min, long max){
+        private void viewportX(double min, double max){
             mmGraphView.getViewport().setMinX(min);
             mmGraphView.getViewport().setMaxX(max);
         }
-
-        /*//Should be invoked by observable
-        private void addPoint(DataPoint dp){
-            mmDatapoints.add(dp);
-            Log.d("GraphManager", "addPoint:\n" + mmDatapoints.toString());
-            updateGraph();
-        }
-        */
 
         public void updateGraph(){
             if(!mmPostureManager.isDBopen()) {
@@ -298,14 +295,15 @@ public class HomeActivity extends AppCompatActivity
             mmGraphView.removeAllSeries();
 
             PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>();
-            long time;
+            double time;
             Calendar c = new GregorianCalendar();
             for(DataPoint dp : points){
                 c.setTime(new Date((long) dp.getX()));
-                time = timeInSeconds(c);
+                time = timeInHours(c);
                 series.appendData(new DataPoint(time, dp.getY()), false, 80000);
             }
-            viewportX(timeInSeconds(start), timeInSeconds(Calendar.getInstance()));
+            viewportX(timeInHours(startOfHour(start)), timeInHours(nextHalfHourTime(Calendar.getInstance())));
+            mmGraphView.getGridLabelRenderer().setNumHorizontalLabels(5);
             mmGraphView.addSeries(series);
         }
 
@@ -321,15 +319,52 @@ public class HomeActivity extends AppCompatActivity
             return secondsPassed;
         }
 
-        private int timeInMinutes(Calendar c){
+        private long timeInMinutes(Calendar cal){
+            Calendar c = (Calendar) cal.clone();
             long now = c.getTimeInMillis();
             c.set(Calendar.HOUR_OF_DAY, 0);
             c.set(Calendar.MINUTE, 0);
             c.set(Calendar.SECOND, 0);
             c.set(Calendar.MILLISECOND, 0);
             long passed = now - c.getTimeInMillis();
-            int minutesPassed = (int)passed / (1000*60);
+            long minutesPassed = (int)passed / (1000*60);
             return minutesPassed;
+        }
+
+        private double timeInHours(Calendar c){
+            long now = c.getTimeInMillis();
+            c.set(Calendar.HOUR_OF_DAY, 0);
+            c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.SECOND, 0);
+            c.set(Calendar.MILLISECOND, 0);
+            long passed = now - c.getTimeInMillis();
+            double hoursPassed = (double)passed / (double)(1000*60*60);
+            return hoursPassed;
+        }
+
+        private Calendar startOfHour(Calendar cal){
+            Calendar c = (Calendar) cal.clone();
+            c.set(Calendar.MILLISECOND, 0);
+            c.set(Calendar.SECOND, 0);
+            if(c.get(Calendar.MINUTE) < 30){
+                c.set(Calendar.MINUTE, 0);
+            } else {
+                c.set(Calendar.MINUTE, 30);
+            }
+            return c;
+        }
+
+        private Calendar nextHalfHourTime(Calendar cal){
+            Calendar c = (Calendar) cal.clone();
+            c.set(Calendar.MILLISECOND, 0);
+            c.set(Calendar.SECOND, 0);
+            if(c.get(Calendar.MINUTE) < 30){
+                c.set(Calendar.MINUTE, 30);
+            } else {
+                c.set(Calendar.MINUTE, 0);
+                c.set(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY)+1);
+            }
+            return c;
         }
 
         private void deleteUserRecords(){
@@ -338,12 +373,19 @@ public class HomeActivity extends AppCompatActivity
             mmPostureManager.closeDB();
         }
 
-        private  void addRecord() {
+        private void addRecord() {
             mmPostureManager.openDB();
             DecimalFormat df = new DecimalFormat("#.00");
             float value = Float.parseFloat(df.format((float)(-(Math.random() * (5 - 3) + 3))));
             mmPostureManager.insert(value);
             mmPostureManager.closeDB();
+        }
+
+        private void populateSQLite(){
+            if(!mmPostureManager.isDBopen()) {
+                mmPostureManager.fakeIt();
+                updateGraph();
+            }
         }
 
         public void startObserving(){

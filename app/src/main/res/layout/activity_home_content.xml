@@ -25,8 +25,14 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:weightSum="2">
+                    android:weightSum="3">
 
+                    <Button
+                        android:id="@+id/fake_data_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fake Data"
+                        android:layout_weight="1"/>
                     <Button
                         android:id="@+id/add_point"
                         android:layout_width="match_parent"
