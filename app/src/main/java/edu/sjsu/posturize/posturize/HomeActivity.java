@@ -2,6 +2,8 @@ package edu.sjsu.posturize.posturize;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
@@ -26,9 +28,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
+import com.google.common.collect.ImmutableMap;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
@@ -64,10 +68,10 @@ public class HomeActivity extends AppCompatActivity
         SideNavDrawer.create(this); //Add SideNavDrawer to activity
 
         gm = new GraphManager(this);
-
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        navigation.setSelectedItemId(R.id.navigation_daily);
+        //TODO: Remove?
+        //BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        //navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        //navigation.setSelectedItemId(R.id.navigation_daily);
     }
 
     @Override
@@ -83,6 +87,7 @@ public class HomeActivity extends AppCompatActivity
         gm.stopObserving();
     }
 
+    //TODO: Remove?
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -112,6 +117,7 @@ public class HomeActivity extends AppCompatActivity
         }
     };
 
+    //TODO: Remove?
     //FIXME: JAVADOCS
     /**
      *
@@ -150,6 +156,7 @@ public class HomeActivity extends AppCompatActivity
         });
     }
 
+    //TODO: Remove? We only have Daily view for now.
     /**
      * This callback method, call DatePickerFragment class,
      * DatePickerFragment class returns calendar view.
@@ -160,6 +167,7 @@ public class HomeActivity extends AppCompatActivity
         fragment.show(getSupportFragmentManager(), "date");
     }
 
+    //TODO: Remove? We only have Daily view for now.
     /**
      * To set date on TextView
      * @param calendar
@@ -172,6 +180,7 @@ public class HomeActivity extends AppCompatActivity
 
     }
 
+    //TODO: Remove?
     /**
      * To receive a callback when the user sets the date.
      * @param view
@@ -215,12 +224,19 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    //TODO: Add JAVADOCS
     public static class GraphManager implements Observer{
 
         private PostureManager mmPostureManager;
         private ArrayList<DataPoint> mmDatapoints;
         private Activity mmActivity;
         private GraphView mmGraphView;
+
+        private static final Map<Integer, String> lableFormatter = ImmutableMap.<Integer, String>builder()
+                .put(0, "12\nAM").put(1, "1").put(2, "2").put(3, "3").put(4, "4").put(5, "5").put(6, "6").put(7, "7")
+                .put(8, "8").put(9, "9").put(10, "10").put(11, "11").put(12, "12\nPM").put(13, "1").put(14, "2").put(15, "3")
+                .put(16, "4").put(17, "5").put(18, "6").put(19, "7").put(20, "8").put(21, "9").put(22, "10").put(23, "11")
+                .build();
 
         GraphManager(Activity activity){
             mmActivity = activity;
@@ -258,15 +274,11 @@ public class HomeActivity extends AppCompatActivity
             mmGraphView.getViewport().setXAxisBoundsManual(true);
             mmGraphView.getViewport().setYAxisBoundsManual(true);
 
-            // Disable scaling and scrolling
-            mmGraphView.getViewport().setScalable(false);
-            mmGraphView.getViewport().setScrollable(false);
-
             //Set Y min and max
             mmGraphView.getViewport().setMinY(-10); //percent off
             mmGraphView.getViewport().setMaxY(1);   //on track
             //Set X min and max
-            viewportX(0,10); //Just some default values to construct
+            viewportX(0,1000); //Just some default values to construct
         }
 
         private void viewportX(double min, double max){
@@ -278,57 +290,51 @@ public class HomeActivity extends AppCompatActivity
             if(!mmPostureManager.isDBopen()) {
                 mmPostureManager.openDB();
                 mmDatapoints = mmPostureManager.get(Calendar.getInstance());
-                Log.d("GraphManager", "updateGraph:\n" + mmDatapoints.toString());
                 mmPostureManager.closeDB();
             } else {
                 mmDatapoints = mmPostureManager.get(Calendar.getInstance());
             }
 
             if(!mmDatapoints.isEmpty()) {
-                Calendar c = new GregorianCalendar();
-                c.setTime(new Date((long) mmDatapoints.get(0).getX()));
-                modifyData(c, mmDatapoints);
+                modifyGraphData(mmDatapoints);
             }
         }
 
-        public void modifyData(Calendar start, ArrayList<DataPoint> points){
+        private void modifyGraphData(ArrayList<DataPoint> points){
             mmGraphView.removeAllSeries();
 
             PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>();
-            double time;
-            Calendar c = new GregorianCalendar();
+            Calendar c = Calendar.getInstance();
             for(DataPoint dp : points){
                 c.setTime(new Date((long) dp.getX()));
-                time = timeInHours(c);
-                series.appendData(new DataPoint(time, dp.getY()), false, 80000);
+                Log.d("modifyGarphData", "Time: " + c.getTime());
+                series.appendData(new DataPoint(timeInHours(c), dp.getY()), false, 80000);
             }
-            viewportX(timeInHours(startOfHour(start)), timeInHours(nextHalfHourTime(Calendar.getInstance())));
-            mmGraphView.getGridLabelRenderer().setNumHorizontalLabels(5);
+
+            series.setColor(Color.BLUE);
+            c.setTime(new Date((long) points.get(0).getX())); //use Calendar c as start time.
+            setHorizontalLabels(c , Calendar.getInstance());
             mmGraphView.addSeries(series);
-        }
 
-        private long timeInSeconds(Calendar cal){
-            Calendar c = (Calendar) cal.clone();
-            long now = c.getTimeInMillis();
-            c.set(Calendar.HOUR_OF_DAY, 0);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 0);
-            c.set(Calendar.MILLISECOND, 0);
-            long passed = now - c.getTimeInMillis();
-            long secondsPassed = (int)passed / 1000;
-            return secondsPassed;
-        }
+            series.setOnDataPointTapListener(new OnDataPointTapListener() {
+                @Override
+                public void onTap(Series series, DataPointInterface dataPoint) {
+                    double minute = dataPoint.getX() % 1;
+                    double hour = dataPoint.getX() - minute;
+                    minute = 60 * minute;
 
-        private long timeInMinutes(Calendar cal){
-            Calendar c = (Calendar) cal.clone();
-            long now = c.getTimeInMillis();
-            c.set(Calendar.HOUR_OF_DAY, 0);
-            c.set(Calendar.MINUTE, 0);
-            c.set(Calendar.SECOND, 0);
-            c.set(Calendar.MILLISECOND, 0);
-            long passed = now - c.getTimeInMillis();
-            long minutesPassed = (int)passed / (1000*60);
-            return minutesPassed;
+                    String ampm;
+                    if(hour > 12){
+                        hour -= 12;
+                        ampm = "PM";
+                    } else {
+                        ampm = "AM";
+                    }
+                    String time = (int) hour + ":" + String.format("%02d",(int) minute) + ampm;
+
+                    Toast.makeText(mmActivity.getApplicationContext(), "DataPoint info: " + time, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         private double timeInHours(Calendar c){
@@ -342,31 +348,72 @@ public class HomeActivity extends AppCompatActivity
             return hoursPassed;
         }
 
-        private Calendar startOfHour(Calendar cal){
+        /**
+         * Resets the calendar to the beginning of the hour current hour, or to the beginning of the next hour
+         * @param cal Calendar to reset the time
+         * @param nextHour True if set to next hour, false if set to current hour
+         * @return new Calendar of time reset to current or next hour.
+         */
+        private Calendar setHour(Calendar cal, boolean nextHour){
             Calendar c = (Calendar) cal.clone();
             c.set(Calendar.MILLISECOND, 0);
             c.set(Calendar.SECOND, 0);
-            if(c.get(Calendar.MINUTE) < 30){
-                c.set(Calendar.MINUTE, 0);
-            } else {
-                c.set(Calendar.MINUTE, 30);
-            }
-            return c;
-        }
-
-        private Calendar nextHalfHourTime(Calendar cal){
-            Calendar c = (Calendar) cal.clone();
-            c.set(Calendar.MILLISECOND, 0);
-            c.set(Calendar.SECOND, 0);
-            if(c.get(Calendar.MINUTE) < 30){
-                c.set(Calendar.MINUTE, 30);
-            } else {
-                c.set(Calendar.MINUTE, 0);
+            c.set(Calendar.MINUTE, 0);
+            if(nextHour){
                 c.set(Calendar.HOUR_OF_DAY, c.get(Calendar.HOUR_OF_DAY)+1);
             }
             return c;
         }
 
+        private void setHorizontalLabels(Calendar start, Calendar end){
+            double min = timeInHours(setHour(start, false));
+            double max = timeInHours(setHour(Calendar.getInstance(), true));
+
+            if(min%2 != 0){
+                min -= 1;
+                start.set(Calendar.HOUR_OF_DAY, start.get(Calendar.HOUR_OF_DAY) - 1);
+            }
+            if(max%2 != 0 && max != 23){
+                max += 1;
+                end.set(Calendar.HOUR_OF_DAY, end.get(Calendar.HOUR_OF_DAY) + 1);
+            }
+
+            viewportX(min, max);
+
+            int startTime = (int) timeInHours(setHour(start, false));
+            int endTime = (int) timeInHours(setHour(end, true));
+            int numOfHorLabels = (endTime - startTime + 1);
+
+            mmGraphView.getGridLabelRenderer().setNumHorizontalLabels(numOfHorLabels+1);
+
+            int hourStep = 1;
+            if(numOfHorLabels > 6){ //If used longer than 6 hours, use 2 hour steps
+                hourStep = 2;
+                numOfHorLabels /= 2;
+            }
+
+
+            ArrayList<String> timeFrame = new ArrayList<>();
+            for(int i = startTime; i <= endTime; i+=hourStep){
+                if(i == startTime && !lableFormatter.get(i).contains("M")){
+                    String firstLabel = lableFormatter.get(i);
+                    firstLabel = (i<12) ? firstLabel.concat("AM") : firstLabel.concat("PM");
+                    timeFrame.add(firstLabel);
+                } else {
+                    timeFrame.add(lableFormatter.get(i));
+                }
+                Log.d("labelFormatter", "i: " + i + " label: " + lableFormatter.get(i) + " size:" + timeFrame.size());
+            }
+
+            StaticLabelsFormatter slf = new StaticLabelsFormatter(mmGraphView);
+            slf.setHorizontalLabels(timeFrame.toArray(new String[numOfHorLabels]));
+            mmGraphView.getGridLabelRenderer().setLabelFormatter(slf);
+            mmGraphView.getGridLabelRenderer().setTextSize(40f);
+            mmGraphView.getGridLabelRenderer().reloadStyles();
+        }
+
+        /*******************************/
+        /********onClick methods********/
         private void deleteUserRecords(){
             mmPostureManager.openDB();
             mmPostureManager.delete(GoogleAccountInfo.getInstance().getId());
@@ -384,16 +431,20 @@ public class HomeActivity extends AppCompatActivity
         private void populateSQLite(){
             if(!mmPostureManager.isDBopen()) {
                 mmPostureManager.fakeIt();
-                updateGraph();
+                //updateGraph();
             }
         }
+        /********onClick methods********/
+        /*******************************/
 
-        public void startObserving(){
+        /********************************/
+        /********Observer Methods********/
+        private void startObserving(){
             mmPostureManager.addObserver(this);
             Log.d("GraphManager", "Observing PostureManager");
         }
 
-        public void stopObserving(){
+        private void stopObserving(){
             mmPostureManager.deleteObserver(this);
             Log.d("GraphManager", "Stopped observing PostureManager");
         }
@@ -403,5 +454,7 @@ public class HomeActivity extends AppCompatActivity
             Log.d("GraphManager", "Notified");
             updateGraph();
         }
+        /********Observer Methods********/
+        /********************************/
     }
 }
