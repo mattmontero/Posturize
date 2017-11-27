@@ -9,10 +9,8 @@ import com.jjoe64.graphview.series.DataPoint;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Observable;
 
-import edu.sjsu.posturize.posturize.HomeActivity;
 import edu.sjsu.posturize.posturize.predefined.Predefined;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
@@ -58,10 +56,8 @@ public class PostureManager extends Observable{
     public long insert(float value){
         //Log.d("ADDING MILLIS", "current millis: " + Calendar.getInstance().getTimeInMillis());
         long row = db.insertRow(GoogleAccountInfo.getInstance().getId(), GoogleAccountInfo.getInstance().getEmail(), Calendar.getInstance().getTimeInMillis(), value);
-        Log.d("PostureManager", "Insert: " + row);
         setChanged();
         notifyObservers(row);
-        Log.d("PostureManager", "Observers notified: " + countObservers());
 
         return row;
     }
@@ -75,11 +71,9 @@ public class PostureManager extends Observable{
         for (DataPoint dp : Predefined.SQLiteEntries) {
             c.setTime(new Date((long)(dp.getX())));
             float value = (float)dp.getY();
-            long id = db.insertRow(GoogleAccountInfo.getInstance().getId(),
+            db.insertRow(GoogleAccountInfo.getInstance().getId(),
                     GoogleAccountInfo.getInstance().getEmail(),
                     c.getTimeInMillis(),value);
-            Log.d("FakeIt", "insert: time : " + c.getTimeInMillis());
-            Log.d("FakeIt", "insert: value: " + value);
         }
         setChanged();
         notifyObservers();
@@ -95,7 +89,7 @@ public class PostureManager extends Observable{
         if (db.deleteUser(userId)) {
             Log.d("PostureManager", "User: " + GoogleAccountInfo.getInstance().getEmail() + " deleted");
         } else {
-            Log.d("PostureManager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + "was NOT deleted");
+            Log.d("PostureManager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + " was NOT deleted");
         }
     }
 
