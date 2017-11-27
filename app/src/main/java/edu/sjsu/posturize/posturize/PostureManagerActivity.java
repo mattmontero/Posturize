@@ -16,7 +16,6 @@ import com.jjoe64.graphview.series.DataPoint;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.logging.SimpleFormatter;
 
 public class PostureManagerActivity extends AppCompatActivity
         implements View.OnClickListener{
