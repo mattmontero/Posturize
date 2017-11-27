@@ -162,7 +162,6 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if(GoogleAccountInfo.getInstance().signingOut){
-            Log.d("onConnected", "signingOut.");
             googleSignOut();
         }
     }
@@ -260,7 +259,6 @@ public class SignInActivity extends AppCompatActivity implements
             btConnection.setBluetoothAdapter(BluetoothAdapter.getDefaultAdapter());
 
             startActivity(new Intent(this, HomeActivity.class));
-
         } else {
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.remember_me).setVisibility(View.VISIBLE);
