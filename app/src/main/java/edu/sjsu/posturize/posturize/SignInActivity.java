@@ -59,6 +59,8 @@ public class SignInActivity extends AppCompatActivity implements
 
         if(sharedPreferences.getBoolean("REMEMBER_ME", false)) {
             silentSignIn();
+        } else {
+            updateUI(false);
         }
     }
 
@@ -250,13 +252,13 @@ public class SignInActivity extends AppCompatActivity implements
      * @param signedIn state of user account
      */
     private void updateUI(boolean signedIn){
+        findViewById(R.id.google_sign_in_button).setVisibility(View.INVISIBLE);
+        findViewById(R.id.remember_me).setVisibility(View.INVISIBLE);
         if(signedIn) {
             BluetoothConnection btConnection = BluetoothConnection.getInstance();
             btConnection.setBluetoothAdapter(BluetoothAdapter.getDefaultAdapter());
 
             startActivity(new Intent(this, HomeActivity.class));
-            findViewById(R.id.google_sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.remember_me).setVisibility(View.GONE);
         } else {
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.remember_me).setVisibility(View.VISIBLE);

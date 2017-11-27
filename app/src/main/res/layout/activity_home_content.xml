@@ -14,11 +14,41 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.27">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="3">
+
+                    <Button
+                        android:id="@+id/fake_data_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Fake Data"
+                        android:layout_weight="1"/>
+                    <Button
+                        android:id="@+id/add_point"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Add"
+                        android:backgroundTintMode="@android:color/transparent"
+                        android:layout_weight="1"/>
+                    <Button
+                        android:id="@+id/delete_points"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:backgroundTint="#FF0000"
+                        android:textSize="12sp"
+                        android:text="Remove User Data"
+                        android:layout_weight="1"/>
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/picDate"
@@ -35,8 +65,9 @@
                 <com.jjoe64.graphview.GraphView
                     android:id="@+id/graph"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp" />
+                    android:layout_height="400dp"/>
 
+                <!--
                 <android.support.design.widget.BottomNavigationView
                     android:id="@+id/navigation"
                     android:layout_width="match_parent"
@@ -45,6 +76,8 @@
                     android:layout_marginTop="20dp"
                     android:background="?android:attr/windowBackground"
                     app:menu="@menu/bottom_nav_menu" />
-        </LinearLayout>
+                    -->
+            </LinearLayout>
+        </ScrollView>
     </FrameLayout>
 </LinearLayout>

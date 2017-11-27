@@ -11,6 +11,10 @@ import android.view.View;
 
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+import com.jjoe64.graphview.series.DataPoint;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class PostureManagerActivity extends AppCompatActivity
@@ -58,7 +62,7 @@ public class PostureManagerActivity extends AppCompatActivity
 
     private void displayRecords(){
         tempPm.openDB();
-        ((TextView) findViewById(R.id.textDisplay)).setText(tempPm.get(Calendar.getInstance()).toString());
+        ((TextView) findViewById(R.id.textDisplay)).setText(formatQuery(tempPm.get(Calendar.getInstance())));
         tempPm.closeDB();
     }
 
@@ -71,8 +75,23 @@ public class PostureManagerActivity extends AppCompatActivity
 
     private  void addRecord() {
         tempPm.openDB();
-        tempPm.insert((float)(Math.random() * (70 - 65) + 65));
-        ((TextView) findViewById(R.id.textDisplay)).setText(tempPm.get(Calendar.getInstance()).toString());
+        DecimalFormat df = new DecimalFormat("#.00");
+        float value = Float.parseFloat(df.format((float)(Math.random() * (5 - 3) + 3)));
+        tempPm.insert(value);
+        ((TextView) findViewById(R.id.textDisplay)).setText(formatQuery(tempPm.get(Calendar.getInstance())));
         tempPm.closeDB();
+    }
+
+    private String formatQuery(ArrayList<DataPoint> dps){
+        String data = "[";
+        for(int i = 0; i < dps.size(); i++){
+            data = data.concat("[" + (long)(dps.get(i).getX()) + ", " + dps.get(i).getY() + "]");
+            if(i < dps.size()-1){
+                data = data.concat(", ");
+            }
+        }
+        data = data.concat("]");
+        Log.d("FormatQuery", data);
+        return data;
     }
 }
