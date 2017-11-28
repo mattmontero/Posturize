@@ -38,7 +38,10 @@ public class PostureManager extends Observable{
     }
 
     public boolean isDBopen(){
-        return db.isOpen();
+        if(db != null) {
+            return db.isOpen();
+        }
+        return false;
     }
 
     /**
@@ -110,7 +113,10 @@ public class PostureManager extends Observable{
 
     public DataPoint getRow(long row){
         Cursor c = db.getRow(row);
-        return new DataPoint((double) c.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), (double) PosturizeDBContract.PostureEntry.COL_VALUE);
+        if(c != null) {
+            return new DataPoint((double) c.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), (double) PosturizeDBContract.PostureEntry.COL_VALUE);
+        }
+        return null;
     }
 
     /**
@@ -142,5 +148,9 @@ public class PostureManager extends Observable{
         }
         cursor.close();
         return values;
+    }
+
+    public void empty() {
+        db.deleteAll();
     }
 }
