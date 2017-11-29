@@ -23,6 +23,7 @@ import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by matthewmontero on 8/6/17.
+ * Help from https://developer.android.com/guide/topics/connectivity/bluetooth.html
  */
 
 public class BluetoothConnection {

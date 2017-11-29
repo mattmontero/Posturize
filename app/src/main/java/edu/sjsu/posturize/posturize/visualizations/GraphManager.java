@@ -84,6 +84,10 @@ public class GraphManager implements Observer {
         constructGraph();
     }
 
+    /**
+     * Creates graph.
+     * Sets X and Y axis
+     */
     private void constructGraph(){
         mmGraphView = (GraphView) mView.findViewById(R.id.graphView);
 
@@ -100,16 +104,25 @@ public class GraphManager implements Observer {
         hide();
     }
 
+    /**
+     * Sets graph visibility to GONE
+     */
     public void hide(){
         mmGraphView.setVisibility(View.GONE);
     }
 
+    /**
+     * Sets graph visibility to VISIBLE
+     */
     public void show(){
         mmGraphView.setVisibility(View.VISIBLE);
-        setOnClickListeners();
+        setInteractionListeners();
     }
 
-    public void setOnClickListeners(){
+    /**
+     * Sets gesture recognition for graph
+     */
+    public void setInteractionListeners(){
         final GestureDetector sgd = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e){
@@ -136,12 +149,20 @@ public class GraphManager implements Observer {
         });
     }
 
+    /**
+     * Sets the new x axis max and min
+     * @param min
+     * @param max
+     */
     private void viewportX(double min, double max){
         mmGraphView.getViewport().setMinX(min);
         mmGraphView.getViewport().setMaxX(max);
     }
 
-    public void updateGraph(){
+    /**
+     * Updates graph DataPoints
+     */
+    public void updateDataPoints(){
         if(!mmPostureManager.isDBopen()) {
             mmPostureManager.openDB();
             mmDatapoints = mmPostureManager.get(Calendar.getInstance());
@@ -158,6 +179,10 @@ public class GraphManager implements Observer {
         }
     }
 
+    /**
+     * Modifies the data series in the graph and redraws
+     * @param points new set of datapoints
+     */
     private void modifyGraphData(ArrayList<DataPoint> points){
         mmGraphView.removeAllSeries();
 
@@ -309,7 +334,7 @@ public class GraphManager implements Observer {
     @Override
     public void update(Observable observable, Object o) {
         Log.d("GraphManager", "Notified");
-        updateGraph();
+        updateDataPoints();
     }
     /********Observer Methods********/
     /********************************/
