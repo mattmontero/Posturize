@@ -23,6 +23,18 @@ public class GraphFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        gm.startObserving();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        gm.stopObserving();
+    }
+
     public static GraphFragment newInstance() {
         GraphFragment fragment = new GraphFragment();
         Bundle args = new Bundle();

@@ -1,6 +1,5 @@
 package edu.sjsu.posturize.posturize.visualizations;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
@@ -34,39 +33,15 @@ import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by Matt on 11/28/2017.
+ * GraphManager handles interaction and modification of the GraphView.
  */
 
 public class GraphManager implements Observer {
-    private PostureManager mmPostureManager;
-    private ArrayList<DataPoint> mmDatapoints;
+    private PostureManager mPostureManager;
+    private ArrayList<DataPoint> mDataPoints;
     private View mView;
-    private GraphView mmGraphView;
+    private GraphView mGraphView;
     private Context context;
-
-    private View.OnLongClickListener onLongClickListener = new View.OnLongClickListener(){
-        @Override
-        public boolean onLongClick(View view) {
-            if (view.getId() == R.id.graphView){
-                populateSQLite();
-                return true;
-            }
-            return  false;
-        }
-    };
-
-    private View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()){
-                case R.id.add_point:
-                    addRecord();
-                    break;
-                case R.id.delete_points:
-                    deleteUserRecords();
-                    break;
-            }
-        }
-    };
 
     private static final Map<Integer, String> lableFormatter = ImmutableMap.<Integer, String>builder()
             .put(0, "12\nAM").put(1, "1").put(2, "2").put(3, "3").put(4, "4").put(5, "5").put(6, "6").put(7, "7")
@@ -76,31 +51,21 @@ public class GraphManager implements Observer {
 
     public GraphManager(View activity){
         mView = activity;
-        mmPostureManager = BluetoothConnection.getInstance().getPostureManager();
-        mmPostureManager.openDB();
-        mmDatapoints = mmPostureManager.get(Calendar.getInstance());
-        mmPostureManager.closeDB();
+        mPostureManager = BluetoothConnection.getInstance().getPostureManager();
+        mDataPoints = new ArrayList<>();
         context = SignInActivity.getAppContext();
-        constructGraph();
-    }
-
-    /**
-     * Creates graph.
-     * Sets X and Y axis
-     */
-    private void constructGraph(){
-        mmGraphView = (GraphView) mView.findViewById(R.id.graphView);
+        mGraphView = (GraphView) mView.findViewById(R.id.graphView);
 
         //Manual Bounds
-        mmGraphView.getViewport().setXAxisBoundsManual(true);
-        mmGraphView.getViewport().setYAxisBoundsManual(true);
+        mGraphView.getViewport().setXAxisBoundsManual(true);
+        mGraphView.getViewport().setYAxisBoundsManual(true);
 
         //Set Y min and max
-        mmGraphView.getViewport().setMinY(-40); //percent off
-        mmGraphView.getViewport().setMaxY(1);   //on track
-        //Set X min and max
-        viewportX(0,1000); //Just some default values to construct
-        startObserving();
+        mGraphView.getViewport().setMinY(-40); //percent off
+        mGraphView.getViewport().setMaxY(1);   //on track
+
+        setInteractionListeners();
+        updateDataPoints();
         hide();
     }
 
@@ -108,15 +73,14 @@ public class GraphManager implements Observer {
      * Sets graph visibility to GONE
      */
     public void hide(){
-        mmGraphView.setVisibility(View.GONE);
+        mGraphView.setVisibility(View.GONE);
     }
 
     /**
      * Sets graph visibility to VISIBLE
      */
     public void show(){
-        mmGraphView.setVisibility(View.VISIBLE);
-        setInteractionListeners();
+        mGraphView.setVisibility(View.VISIBLE);
     }
 
     /**
@@ -129,10 +93,12 @@ public class GraphManager implements Observer {
                 addRecord();
                 return true;
             }
+
             @Override
             public void onLongPress(MotionEvent e){
                 populateSQLite();
             }
+
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
                 deleteUserRecords();
@@ -150,32 +116,42 @@ public class GraphManager implements Observer {
     }
 
     /**
-     * Sets the new x axis max and min
+     * Sets the new max and min for x axis
      * @param min
      * @param max
      */
     private void viewportX(double min, double max){
-        mmGraphView.getViewport().setMinX(min);
-        mmGraphView.getViewport().setMaxX(max);
+        mGraphView.getViewport().setMinX(min);
+        mGraphView.getViewport().setMaxX(max);
+    }
+
+    /**
+     * Sets the new min and max for y axis
+     * @param min
+     * @param max
+     */
+    private void viewportY(double min, double max){
+        mGraphView.getViewport().setMinY(min);
+        mGraphView.getViewport().setMaxY(max);
     }
 
     /**
      * Updates graph DataPoints
      */
     public void updateDataPoints(){
-        if(!mmPostureManager.isDBopen()) {
-            mmPostureManager.openDB();
-            mmDatapoints = mmPostureManager.get(Calendar.getInstance());
-            mmPostureManager.closeDB();
+        if(!mPostureManager.isDBopen()) {
+            mPostureManager.openDB();
+            mDataPoints = mPostureManager.get(Calendar.getInstance());
+            mPostureManager.closeDB();
         } else {
-            mmDatapoints = mmPostureManager.get(Calendar.getInstance());
+            mDataPoints = mPostureManager.get(Calendar.getInstance());
         }
 
-        if(!mmDatapoints.isEmpty()) {
-            modifyGraphData(mmDatapoints);
+        if(!mDataPoints.isEmpty()) {
+            modifyGraphData(mDataPoints);
         } else {
-            mmGraphView.removeAllSeries();
-            mmGraphView.getGridLabelRenderer().reloadStyles();
+            mGraphView.removeAllSeries();
+            mGraphView.getGridLabelRenderer().reloadStyles();
         }
     }
 
@@ -184,11 +160,15 @@ public class GraphManager implements Observer {
      * @param points new set of datapoints
      */
     private void modifyGraphData(ArrayList<DataPoint> points){
-        mmGraphView.removeAllSeries();
+        mGraphView.removeAllSeries();
 
         PointsGraphSeries<DataPoint> series = new PointsGraphSeries<>();
         Calendar c = Calendar.getInstance();
+        double minY = -10.0;
         for(DataPoint dp : points){
+            if (dp.getY() < minY){
+                minY = dp.getY()+1;
+            }
             c.setTime(new Date((long) dp.getX()));
             Log.d("modifyGarphData", "Time: " + c.getTime());
             series.appendData(new DataPoint(timeInHours(c), dp.getY()), false, 80000);
@@ -197,7 +177,8 @@ public class GraphManager implements Observer {
         series.setColor(Color.BLUE);
         c.setTime(new Date((long) points.get(0).getX())); //use Calendar c as start time.
         setHorizontalLabels(c , Calendar.getInstance());
-        mmGraphView.addSeries(series);
+        viewportY(minY, 1);
+        mGraphView.addSeries(series);
 
         series.setOnDataPointTapListener(new OnDataPointTapListener() {
             @Override
@@ -267,7 +248,7 @@ public class GraphManager implements Observer {
         int endTime = (int) timeInHours(setHour(end, true));
         int numOfHorLabels = (endTime - startTime + 1);
 
-        mmGraphView.getGridLabelRenderer().setNumHorizontalLabels(numOfHorLabels+1);
+        mGraphView.getGridLabelRenderer().setNumHorizontalLabels(numOfHorLabels+1);
 
         int hourStep = 1;
         if(numOfHorLabels > 6){ //If used longer than 6 hours, use 2 hour steps
@@ -288,46 +269,46 @@ public class GraphManager implements Observer {
             Log.d("labelFormatter", "i: " + i + " label: " + lableFormatter.get(i) + " size:" + timeFrame.size());
         }
 
-        StaticLabelsFormatter slf = new StaticLabelsFormatter(mmGraphView);
+        StaticLabelsFormatter slf = new StaticLabelsFormatter(mGraphView);
         slf.setHorizontalLabels(timeFrame.toArray(new String[numOfHorLabels]));
-        mmGraphView.getGridLabelRenderer().setLabelFormatter(slf);
-        mmGraphView.getGridLabelRenderer().setTextSize(40f);
-        mmGraphView.getGridLabelRenderer().reloadStyles();
+        mGraphView.getGridLabelRenderer().setLabelFormatter(slf);
+        mGraphView.getGridLabelRenderer().setTextSize(40f);
+        mGraphView.getGridLabelRenderer().reloadStyles();
     }
 
     /*******************************/
-    /********onClick methods********/
+    /********onTouch methods********/
     private void deleteUserRecords(){
-        mmPostureManager.openDB();
-        mmPostureManager.delete(GoogleAccountInfo.getInstance().getId());
-        mmPostureManager.closeDB();
+        mPostureManager.openDB();
+        mPostureManager.delete(GoogleAccountInfo.getInstance().getId());
+        mPostureManager.closeDB();
     }
 
     private void addRecord() {
-        mmPostureManager.openDB();
+        mPostureManager.openDB();
         DecimalFormat df = new DecimalFormat("#.00");
         float value = Float.parseFloat(df.format((float)(-(Math.random() * (5 - 3) + 3))));
-        mmPostureManager.insert(value);
-        mmPostureManager.closeDB();
+        mPostureManager.insert(value);
+        mPostureManager.closeDB();
     }
 
     private void populateSQLite(){
-        if(!mmPostureManager.isDBopen()) {
-            mmPostureManager.fakeIt();
+        if(!mPostureManager.isDBopen()) {
+            mPostureManager.fakeIt();
         }
     }
-    /********onClick methods********/
+    /********onTouch methods********/
     /*******************************/
 
     /********************************/
     /********Observer Methods********/
     public void startObserving(){
-        mmPostureManager.addObserver(this);
+        mPostureManager.addObserver(this);
         Log.d("GraphManager", "Observing PostureManager");
     }
 
     public void stopObserving(){
-        mmPostureManager.deleteObserver(this);
+        mPostureManager.deleteObserver(this);
         Log.d("GraphManager", "Stopped observing PostureManager");
     }
 
