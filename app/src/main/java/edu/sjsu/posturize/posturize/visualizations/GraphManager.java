@@ -167,10 +167,9 @@ public class GraphManager implements Observer {
         double minY = -10.0;
         for(DataPoint dp : points){
             if (dp.getY() < minY){
-                minY = dp.getY()+1;
+                minY = dp.getY()-5;
             }
             c.setTime(new Date((long) dp.getX()));
-            Log.d("modifyGarphData", "Time: " + c.getTime());
             series.appendData(new DataPoint(timeInHours(c), dp.getY()), false, 80000);
         }
 
@@ -266,7 +265,6 @@ public class GraphManager implements Observer {
             } else {
                 timeFrame.add(lableFormatter.get(i));
             }
-            Log.d("labelFormatter", "i: " + i + " label: " + lableFormatter.get(i) + " size:" + timeFrame.size());
         }
 
         StaticLabelsFormatter slf = new StaticLabelsFormatter(mGraphView);
@@ -304,12 +302,12 @@ public class GraphManager implements Observer {
     /********Observer Methods********/
     public void startObserving(){
         mPostureManager.addObserver(this);
-        Log.d("GraphManager", "Observing PostureManager");
+        //Log.d("GraphManager", "Observing PostureManager");
     }
 
     public void stopObserving(){
         mPostureManager.deleteObserver(this);
-        Log.d("GraphManager", "Stopped observing PostureManager");
+        //Log.d("GraphManager", "Stopped observing PostureManager");
     }
 
     @Override
