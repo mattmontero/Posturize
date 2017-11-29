@@ -9,6 +9,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import edu.sjsu.posturize.posturize.PostureManagerActivity;
@@ -46,6 +48,13 @@ public class SideNavDrawer
         NavigationView navigationView = (NavigationView) (activity.findViewById(R.id.nav_view));
         navigationView.setNavigationItemSelectedListener(sideNavDrawer);
         navigationView.setItemBackgroundResource(R.drawable.item_background);
+        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
+
+        //Set header
+        ((TextView) headerLayout.findViewById(R.id.side_nav_email)).setText(GoogleAccountInfo.getInstance().getEmail());
+        ((TextView) headerLayout.findViewById(R.id.side_nav_username))
+                .setText(GoogleAccountInfo.getInstance().getFirstName() + " " + GoogleAccountInfo.getInstance().getLastName());
+        ((ImageView) headerLayout.findViewById(R.id.imageView)).setImageResource(R.mipmap.app_icon);
     }
 
     @Override
