@@ -8,13 +8,18 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <Button
+        android:id="@+id/forceAnalysis"
+        android:layout_width="300dp"
+        android:layout_height="75dp"
+        android:text="Click Me!" />
     <ImageView
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:background="@mipmap/spine"/>
     <TextView
+        android:id="@+id/analysisText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Some analysis shenanigans\ngoes here."/>
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
