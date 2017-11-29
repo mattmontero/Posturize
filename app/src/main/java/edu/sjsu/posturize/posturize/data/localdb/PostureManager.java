@@ -94,6 +94,9 @@ public class PostureManager extends Observable{
         } else {
             Log.d("PostureManager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + " was NOT deleted");
         }
+
+        setChanged();
+        notifyObservers();
     }
 
     public ArrayList<String> getAllUser(){

@@ -258,7 +258,7 @@ public class SignInActivity extends AppCompatActivity implements
             BluetoothConnection btConnection = BluetoothConnection.getInstance();
             btConnection.setBluetoothAdapter(BluetoothAdapter.getDefaultAdapter());
 
-            startActivity(new Intent(this, HomeActivity.class));
+            startActivity(new Intent(this, MainContentActivity.class));
         } else {
             findViewById(R.id.google_sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.remember_me).setVisibility(View.VISIBLE);
