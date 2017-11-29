@@ -110,25 +110,25 @@ void DW1000RangingClass::generalStart(){
     
     if(DEBUG){
         // DEBUG monitoring
-        Serial.println("DW1000-arduino");
+        //Serial.println("DW1000-arduino");
         // initialize the driver
         
         
-        Serial.println("configuration..");
+        //Serial.println("configuration..");
         // DEBUG chip info and registers pretty printed
         char msg[90];
         DW1000.getPrintableDeviceIdentifier(msg);
-        Serial.print("Device ID: "); Serial.println(msg);
+        //Serial.print("Device ID: "); Serial.println(msg);
         DW1000.getPrintableExtendedUniqueIdentifier(msg);
-        Serial.print("Unique ID: "); Serial.print(msg);
+        //Serial.print("Unique ID: "); Serial.print(msg);
         char string[6];
         sprintf(string, "%02X:%02X", _currentShortAddress[0], _currentShortAddress[1]);
-        Serial.print(" short: ");Serial.println(string);
+        //Serial.print(" short: ");Serial.println(string);
         
         DW1000.getPrintableNetworkIdAndShortAddress(msg);
-        Serial.print("Network ID & Device Address: "); Serial.println(msg);
+        //Serial.print("Network ID & Device Address: "); Serial.println(msg);
         DW1000.getPrintableDeviceMode(msg);
-        Serial.print("Device mode: "); Serial.println(msg);
+        //Serial.print("Device mode: "); Serial.println(msg);
     }
     
     
@@ -144,8 +144,8 @@ void DW1000RangingClass::startAsAnchor(char address[],  const byte mode[]){
     DW1000.convertToByte(address, _currentAddress);
     //write the address on the DW1000 chip
     DW1000.setEUI(address);
-    Serial.print("device address: ");
-    Serial.println(address);
+    //Serial.print("device address: ");
+    //Serial.println(address);
     //we need to define a random short address:
     randomSeed(analogRead(0));
     //_currentShortAddress[0]=random(0,256);
@@ -163,7 +163,7 @@ void DW1000RangingClass::startAsAnchor(char address[],  const byte mode[]){
     //defined type as anchor
     _type=ANCHOR;
     
-    Serial.println("### ANCHOR ###");
+    //Serial.println("### ANCHOR ###");
     
 }
 
@@ -172,8 +172,8 @@ void DW1000RangingClass::startAsTag(char address[],  const byte mode[]){
     DW1000.convertToByte(address, _currentAddress);
     //write the address on the DW1000 chip
     DW1000.setEUI(address);
-    Serial.print("device address: ");
-    Serial.println(address);
+    //Serial.print("device address: ");
+    //Serial.println(address);
     //we need to define a random short address:
     randomSeed(analogRead(0));
     _currentShortAddress[0]=address[0];
@@ -189,7 +189,7 @@ void DW1000RangingClass::startAsTag(char address[],  const byte mode[]){
     //defined type as anchor
     _type=TAG;
     
-    Serial.println("### TAG ###");
+    //Serial.println("### TAG ###");
 }
 
 boolean DW1000RangingClass::addNetworkDevices(DW1000Device *device, boolean shortAddress)
@@ -329,8 +329,8 @@ void DW1000RangingClass::checkForReset(){
 void DW1000RangingClass::checkForInactiveDevices(){
     for(int i=0; i<_networkDevicesNumber; i++){
         if(_networkDevices[i].isInactive()){
-            Serial.print("delete inactive device: ");
-            Serial.println(_networkDevices[i].getShortAddress(), HEX);
+            //Serial.print("delete inactive device: ");
+            //Serial.println(_networkDevices[i].getShortAddress(), HEX);
             //we need to delete the device from the array:
             removeNetworkDevices(i);
             
@@ -448,9 +448,9 @@ void DW1000RangingClass::loop(){
             
             if(addNetworkDevices(&myTag))
             {
-                Serial.print("blink; 1 device added ! -> "); 
-                Serial.print(" short:");
-                Serial.println(myTag.getShortAddress(), HEX);
+                //Serial.print("blink; 1 device added ! -> "); 
+                //Serial.print(" short:");
+                //Serial.println(myTag.getShortAddress(), HEX);
                 
                 //we relpy by the transmit ranging init message
                 transmitRangingInit(&myTag);
@@ -467,9 +467,9 @@ void DW1000RangingClass::loop(){
             
             if(addNetworkDevices(&myAnchor, true))
             {
-                Serial.print("ranging init; 1 device added ! -> ");
-                Serial.print(" short:");
-                Serial.println(myAnchor.getShortAddress(), HEX);
+                //Serial.print("ranging init; 1 device added ! -> ");
+                //Serial.print(" short:");
+                //Serial.println(myAnchor.getShortAddress(), HEX);
             }
         
             noteActivity();
@@ -490,7 +490,7 @@ void DW1000RangingClass::loop(){
             
             if(myDistantDevice==NULL)
             {
-                Serial.println("Not found");
+                //Serial.println("Not found");
                 //we don't have the short address of the device in memory
                 /*
                 Serial.print("unknown: ");
