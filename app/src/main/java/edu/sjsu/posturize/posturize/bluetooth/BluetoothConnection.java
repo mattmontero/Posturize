@@ -251,7 +251,7 @@ public class BluetoothConnection {
                 if(mmInStream != null) {
                     try {
                         bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
-                        for (int i = begin; i < bytes; i++) {
+                        /*for (int i = begin; i < bytes; i++) {
                             if (buffer[i] == "#".getBytes()[0]) {
                                 Log.d("Found #", mHandler.toString());
                                 mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
@@ -262,7 +262,27 @@ public class BluetoothConnection {
                                     begin = 0;
                                 }
                             }
+                        }*/
+                        for (int i = 0; i < bytes; i++) {
+                            if (buffer[i] == "#".getBytes()[0]) {
+                                Log.d("Found #", mHandler.toString());
+                                mHandler.obtainMessage(1, 0, i, buffer).sendToTarget();
+                                Log.d("Message obtained", mHandler.toString());
+
+                                //create new buffer/remove processed message
+                                byte[] newBuffer = new byte[1024];
+                                for(int a = i+1; a < bytes; a++){
+                                    newBuffer[a-i-1] = buffer[a];
+                                }
+                                buffer = newBuffer;
+                                bytes -= i;
+                               /* if (i == bytes - 1) {
+                                    bytes = 0;
+                                    begin = 0;
+                                }*/
+                            }
                         }
+
                     } catch (IOException e) {
                         if(!isKilling){ //Connection dropped
                             Log.d("ConnectedThread run()", e.toString());

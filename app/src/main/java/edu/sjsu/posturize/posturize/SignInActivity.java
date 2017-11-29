@@ -224,7 +224,7 @@ public class SignInActivity extends AppCompatActivity implements
                     // one-off job
                     .setRecurring(false)
                     // start between 0 and 60 seconds from now
-                    .setTrigger(Trigger.executionWindow(0,(curTimeMilis/86400000+1) * 86400000 - curTimeMilis))
+                    .setTrigger(Trigger.executionWindow((curTimeMilis/86400000+1) * 86400000 - curTimeMilis,(curTimeMilis/86400000+1) * 86400000 - curTimeMilis))
                     //.setTrigger(Trigger.executionWindow(60, 60))
                     // don't overwrite an existing job with the same the
                     .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)

@@ -275,7 +275,7 @@ public class HomeActivity extends AppCompatActivity
             mmGraphView.getViewport().setYAxisBoundsManual(true);
 
             //Set Y min and max
-            mmGraphView.getViewport().setMinY(-10); //percent off
+            mmGraphView.getViewport().setMinY(-40); //percent off
             mmGraphView.getViewport().setMaxY(1);   //on track
             //Set X min and max
             viewportX(0,1000); //Just some default values to construct
