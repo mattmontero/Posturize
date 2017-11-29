@@ -48,6 +48,7 @@ void showDeviceInfo() {
   static int isCalibrating = false;
   static float threshold = 0.06;
   static float calibrationAry[CALIBRATION_SIZE];
+  static float slouchAvg[CON_SEC_SLOUCH_NUM];
   static int calibrationCounter = 0;
   static int bluetoothCalibration = false;
 
@@ -91,6 +92,9 @@ void checkForBTData(char inData){
     break;
   case 'c':
     Serial.print("c#");
+    if(isCalibrated){
+      Serial.print("*#");
+    }
   default:
     break;
   }
@@ -190,7 +194,7 @@ void newRange() {
         if((calibratedValue - calibratedDev*2 > currentSum)){
         //if((currentDev < 2.5*calibratedDev)&&(calibratedValue - calibratedDev*3 > currentSum)){
             if(lastPollSlouch){
-              conSecSlouch++;
+              slouchAvg[conSecSlouch++] = currentSum;
             }else{
               conSecSlouch=0;
             }
@@ -205,7 +209,10 @@ void newRange() {
               delay(400);
               digitalWrite(RELAY_PIN, LOW);
               conSecSlouch=0;
-              Serial.print((currentSum - calibratedValue)/calibratedValue*100, 3);Serial.print(",#");
+              currentSum = 0;
+              for(int i = 0; i < CON_SEC_SLOUCH_NUM; i++)
+                currentSum += slouchAvg[i];
+              Serial.print((currentSum/CON_SEC_SLOUCH_NUM - calibratedValue)/calibratedValue*100, 3);Serial.print(",#");
             }
             //Serial.print("...SLOUCH DETECTED.... ");
             
