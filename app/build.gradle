@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
@@ -36,7 +37,10 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.jjoe64:graphview:4.2.1'
     compile 'com.firebase:firebase-jobdispatcher:0.8.4'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-all:1.10.19'
+    testCompile 'org.robolectric:robolectric:3.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

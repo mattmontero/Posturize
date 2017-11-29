@@ -9,6 +9,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import edu.sjsu.posturize.posturize.PostureManagerActivity;
 import edu.sjsu.posturize.posturize.PreferencesActivity;
@@ -42,10 +43,8 @@ public class SideNavDrawer
         Log.d("Toggle", toggle.toString());
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) (activity.findViewById(R.id.nav_view));
         navigationView.setNavigationItemSelectedListener(sideNavDrawer);
-
         navigationView.setItemBackgroundResource(R.drawable.item_background);
     }
 

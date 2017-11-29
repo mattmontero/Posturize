@@ -23,6 +23,7 @@ import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by matthewmontero on 8/6/17.
+ * Help from https://developer.android.com/guide/topics/connectivity/bluetooth.html
  */
 
 public class BluetoothConnection {
@@ -265,9 +266,8 @@ public class BluetoothConnection {
                         }*/
                         for (int i = 0; i < bytes; i++) {
                             if (buffer[i] == "#".getBytes()[0]) {
-                                Log.d("Found #", mHandler.toString());
+                                //Log.d("Found #", mHandler.toString());
                                 mHandler.obtainMessage(1, 0, i, buffer).sendToTarget();
-                                Log.d("Message obtained", mHandler.toString());
 
                                 //create new buffer/remove processed message
                                 byte[] newBuffer = new byte[1024];
@@ -310,7 +310,7 @@ public class BluetoothConnection {
             byte[] writeBuf = (byte[]) msg.obj;
             int begin = (int) msg.arg1;
             int end = (int) msg.arg2;
-            Log.d(HANDLER_TAG, msg.toString());
+            //Log.d(HANDLER_TAG, msg.toString());
             switch(msg.what){
                 case 1:
                     String writeMessage = new String(writeBuf);
@@ -321,12 +321,12 @@ public class BluetoothConnection {
                         kill();
                         Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
                     } else {
-                        Log.d(HANDLER_TAG, writeMessage);
+                        //Log.d(HANDLER_TAG, writeMessage);
                         lastChar = writeMessage.substring(writeMessage.length()-1);
-                        Log.d(HANDLER_TAG, "lastChar: " + lastChar);
+                        //Log.d(HANDLER_TAG, "lastChar: " + lastChar);
                         switch (lastChar){
                             case ",":
-                                Log.d(HANDLER_TAG, ", = " + lastChar);
+                                //Log.d(HANDLER_TAG, ", = " + lastChar);
                                 float[] values = parseMessage(writeMessage);
                                 mPostureManager.openDB();
                                 //long time = Calendar.getInstance().getTimeInMillis() - values.length*ARDUINO_COLLECTION_INTERVAL;
@@ -335,17 +335,12 @@ public class BluetoothConnection {
                                     //time += ARDUINO_COLLECTION_INTERVAL;
                                 }
                                 mPostureManager.closeDB();
-                                Log.d(HANDLER_TAG, "Values received: " + Arrays.toString(values));
                                 break;
                             case "*": //calibrate
-                                Log.d(HANDLER_TAG, "* =  " + lastChar);
                                 WearableState.getInstance().setIsCalibrated(true);
-                                //mCalibrateSideNavModal.updateUI();
                                 break;
                             case "c": //connect
-                                Log.d(HANDLER_TAG, "c =  " + lastChar);
                                 WearableState.getInstance().setIsConnected(true);
-                                //mBluetoothSideNavModal.updateUI();
                                 break;
                         }
                     }
