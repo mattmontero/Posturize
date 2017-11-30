@@ -23,6 +23,7 @@ import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by matthewmontero on 8/6/17.
+ * BluetoothConnection manages the communication between the wearable and phone.
  */
 
 public class BluetoothConnection {
@@ -49,22 +50,33 @@ public class BluetoothConnection {
         return singleBluetoothConnection;
     }
 
+    /**
+     * @return PostureManager instance
+     */
     public PostureManager getPostureManager(){
         return mPostureManager;
     }
 
+    /**
+     * @param btAdapter sets mBluetoothAdapter
+     */
     public void setBluetoothAdapter(BluetoothAdapter btAdapter){
         mBluetoothAdapter = btAdapter;
     }
 
+    /**
+     * @return BluetoothAdapter instance
+     */
     public BluetoothAdapter getBluetoothAdapter(){
         return mBluetoothAdapter;
     }
 
-    public boolean isConnected(){
-        return mConnectThread != null;
-    }
-
+    /**
+     * Attemps to connect to bluetooth device, HC-06
+     * Device should already be paired.
+     * @return true if connection is successful
+     *         false if connection fails
+     */
     public boolean connect(){
         //3. Get the Bluetooth module device
         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
@@ -96,6 +108,10 @@ public class BluetoothConnection {
         return true;
     }
 
+    /**
+     * Disconnects bluetooth
+     * Interrupts ConnectThread and ConnectedThread
+     */
     public void kill() {
         isKilling = true;
         mConnectThread.interrupt();
@@ -126,6 +142,10 @@ public class BluetoothConnection {
         }
     };
 
+    /**
+     * Takes a string and writes to wearable
+     * @param valueToWrite
+     */
     public void write(String valueToWrite){
         //Send * to arduino
         Log.d("sending message", valueToWrite);
@@ -141,6 +161,9 @@ public class BluetoothConnection {
         }
     }
 
+    /**
+     * ConnectThread creates establishes the connection
+     */
     private class ConnectThread extends Thread {
         private BluetoothSocket mmSocket;
         private final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
@@ -200,6 +223,9 @@ public class BluetoothConnection {
         }
     }
 
+    /**
+     * ConnectedThread reads and write from the in and out stream.
+     */
     private class ConnectedThread extends Thread{
         private BluetoothSocket mmSocket;
         private InputStream mmInStream;
@@ -251,23 +277,9 @@ public class BluetoothConnection {
                 if(mmInStream != null) {
                     try {
                         bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
-                        /*for (int i = begin; i < bytes; i++) {
-                            if (buffer[i] == "#".getBytes()[0]) {
-                                Log.d("Found #", mHandler.toString());
-                                mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
-                                Log.d("Message obtained", mHandler.toString());
-                                begin++;
-                                if (i == bytes - 1) {
-                                    bytes = 0;
-                                    begin = 0;
-                                }
-                            }
-                        }*/
                         for (int i = 0; i < bytes; i++) {
                             if (buffer[i] == "#".getBytes()[0]) {
-                                Log.d("Found #", mHandler.toString());
                                 mHandler.obtainMessage(1, 0, i, buffer).sendToTarget();
-                                Log.d("Message obtained", mHandler.toString());
 
                                 //create new buffer/remove processed message
                                 byte[] newBuffer = new byte[1024];
@@ -276,10 +288,6 @@ public class BluetoothConnection {
                                 }
                                 buffer = newBuffer;
                                 bytes -= i;
-                               /* if (i == bytes - 1) {
-                                    bytes = 0;
-                                    begin = 0;
-                                }*/
                             }
                         }
 
@@ -302,6 +310,9 @@ public class BluetoothConnection {
         }
     }
 
+    /**
+     * Handles the incoming message.
+     */
     private Handler mHandler = new Handler() {
         String HANDLER_TAG = "Message Received";
         final int ARDUINO_COLLECTION_INTERVAL = 1000;
@@ -310,7 +321,7 @@ public class BluetoothConnection {
             byte[] writeBuf = (byte[]) msg.obj;
             int begin = (int) msg.arg1;
             int end = (int) msg.arg2;
-            Log.d(HANDLER_TAG, msg.toString());
+            //Log.d(HANDLER_TAG, msg.toString());
             switch(msg.what){
                 case 1:
                     String writeMessage = new String(writeBuf);
@@ -321,12 +332,12 @@ public class BluetoothConnection {
                         kill();
                         Log.d("BLUETOOTH CONNECTION", "ERROR: No user found, disconnecting...");
                     } else {
-                        Log.d(HANDLER_TAG, writeMessage);
+                        //Log.d(HANDLER_TAG, writeMessage);
                         lastChar = writeMessage.substring(writeMessage.length()-1);
-                        Log.d(HANDLER_TAG, "lastChar: " + lastChar);
+                        //Log.d(HANDLER_TAG, "lastChar: " + lastChar);
                         switch (lastChar){
                             case ",":
-                                Log.d(HANDLER_TAG, ", = " + lastChar);
+                                //Log.d(HANDLER_TAG, ", = " + lastChar);
                                 float[] values = parseMessage(writeMessage);
                                 mPostureManager.openDB();
                                 //long time = Calendar.getInstance().getTimeInMillis() - values.length*ARDUINO_COLLECTION_INTERVAL;
@@ -335,17 +346,12 @@ public class BluetoothConnection {
                                     //time += ARDUINO_COLLECTION_INTERVAL;
                                 }
                                 mPostureManager.closeDB();
-                                Log.d(HANDLER_TAG, "Values received: " + Arrays.toString(values));
                                 break;
                             case "*": //calibrate
-                                Log.d(HANDLER_TAG, "* =  " + lastChar);
                                 WearableState.getInstance().setIsCalibrated(true);
-                                //mCalibrateSideNavModal.updateUI();
                                 break;
                             case "c": //connect
-                                Log.d(HANDLER_TAG, "c =  " + lastChar);
                                 WearableState.getInstance().setIsConnected(true);
-                                //mBluetoothSideNavModal.updateUI();
                                 break;
                         }
                     }
@@ -354,6 +360,11 @@ public class BluetoothConnection {
         }
     };
 
+    /**
+     * Used to parse messaged into array of floats
+     * @param message incoming message
+     * @return float[] of values received from wearables
+     */
     private float[] parseMessage(String message){
         String[] strValues;
         if(message.endsWith(",")){
@@ -372,6 +383,11 @@ public class BluetoothConnection {
         return null;
     }
 
+    /**
+     * Verifies a string is numeric
+     * @param str to be checked
+     * @return true if str is numeric, false otherwise
+     */
     private boolean isNumeric(String str){
         try{
             float value = Float.parseFloat(str);

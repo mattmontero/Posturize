@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.sjsu.posturize.posturize.fragments.AnalysisFragment;
 import edu.sjsu.posturize.posturize.notifications.reminder.DailyUpdateActivity;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
@@ -93,8 +94,10 @@ public class FirebaseHelper {
                                             @Nullable FirebaseFirestoreException e) {
                             if (snapshot != null && snapshot.exists()) {
                                 ArrayList<String> analysisList = (ArrayList<String>) snapshot.getData().get("daily");
-                                if(analysisList != null && !analysisList.isEmpty())
+                                if(analysisList != null && !analysisList.isEmpty()) {
                                     DailyUpdateActivity.setAnalysis(analysisList.get(0));
+                                    AnalysisFragment.setAnalysis(analysisList);
+                                }
                                 else
                                     DailyUpdateActivity.setAnalysis("NO ANALYSIS FOUND");
                             }

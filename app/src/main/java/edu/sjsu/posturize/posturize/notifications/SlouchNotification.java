@@ -9,11 +9,12 @@ import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
-import edu.sjsu.posturize.posturize.HomeActivity;
+import edu.sjsu.posturize.posturize.MainContentActivity;
 import edu.sjsu.posturize.posturize.R;
 
 /**
  * Created by Matt on 10/29/2017.
+ * SlouchNotification sends a push notification to the app
  */
 public class SlouchNotification extends ContextWrapper {
     private NotificationManager mNotificationManager;
@@ -34,12 +35,12 @@ public class SlouchNotification extends ContextWrapper {
                 .setContentText(text);
 
         //Creates an explicit intent for an activity in your app
-        Intent resultIntent = new Intent(context, HomeActivity.class);
+        Intent resultIntent = new Intent(context, MainContentActivity.class);
         //The stack builder object will contain an artificial back stack for the started Activity
         //This ensures that navigating backward from the Activity leads out of your app to the Home screen.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         //Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(HomeActivity.class);
+        stackBuilder.addParentStack(MainContentActivity.class);
         //Adds the Intent that starts the Activity to the top of the stack
         stackBuilder.addNextIntent(resultIntent);
         PendingIntent resultPendingIntent =

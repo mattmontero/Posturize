@@ -9,6 +9,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import edu.sjsu.posturize.posturize.AboutUsActivity;
 import edu.sjsu.posturize.posturize.instructions.InstructionsActivity;
@@ -21,6 +24,7 @@ import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by Matt on 11/18/2017.
+ * Side Navigation Drawer contains all the sideNav Modals
  */
 
 public class SideNavDrawer
@@ -44,20 +48,26 @@ public class SideNavDrawer
         Log.d("Toggle", toggle.toString());
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) (activity.findViewById(R.id.nav_view));
         navigationView.setNavigationItemSelectedListener(sideNavDrawer);
-
         navigationView.setItemBackgroundResource(R.drawable.item_background);
+        View headerLayout = navigationView.inflateHeaderView(R.layout.nav_header_main);
+
+        //Set header
+        ((TextView) headerLayout.findViewById(R.id.side_nav_email)).setText(GoogleAccountInfo.getInstance().getEmail());
+        ((TextView) headerLayout.findViewById(R.id.side_nav_username))
+                .setText(GoogleAccountInfo.getInstance().getFirstName() + " " + GoogleAccountInfo.getInstance().getLastName());
+        ((ImageView) headerLayout.findViewById(R.id.imageView)).setImageResource(R.mipmap.app_icon);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_settings_button) { //TODO: Remove after testing
+        /*if (id == R.id.nav_settings_button) {
             activity.startActivity((new Intent(activity, PostureManagerActivity.class)));
-        } else if (id == R.id.nav_preferences_button_button) {
+        } else */
+        if (id == R.id.nav_preferences_button_button) {
             activity.startActivity((new Intent(activity, PreferencesActivity.class)));
         } else if (id == R.id.nav_calibration_button) {
             CalibrateSideNavModal.newInstance().show(activity.getFragmentManager(), "CalibrationModal");

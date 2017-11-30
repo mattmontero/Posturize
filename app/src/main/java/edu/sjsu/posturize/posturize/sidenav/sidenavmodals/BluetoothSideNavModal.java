@@ -22,6 +22,7 @@ import edu.sjsu.posturize.posturize.bluetooth.WearableState;
 
 /**
  * Created by Matt on 11/17/2017.
+ * Modal for side nav
  */
 
 public class BluetoothSideNavModal extends DialogFragment
@@ -92,6 +93,10 @@ public class BluetoothSideNavModal extends DialogFragment
         super.dismiss();
     }
 
+    /**
+     * Sets button text
+     * @param dialog
+     */
     private void setUI(Dialog dialog){
         mConnectButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
         mCancelButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
@@ -105,6 +110,9 @@ public class BluetoothSideNavModal extends DialogFragment
         }
     }
 
+    /**
+     * Tells mBluetoothConnection to connect or kill the wearable connection
+     */
     private void connectButtonPressed() {
         if(WearableState.getInstance().isConnected()){
             mBluetoothConnection.kill();
@@ -116,6 +124,13 @@ public class BluetoothSideNavModal extends DialogFragment
         }
     }
 
+    /**
+     * Verifies if
+     *  1. Bluetooth is supported
+     *  2. Bluetooth is enabled
+     * Then attempst to connect
+     * @return
+     */
     private boolean connectBLE(){
         final String BLUETOOTH = "Bluetooth_Setup";
         //1. Check if device has bluetooth.

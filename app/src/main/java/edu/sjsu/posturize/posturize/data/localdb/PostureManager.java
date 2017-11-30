@@ -38,7 +38,10 @@ public class PostureManager extends Observable{
     }
 
     public boolean isDBopen(){
-        return db.isOpen();
+        if(db != null) {
+            return db.isOpen();
+        }
+        return false;
     }
 
     /**
@@ -91,8 +94,14 @@ public class PostureManager extends Observable{
         } else {
             Log.d("PostureManager", "Something happened and " + GoogleAccountInfo.getInstance().getEmail() + " was NOT deleted");
         }
+
+        setChanged();
+        notifyObservers();
     }
 
+    /**
+     * @return ArrayList<String> of user ID's in SQLite database
+     */
     public ArrayList<String> getAllUser(){
         ArrayList<String> values = new ArrayList<>();
         Cursor cursor = db.getUniqueUserId();
@@ -108,9 +117,16 @@ public class PostureManager extends Observable{
         return values;
     }
 
+    /**
+     * @param row row ID to query
+     * @return DataPoint of row, row
+     */
     public DataPoint getRow(long row){
         Cursor c = db.getRow(row);
-        return new DataPoint((double) c.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), (double) PosturizeDBContract.PostureEntry.COL_VALUE);
+        if(c != null) {
+            return new DataPoint((double) c.getLong(PosturizeDBContract.PostureEntry.COL_DATETIME), (double) PosturizeDBContract.PostureEntry.COL_VALUE);
+        }
+        return null;
     }
 
     /**
@@ -125,10 +141,11 @@ public class PostureManager extends Observable{
         return construct(db.getDay(id, day));
     }
 
-    public ArrayList<DataPoint> get(Calendar start, Calendar end){
-        return construct(db.getDays(start, end));
-    }
-
+    /**
+     * Constructs an ArrayList<DataPoint> from the query
+     * @param cursor the cursor from a query
+     * @return ArrayList<DataPoint>
+     */
     private ArrayList<DataPoint> construct(Cursor cursor){
         ArrayList<DataPoint> values = new ArrayList<>();
         if(cursor.moveToFirst()) {
@@ -142,5 +159,12 @@ public class PostureManager extends Observable{
         }
         cursor.close();
         return values;
+    }
+
+    /**
+     * Empties the SQLite table
+     */
+    public void empty() {
+        db.deleteAll();
     }
 }

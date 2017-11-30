@@ -25,6 +25,10 @@ public class GoogleAccountInfo {
         return singleton;
     }
 
+    public void setMock(String id, String un){
+        this.id = id;
+        this.email = un;
+    }
 
     /**
      *

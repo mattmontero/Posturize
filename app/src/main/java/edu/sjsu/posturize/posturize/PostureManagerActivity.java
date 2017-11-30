@@ -76,7 +76,7 @@ public class PostureManagerActivity extends AppCompatActivity
     private  void addRecord() {
         tempPm.openDB();
         DecimalFormat df = new DecimalFormat("#.00");
-        float value = Float.parseFloat(df.format((float)(Math.random() * (5 - 3) + 3)));
+        float value = Float.parseFloat(df.format((float)-(Math.random() * (5 - 3) + 3)));
         tempPm.insert(value);
         ((TextView) findViewById(R.id.textDisplay)).setText(formatQuery(tempPm.get(Calendar.getInstance())));
         tempPm.closeDB();
