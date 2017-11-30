@@ -53,7 +53,9 @@ public class AnalysisFragment extends Fragment implements View.OnClickListener {
 
         this.syncButton = (Button) rootView.findViewById(R.id.forceAnalysis);
         this.analysis = (TextView) rootView.findViewById(R.id.analysisText);
-        this.analysis.setText(dailyAnalysis.get(0));
+        if(dailyAnalysis != null && !dailyAnalysis.isEmpty()) {
+            this.analysis.setText(dailyAnalysis.get(0));
+        }
         this.syncButton.setOnClickListener(this);
 
         return rootView;
