@@ -6,25 +6,27 @@
     <!--TODO: Update item images-->
 
     <group android:checkableBehavior="single">
+        <!--
         <item
             android:id="@+id/nav_settings_button"
             android:icon="@drawable/googleg_disabled_color_18"
             android:title="Posture Manager" />
+         -->
         <item
             android:id="@+id/nav_bluetooth_button"
-            android:icon="@drawable/ic_dashboard_black_24dp"
+            android:icon="@android:drawable/stat_sys_data_bluetooth"
             android:title="Bluetooth" />
         <item
             android:id="@+id/nav_calibration_button"
-            android:icon="@drawable/common_full_open_on_phone"
+            android:icon="@mipmap/calibrate"
             android:title="Calibration" />
         <item
             android:id="@+id/nav_preferences_button_button"
-            android:icon="@drawable/common_google_signin_btn_icon_light_focused"
+            android:icon="@android:drawable/ic_menu_preferences"
             android:title="Preferences" />
         <item
             android:id="@+id/nav_sign_out_button"
-            android:icon="@drawable/ic_home_black_24dp"
+            android:icon="@android:drawable/ic_input_delete"
             android:title="Sign Out" />
     </group>
 </menu>

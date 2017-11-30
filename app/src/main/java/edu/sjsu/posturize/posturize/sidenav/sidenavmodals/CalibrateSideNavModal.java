@@ -99,11 +99,18 @@ public class CalibrateSideNavModal extends DialogFragment
         super.dismiss();
     }
 
+    /**
+     * Writes keyword "*" to wearables to initiate calibration
+     */
     private void calibrate(){
         mCalibrationStatusTextView.setText("Calibrating...");
         BluetoothConnection.getInstance().write("*");
     }
 
+    /**
+     * Sets UI button and text
+     * @param dialog
+     */
     private void setUI(Dialog dialog){
         mCalibrateButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
         mCancelButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);

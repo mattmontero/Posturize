@@ -9,6 +9,7 @@ import java.util.Observer;
 
 /**
  * Created by Matt on 11/18/2017.
+ * Singleton to track the state of the wearables
  */
 
 public class WearableState extends Observable{
@@ -22,6 +23,9 @@ public class WearableState extends Observable{
     private static String isConnected;
     private static String isCalibrated;
 
+    /**
+     * Initial values set to disconnected
+     */
     private WearableState(){
         isConnected = DISCONNECTED;
         isCalibrated = NOT_CALIBRATED;

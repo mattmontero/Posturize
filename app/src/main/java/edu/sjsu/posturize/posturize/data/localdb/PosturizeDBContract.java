@@ -164,10 +164,21 @@ public final class PosturizeDBContract {
         return c;
     }
 
+    /**
+     * Queries for a given Day
+     * @param day day to query
+     * @return Query for all rows for given day
+     */
     public Cursor getDay(Calendar day){
         return this.getDay(GoogleAccountInfo.getInstance().getId(), day);
     }
 
+    /**
+     * Queries for a User on a given Day
+     * @param id user Id
+     * @param day day to query
+     * @return Query for all rows for given day
+     */
     public Cursor getDay(String id, Calendar day){
         long[] startEnd = dayStartAndEndInMillis(day);
         Log.d(TAG, "Start: " + startEnd[0]);

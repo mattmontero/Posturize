@@ -14,6 +14,7 @@ import edu.sjsu.posturize.posturize.R;
 
 /**
  * Created by Matt on 10/29/2017.
+ * SlouchNotification sends a push notification to the app
  */
 public class SlouchNotification extends ContextWrapper {
     private NotificationManager mNotificationManager;
