@@ -44,7 +44,6 @@ import static android.R.attr.id;
 public class AnalysisFragment extends Fragment implements View.OnClickListener {
 
     private static ArrayList<String> dailyAnalysis;
-    private static StringBuilder result;
     private Button syncButton;
     private TextView analysis;
 
@@ -54,7 +53,7 @@ public class AnalysisFragment extends Fragment implements View.OnClickListener {
 
         this.syncButton = (Button) rootView.findViewById(R.id.forceAnalysis);
         this.analysis = (TextView) rootView.findViewById(R.id.analysisText);
-        this.analysis.setText(this.result.toString());
+        this.analysis.setText(dailyAnalysis.get(0));
         this.syncButton.setOnClickListener(this);
 
         return rootView;
@@ -110,8 +109,6 @@ public class AnalysisFragment extends Fragment implements View.OnClickListener {
 
     public static void setAnalysis(ArrayList<String> list){
         dailyAnalysis = list;
-        result = new StringBuilder();
-        result.append(list.get(0));
     }
 
     public static String POST(String url){
