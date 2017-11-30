@@ -19,6 +19,8 @@
         android:theme="@style/AppTheme.NoActionBar">
         <activity android:name=".PostureManagerActivity" />
         <activity android:name=".HomeActivity" />
+        <activity android:name=".AboutUsActivity" />
+        <activity android:name=".instructions.InstructionsActivity" />
         <activity
             android:name=".SignInActivity"
             android:label="@string/app_name">

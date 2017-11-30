@@ -10,6 +10,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import edu.sjsu.posturize.posturize.AboutUsActivity;
+import edu.sjsu.posturize.posturize.instructions.InstructionsActivity;
 import edu.sjsu.posturize.posturize.PostureManagerActivity;
 import edu.sjsu.posturize.posturize.PreferencesActivity;
 import edu.sjsu.posturize.posturize.R;
@@ -64,7 +66,21 @@ public class SideNavDrawer
         } else if (id == R.id.nav_sign_out_button) {
             GoogleAccountInfo.getInstance().signOut();
             activity.finish();
+        } else if (id == R.id.nav_about_us) {
+            activity.startActivity((new Intent(activity, AboutUsActivity.class)));
+        } else if (id == R.id.nav_instructions) {
+            activity.startActivity((new Intent(activity, InstructionsActivity.class)));
         }
+
+
+//        <item
+//        android:id="@+id/nav_about_us"
+//        android:icon="@drawable/ic_home_black_24dp"
+//        android:title="Sign Out" />
+//        <item
+//        android:id="@+id/nav_instructions"
+//        android:icon="@drawable/ic_home_black_24dp"
+//        android:title="Sign Out" />
 
         DrawerLayout drawer = (DrawerLayout) (activity.findViewById(R.id.drawer_layout));
         drawer.closeDrawer(GravityCompat.START);

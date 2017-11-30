@@ -64,5 +64,19 @@
         <item>15%</item>
     </string-array>
 
+    <!-- about us bio -->
+    <string name="about_us_bio">Posturize is a posture correcting application created by three San Jose State University students: Mark Bragg, Jonathan Chen, and Matthew Montero. We thought of this idea after years of sitting in front of our computers writing code. We know firsthand how easy it is to end up with bad posture, and we decided that it is time to develop an easy-to-use solution that can be used in any situation. With the two wearables both attached to the proper places on the body, Posturize can be used to monitor your posture no matter the activity the user is performing.</string>
+
+    <!-- instruction slides text -->
+    <string-array name="instructions">
+        <item>The following instructions will provide a logical path to take in order for you to begin using Posturize.</item>
+        <item>First, you need to connect the wearables to the phone. Open the sidebar navigation, and tap the bluetooth button.</item>
+        <item>Now you can tap the connect button, and wait for the dialog to tell you they are connected.</item>
+        <item>Once you have connected your wearables and your phone, you need to calibrate your wearables. Open the sidebar navigation and tap the calibrate button, then tap the calibrate button in the popup. The wearables will vibrate twice to let you know the calibration process has begun.</item>
+        <item>Optionally, you can tap the button on the wearables to calibrate.</item>
+        <item>While the calibration takes place, which can take 1-2 minutes to complete. Sit in your ideal position in your best posture until the wearables vibrate once.</item>
+        <item>Now that your wearables are calibrated, data collection has commenced and you will be notified when you slouch.</item>
+    </string-array>
+
 </resources>
 
