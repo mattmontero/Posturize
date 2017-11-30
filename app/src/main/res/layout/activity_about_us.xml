@@ -6,11 +6,9 @@
               android:background="@drawable/background">
 
     <TextView
-        android:id="@+id/text_view_posturize_bio"
+        android:id="@+id/about_us_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textColor="#000000"
         android:text="@string/about_us_bio"
         />
 
