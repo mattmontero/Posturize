@@ -92,9 +92,6 @@ void checkForBTData(char inData){
     break;
   case 'c':
     Serial.print("c#");
-    if(isCalibrated){
-      Serial.print("*#");
-    }
   default:
     break;
   }
