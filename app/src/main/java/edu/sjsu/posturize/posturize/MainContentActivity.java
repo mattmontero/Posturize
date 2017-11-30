@@ -16,6 +16,10 @@ import edu.sjsu.posturize.posturize.fragments.GraphFragment;
 import edu.sjsu.posturize.posturize.sidenav.SideNavDrawer;
 import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
+/**
+ * FragmentActivity for Analysis and Graph
+ */
+
 public class MainContentActivity extends FragmentActivity {
     //Number of pages to show
     private static final int NUM_PAGES = 2;
@@ -55,7 +59,6 @@ public class MainContentActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position){
-            Log.d("PagerAdapter", "Position: " + position);
             switch (position){
                 case 0:
                     return AnalysisFragment.newInstance();

@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import edu.sjsu.posturize.posturize.R;
 import edu.sjsu.posturize.posturize.visualizations.GraphManager;
 
+/**
+ * Fragment for the Daily Analysis
+ */
+
 public class AnalysisFragment extends Fragment {
 
     @Override
