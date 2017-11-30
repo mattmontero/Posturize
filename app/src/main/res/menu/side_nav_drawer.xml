@@ -5,7 +5,8 @@
     <!--Group of Items for Side Nav View-->
     <!--TODO: Update item images-->
 
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="single"
+        android:id="@+id/app_stuff">
         <!--
         <item
             android:id="@+id/nav_settings_button"
@@ -24,18 +25,25 @@
             android:id="@+id/nav_preferences_button_button"
             android:icon="@android:drawable/ic_menu_preferences"
             android:title="Preferences" />
+    </group>
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/reading">
+        <item
+            android:id="@+id/nav_about_us"
+            android:icon="@android:drawable/ic_dialog_info"
+            android:title="About Us" />
+        <item
+            android:id="@+id/nav_instructions"
+            android:icon="@android:drawable/ic_menu_help"
+            android:title="Instructions" />
+    </group>
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/sign_out">
         <item
             android:id="@+id/nav_sign_out_button"
             android:icon="@android:drawable/ic_input_delete"
             android:title="Sign Out" />
-
-        <item
-            android:id="@+id/nav_about_us"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="About Us" />
-        <item
-            android:id="@+id/nav_instructions"
-            android:icon="@drawable/ic_home_black_24dp"
-            android:title="Instructions" />
     </group>
 </menu>
