@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import edu.sjsu.posturize.posturize.R;
 import edu.sjsu.posturize.posturize.visualizations.GraphManager;
 
+/**
+ * Fragment for the Graph View
+ */
+
 public class GraphFragment extends Fragment {
 
     static private GraphManager gm;

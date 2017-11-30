@@ -99,6 +99,9 @@ public class PostureManager extends Observable{
         notifyObservers();
     }
 
+    /**
+     * @return ArrayList<String> of user ID's in SQLite database
+     */
     public ArrayList<String> getAllUser(){
         ArrayList<String> values = new ArrayList<>();
         Cursor cursor = db.getUniqueUserId();
@@ -114,6 +117,10 @@ public class PostureManager extends Observable{
         return values;
     }
 
+    /**
+     * @param row row ID to query
+     * @return DataPoint of row, row
+     */
     public DataPoint getRow(long row){
         Cursor c = db.getRow(row);
         if(c != null) {
@@ -134,10 +141,11 @@ public class PostureManager extends Observable{
         return construct(db.getDay(id, day));
     }
 
-    public ArrayList<DataPoint> get(Calendar start, Calendar end){
-        return construct(db.getDays(start, end));
-    }
-
+    /**
+     * Constructs an ArrayList<DataPoint> from the query
+     * @param cursor the cursor from a query
+     * @return ArrayList<DataPoint>
+     */
     private ArrayList<DataPoint> construct(Cursor cursor){
         ArrayList<DataPoint> values = new ArrayList<>();
         if(cursor.moveToFirst()) {
@@ -153,6 +161,9 @@ public class PostureManager extends Observable{
         return values;
     }
 
+    /**
+     * Empties the SQLite table
+     */
     public void empty() {
         db.deleteAll();
     }

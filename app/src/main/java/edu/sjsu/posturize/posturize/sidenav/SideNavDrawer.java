@@ -22,6 +22,7 @@ import edu.sjsu.posturize.posturize.users.GoogleAccountInfo;
 
 /**
  * Created by Matt on 11/18/2017.
+ * Side Navigation Drawer contains all the sideNav Modals
  */
 
 public class SideNavDrawer
@@ -61,9 +62,10 @@ public class SideNavDrawer
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.nav_settings_button) { //TODO: Remove after testing
+        /*if (id == R.id.nav_settings_button) {
             activity.startActivity((new Intent(activity, PostureManagerActivity.class)));
-        } else if (id == R.id.nav_preferences_button_button) {
+        } else */
+        if (id == R.id.nav_preferences_button_button) {
             activity.startActivity((new Intent(activity, PreferencesActivity.class)));
         } else if (id == R.id.nav_calibration_button) {
             CalibrateSideNavModal.newInstance().show(activity.getFragmentManager(), "CalibrationModal");

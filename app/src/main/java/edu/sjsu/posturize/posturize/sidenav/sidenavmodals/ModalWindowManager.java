@@ -6,6 +6,7 @@ import android.view.WindowManager;
 
 /**
  * Created by Matt on 11/18/2017.
+ * Formats modal windows
  */
 
 public class ModalWindowManager {
